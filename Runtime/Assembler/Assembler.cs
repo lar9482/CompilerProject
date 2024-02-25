@@ -433,6 +433,8 @@ public class Assembler {
             case "sw": return (int) Opcode.sw; 
             case "interrupt": return (int) Opcode.interrupt; 
             case "label": return (int) Opcode.label; 
+            case "bLt": return (int) Opcode.bLt;
+            case "bGt": return (int) Opcode.bGt;
             default:
                 throw new Exception(String.Format("{0} is not a valid opcode", opcode));
         }
