@@ -34,5 +34,7 @@ public enum Opcode {
     sb = 30,
     sw = 31,
     interrupt = 32,
-    label = 33
+    label = 33,
+    bLt = 34,
+    bGt = 35,
 }

@@ -154,7 +154,7 @@ public class Tests {
     }
 
     [Test]
-    public void jumpLinkTest() {
+    public void JumpLinkTest() {
         string assemblyFilePath = "../../../TestFiles/jumpLink.asm";
         string binFilePath = "../../../TestFiles/Output/jumpLink.out";
 
@@ -177,6 +177,46 @@ public class Tests {
         Assert.AreEqual(expectedR10, registers[RegID.r10]);
         Assert.AreEqual(expectedR11, registers[RegID.r11]);
         Assert.AreEqual(expectedR12, registers[RegID.r12]);
+    }
+
+    [Test]
+    public void LoopLessThanTest() {
+        string assemblyFilePath = "../../../TestFiles/loopLessThan.asm";
+        string binFilePath = "../../../TestFiles/Output/loopLessthan.out";
+
+        assembler.assembleFile(assemblyFilePath, binFilePath);
+        machine.loadProgram(binFilePath);
+        machine.runProgram();
+
+        Dictionary<RegID, int> registers = machine.dumpRegisters();
+
+        int expectedR1 = 101;
+        int expectedR2 = 101;
+        int expectedR3 = 5050;
+
+        Assert.AreEqual(expectedR1, registers[RegID.r1]);
+        Assert.AreEqual(expectedR2, registers[RegID.r2]);
+        Assert.AreEqual(expectedR3, registers[RegID.r3]);
+    }
+
+    [Test]
+    public void LoopGreaterThanTest() {
+        string assemblyFilePath = "../../../TestFiles/loopGreaterThan.asm";
+        string binFilePath = "../../../TestFiles/Output/loopGreaterthan.out";
+
+        assembler.assembleFile(assemblyFilePath, binFilePath);
+        machine.loadProgram(binFilePath);
+        machine.runProgram();
+
+        Dictionary<RegID, int> registers = machine.dumpRegisters();
+
+        int expectedR1 = -1;
+        int expectedR2 = -1;
+        int expectedR3 = 5050;
+
+        Assert.AreEqual(expectedR1, registers[RegID.r1]);
+        Assert.AreEqual(expectedR2, registers[RegID.r2]);
+        Assert.AreEqual(expectedR3, registers[RegID.r3]);
     }
 }
 #pragma warning restore NUnit2005 // Consider using Assert.That(actual, Is.EqualTo(expected)) instead of Assert.AreEqual(expected, actual)

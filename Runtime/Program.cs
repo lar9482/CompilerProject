@@ -1,8 +1,8 @@
 ﻿using Compiler.Runtime;
 
 int startProgramAddress = 0;
-string assemblyFilePath = "./AssemblyTests/printInst.asm";
-string binFilePath = "./AssemblyTests/Output/printInst.out";
+string assemblyFilePath = "./AssemblyTests/loopGreaterThan.asm";
+string binFilePath = "./AssemblyTests/Output/loopGreaterThan.out";
 
 Assembler assembler = new Assembler(startProgramAddress);
 assembler.assembleFile(assemblyFilePath, binFilePath);

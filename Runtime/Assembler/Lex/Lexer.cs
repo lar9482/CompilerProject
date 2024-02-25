@@ -193,6 +193,10 @@ public class Lexer {
                 return new Token(lexeme, lineCounter, TokenType.bEq_Inst);
             case "bNe":
                 return new Token(lexeme, lineCounter, TokenType.bNe_Inst);
+            case "bLt":
+                return new Token(lexeme, lineCounter, TokenType.bLt_Inst);
+            case "bGt":
+                return new Token(lexeme, lineCounter, TokenType.bGt_Inst);
             case "jmp":
                 return new Token(lexeme, lineCounter, TokenType.jmp_Inst);
             case "jmpL":

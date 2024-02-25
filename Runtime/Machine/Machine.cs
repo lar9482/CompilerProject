@@ -271,6 +271,16 @@ public class Machine {
                     regPC += (inst.smallJumpOffset) << 2;
                 }
                 break;
+            case Opcode.bLt:
+                if (registers[reg1] < registers[reg2]) {
+                    regPC += (inst.smallJumpOffset) << 2;
+                }
+                break;
+            case Opcode.bGt:
+                if (registers[reg1] > registers[reg2]) {
+                    regPC += (inst.smallJumpOffset) << 2;
+                }
+                break;
             case Opcode.jmp:
                 regPC += (inst.largeJumpOffset) << 2;
                 break;

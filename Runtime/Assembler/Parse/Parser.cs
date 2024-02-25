@@ -55,6 +55,8 @@ public class Parser {
                 break;
             case TokenType.bEq_Inst:
             case TokenType.bNe_Inst:
+            case TokenType.bLt_Inst:
+            case TokenType.bGt_Inst:
                 instructions.Add(parseJmpBranchInst());
                 break;
             case TokenType.identifier:
@@ -79,7 +81,10 @@ public class Parser {
         List<Inst> nextInstructions = parse();
         return instructions.Concat(nextInstructions).ToList();
     }
-
+    /**
+     * Parsing the form:
+     * Opcode reg, reg
+     */
     private RegInst parseRegInst() {
         Token opcodeToken = consume(tokenQueue.Peek().type);
         Token reg1Token = parseRegister();
@@ -93,6 +98,10 @@ public class Parser {
         );
     }
 
+    /**
+     * Parsing the form:
+     * Opcode reg, imm
+     */
     private ImmInst parseImmInst() {
         Token opcodeToken = consume(tokenQueue.Peek().type);
         Token regToken = parseRegister();
@@ -106,6 +115,10 @@ public class Parser {
         );
     }
 
+    /**
+     * Parsing the form:
+     * Opcode reg, imm[reg]
+     */
     private MemInst parseMemInst() {
         Token opcodeToken = consume(tokenQueue.Peek().type);
         Token regToken = parseRegister();
@@ -123,6 +136,10 @@ public class Parser {
         );
     }
 
+    /**
+     * Parsing the form:
+     * Opcode reg
+     */
     private JmpRegInst parseJmpRegInst() {
         Token opcodeToken = consume(tokenQueue.Peek().type);
         Token regToken = parseRegister();
@@ -132,6 +149,10 @@ public class Parser {
         );
     }
 
+    /**
+     * Parsing the form:
+     * Opcode labelIdentifier
+     */
     private JmpLabelInst parseJmpLabelInst() {
         Token opcodeToken = consume(tokenQueue.Peek().type);
         Token labelToken = consume(TokenType.identifier);
@@ -141,6 +162,10 @@ public class Parser {
         );
     }
 
+    /**
+     * Parsing the form:
+     * Opcode reg, reg, labelIdentifier
+     */
     private JmpBranchInst parseJmpBranchInst() {
         Token opcodeToken = consume(tokenQueue.Peek().type);
         Token reg1Token = parseRegister();
@@ -157,6 +182,11 @@ public class Parser {
         );
     }
 
+    /**
+     * Parsing the form:
+     *
+     * labelIdentifier:
+     */
     private LabelInst parseLabelInst() {
         Token labelToken = consume(TokenType.identifier);
         consume(TokenType.colon);
@@ -167,6 +197,11 @@ public class Parser {
         );
     }
 
+    /**
+     * Parsing the form:
+     *
+     * Opcode
+     */
     private InterruptInst parseInterruptInst() {
         Token commandToken = consume(tokenQueue.Peek().type);
 
@@ -176,6 +211,11 @@ public class Parser {
         );
     }
 
+    /**
+     * Parsing the form:
+     *
+     * Opcode reg
+     */
     private InterruptRegInst parseInterruptRegInst() {
         Token commandToken = consume(tokenQueue.Peek().type);
         Token regToken = parseRegister();
