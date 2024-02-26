@@ -1,4 +1,4 @@
-namespace Compiler.Tokens;
+namespace CompilerProj.Tokens;
 
 public class Token {
     private string lexeme;

@@ -12,7 +12,7 @@ main(args: int[][]) {
         }
             
         s = s + 1;
-		if (n == 1 & first == 0) {
+		if (n == 1 && first == 0) {
             first = s;
         }
     }
