@@ -1,4 +1,4 @@
-namespace Compiler.Lex;
+namespace CompilerProj.Lex;
 
 public class Lexer {
 

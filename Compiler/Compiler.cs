@@ -1,4 +1,4 @@
-namespace Compiler;
+namespace CompilerProj;
 
 public class Compiler {
     
