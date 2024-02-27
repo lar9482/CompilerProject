@@ -16,7 +16,7 @@ public class Lexer {
     public Lexer() {
         this.matchIdentifier = new Regex(@"\b^[a-zA-Z]{1}[a-zA-Z0-9_]*\b");
         this.matchNumber = new Regex(@"^\b\d+\b");
-        this.matchOneSymbol = new Regex(@"^(\(|\{|\[|\]|\}|\)|,|;|=|\+|-|\*|\/|%|<|>|!)");
+        this.matchOneSymbol = new Regex(@"^(\(|\{|\[|\]|\}|\)|,|;|=|\+|-|\*|\/|%|<|>|!|:)");
         this.matchTwoSymbol = new Regex(@"^(<=|>=|==|!=|&&|\|\|)");
         this.matchWhitespace = new Regex(@"^(\n|\t|\s|\r)");
     }
@@ -41,9 +41,10 @@ public class Lexer {
                 case "matchIntegers":
                     break;
                 case "matchWhitespace":
-                    if (matchedLexeme == "\n")
+                    if (matchedLexeme == "\n") {
                         columnCounter = 0;
                         lineCounter++;
+                    } 
                     break;
                 default:
                     throw new InvalidOperationException(
@@ -98,6 +99,7 @@ public class Lexer {
             case "<": return new Token(lexeme, lineCounter, columnCounter, TokenType.less);
             case ">": return new Token(lexeme, lineCounter, columnCounter, TokenType.greater);
             case "!": return new Token(lexeme, lineCounter, columnCounter, TokenType.not);
+            case ":": return new Token(lexeme, lineCounter, columnCounter, TokenType.colon);
             default:
                 throw new Exception(
                     String.Format("Lexer: {0} is not a recognizable one symbol", lexeme)
