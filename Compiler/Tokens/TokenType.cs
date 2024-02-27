@@ -39,5 +39,6 @@ public enum TokenType {
     or,
     not,
     
-    identifier
+    identifier,
+    EOF,
 }
