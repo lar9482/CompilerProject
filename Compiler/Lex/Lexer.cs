@@ -16,9 +16,9 @@ public class Lexer {
     public Lexer() {
         this.matchIdentifier = new Regex(@"\b^[a-zA-Z]{1}[a-zA-Z0-9_]*\b");
         this.matchNumber = new Regex(@"^\b\d+\b");
-        this.matchOneSymbol = new Regex(@"\b^\(|{|\[|\]|}|\)|,|;|=|\+|\-|\*|\/|%|<|>|!|:\b");
-        this.matchTwoSymbol = new Regex(@"\b^(<=|>=|==|!=|&&|\|\|)\b");
-        this.matchWhitespace = new Regex(@"\b^\n|\t|\s|\r\b");
+        this.matchOneSymbol = new Regex(@"^(\(|\{|\[|\]|\}|\)|,|;|=|\+|-|\*|\/|%|<|>|!)");
+        this.matchTwoSymbol = new Regex(@"^(<=|>=|==|!=|&&|\|\|)");
+        this.matchWhitespace = new Regex(@"^(\n|\t|\s|\r)");
     }
 
     public Queue<Token> lexProgram(string programText) {
@@ -34,6 +34,9 @@ public class Lexer {
                     break;
                 case "matchOneSymbol":
                     tokenQueue.Enqueue(resolveOneSymbol(matchedLexeme));
+                    break;
+                case "matchTwoSymbol":
+                    tokenQueue.Enqueue(resolveTwoSymbol(matchedLexeme));
                     break;
                 case "matchIntegers":
                     break;
@@ -61,7 +64,6 @@ public class Lexer {
         matches.Add("matchTwoSymbol", matchTwoSymbol.Match(programText).Value);
         matches.Add("matchOneSymbol", matchOneSymbol.Match(programText).Value);
         matches.Add("matchWhitespace", matchWhitespace.Match(programText).Value);
-
         int longestMatchLength = 0;
         string longestMatch = "";
         string matchType = "";
@@ -93,13 +95,29 @@ public class Lexer {
             case "*": return new Token(lexeme, lineCounter, columnCounter, TokenType.multiply);
             case "/": return new Token(lexeme, lineCounter, columnCounter, TokenType.divide);
             case "%": return new Token(lexeme, lineCounter, columnCounter, TokenType.modus);
-            case "<": return new Token(lexeme, lineCounter, columnCounter, TokenType.lessThan);
-            case ">": return new Token(lexeme, lineCounter, columnCounter, TokenType.greaterThan);
+            case "<": return new Token(lexeme, lineCounter, columnCounter, TokenType.less);
+            case ">": return new Token(lexeme, lineCounter, columnCounter, TokenType.greater);
             case "!": return new Token(lexeme, lineCounter, columnCounter, TokenType.not);
             default:
                 throw new Exception(
                     String.Format("Lexer: {0} is not a recognizable one symbol", lexeme)
                 );
         }
+    }
+
+    private Token resolveTwoSymbol(string lexeme) {
+        switch (lexeme) {
+            case "<=": return new Token(lexeme, lineCounter, columnCounter, TokenType.lessThanEqual); 
+            case ">=": return new Token(lexeme, lineCounter, columnCounter, TokenType.greaterThanEqual); 
+            case "==": return new Token(lexeme, lineCounter, columnCounter, TokenType.equalTo); 
+            case "!=": return new Token(lexeme, lineCounter, columnCounter, TokenType.notEqualTo); 
+            case "&&": return new Token(lexeme, lineCounter, columnCounter, TokenType.and); 
+            case "||": return new Token(lexeme, lineCounter, columnCounter, TokenType.or);
+            default:
+                throw new Exception(
+                    String.Format("Lexer: {0} is not a recognizable two symbol", lexeme)
+                );
+        }
+        
     }
 }
