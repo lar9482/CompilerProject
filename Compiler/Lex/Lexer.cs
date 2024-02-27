@@ -19,6 +19,8 @@ public class Lexer {
         this.matchOneSymbol = new Regex(@"^(\(|\{|\[|\]|\}|\)|,|;|=|\+|-|\*|\/|%|<|>|!|:)");
         this.matchTwoSymbol = new Regex(@"^(<=|>=|==|!=|&&|\|\|)");
         this.matchWhitespace = new Regex(@"^(\n|\t|\s|\r)");
+        this.columnCounter = 1;
+        this.lineCounter = 1;
     }
 
     public Queue<Token> lexProgram(string programText) {
@@ -31,6 +33,7 @@ public class Lexer {
 
             switch(matchType) {
                 case "matchIdentifier":
+                    tokenQueue.Enqueue(resolveIdentifer(matchedLexeme));
                     break;
                 case "matchOneSymbol":
                     tokenQueue.Enqueue(resolveOneSymbol(matchedLexeme));
@@ -42,7 +45,7 @@ public class Lexer {
                     break;
                 case "matchWhitespace":
                     if (matchedLexeme == "\n") {
-                        columnCounter = 0;
+                        columnCounter = 1;
                         lineCounter++;
                     } 
                     break;
@@ -121,5 +124,21 @@ public class Lexer {
                 );
         }
         
+    }
+
+    private Token resolveIdentifer(string lexeme) {
+        switch(lexeme) {
+            case "if": return new Token(lexeme, lineCounter, columnCounter, TokenType.reserved_if);
+            case "while": return new Token(lexeme, lineCounter, columnCounter, TokenType.reserved_while);
+            case "for": return new Token(lexeme, lineCounter, columnCounter, TokenType.reserved_for);
+            case "else": return new Token(lexeme, lineCounter, columnCounter, TokenType.reserved_else);
+            case "return": return new Token(lexeme, lineCounter, columnCounter, TokenType.reserved_return); 
+            case "length": return new Token(lexeme, lineCounter, columnCounter, TokenType.reserved_length);
+            case "int": return new Token(lexeme, lineCounter, columnCounter, TokenType.reserved_int);
+            case "bool": return new Token(lexeme, lineCounter, columnCounter, TokenType.reserved_bool);
+            case "true": return new Token(lexeme, lineCounter, columnCounter, TokenType.reserved_true);
+            case "false": return new Token(lexeme, lineCounter, columnCounter, TokenType.reserved_false);
+            default: return new Token(lexeme, lineCounter, columnCounter, TokenType.identifier);
+        }
     }
 }
