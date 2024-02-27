@@ -16,7 +16,7 @@ public class Lexer {
     public Lexer() {
         this.matchIdentifier = new Regex(@"\b^[a-zA-Z]{1}[a-zA-Z0-9_]*\b");
         this.matchNumber = new Regex(@"^\b\d+\b");
-        this.matchOneSymbol = new Regex(@"^(\(|\{|\[|\]|\}|\)|,|;|=|\+|-|\*|\/|%|<|>|!|:)");
+        this.matchOneSymbol = new Regex(@"^(\(|\{|\[|\]|\}|\)|,|;|=|\+|-|\*|\/|%|<|>|!|:|\"")");
         this.matchTwoSymbol = new Regex(@"^(<=|>=|==|!=|&&|\|\|)");
         this.matchWhitespace = new Regex(@"^(\n|\t|\s|\r)");
         this.columnCounter = 1;
@@ -41,7 +41,9 @@ public class Lexer {
                 case "matchTwoSymbol":
                     tokenQueue.Enqueue(resolveTwoSymbol(matchedLexeme));
                     break;
-                case "matchIntegers":
+                case "matchNumber":
+                    Token numberToken = new Token(matchedLexeme, lineCounter, columnCounter, TokenType.number);
+                    tokenQueue.Enqueue(numberToken);
                     break;
                 case "matchWhitespace":
                     if (matchedLexeme == "\n") {
@@ -103,6 +105,7 @@ public class Lexer {
             case ">": return new Token(lexeme, lineCounter, columnCounter, TokenType.greater);
             case "!": return new Token(lexeme, lineCounter, columnCounter, TokenType.not);
             case ":": return new Token(lexeme, lineCounter, columnCounter, TokenType.colon);
+            case "\"": return new Token(lexeme, lineCounter, columnCounter, TokenType.doubleQuotes);
             default:
                 throw new Exception(
                     String.Format("Lexer: {0} is not a recognizable one symbol", lexeme)
