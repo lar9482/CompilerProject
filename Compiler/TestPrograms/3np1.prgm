@@ -6,9 +6,9 @@ main(args: int[][]) {
 	first: int = 0;
     while (s < limit) {
         if (n % 2 == 0) {
-            n = n / 2
+            n = n / 2;
         } else {
-            n = 3 * n + 1
+            n = 3 * n + 1;
         }
             
         s = s + 1;
