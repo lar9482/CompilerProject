@@ -9,6 +9,7 @@ public class Lexer {
     private readonly Regex matchOneSymbol;
     private readonly Regex matchTwoSymbol;
     private readonly Regex matchWhitespace;
+    private readonly Regex matchComment;
 
     private int lineCounter;
     private int columnCounter;
@@ -19,6 +20,7 @@ public class Lexer {
         this.matchOneSymbol = new Regex(@"^(\(|\{|\[|\]|\}|\)|,|;|=|\+|-|\*|\/|%|<|>|!|:|\"")");
         this.matchTwoSymbol = new Regex(@"^(<=|>=|==|!=|&&|\|\|)");
         this.matchWhitespace = new Regex(@"^(\n|\t|\s|\r)");
+        this.matchComment = new Regex(@"^//");
         this.columnCounter = 1;
         this.lineCounter = 1;
     }
@@ -51,6 +53,10 @@ public class Lexer {
                         lineCounter++;
                     } 
                     break;
+                case "matchComment":
+                    int newlineIndex = programText.IndexOf("\n");
+                    programText = programText.Remove(0, newlineIndex);
+                    continue;
                 default:
                     throw new InvalidOperationException(
                         String.Format("Lexer: {0} is not a recognizable lexeme", matchedLexeme)
@@ -70,6 +76,7 @@ public class Lexer {
         matches.Add("matchTwoSymbol", matchTwoSymbol.Match(programText).Value);
         matches.Add("matchOneSymbol", matchOneSymbol.Match(programText).Value);
         matches.Add("matchWhitespace", matchWhitespace.Match(programText).Value);
+        matches.Add("matchComment", matchComment.Match(programText).Value);
         int longestMatchLength = 0;
         string longestMatch = "";
         string matchType = "";
