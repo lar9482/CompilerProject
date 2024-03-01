@@ -1,17 +1,14 @@
 public class ArrayAssignAST : StmtAST{
-    public string arrayName;
-    public ExprAST accessValue;
+    public ArrayAccessAST arrayAccess;
     public ExprAST value;
 
     public ArrayAssignAST (
-        string arrayName,
-        ExprAST accessValue,
+        ArrayAccessAST arrayAccess,
         ExprAST value,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {
-        
-        this.arrayName = arrayName;
-        this.accessValue = accessValue;
+
+        this.arrayAccess = arrayAccess;
         this.value = value;
     }
 }
