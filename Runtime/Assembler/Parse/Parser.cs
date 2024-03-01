@@ -11,75 +11,73 @@ public class Parser {
 
     public List<Inst> parse() {
         List<Inst> instructions = new List<Inst>();
-
-        switch(tokenQueue.Peek().type) {
-            case TokenType.mov_Inst:
-            case TokenType.add_Inst:
-            case TokenType.sub_Inst:
-            case TokenType.mult_Inst:
-            case TokenType.div_Inst:
-            case TokenType.and_Inst:
-            case TokenType.or_Inst:
-            case TokenType.xor_Inst:
-            case TokenType.not_Inst:
-            case TokenType.nor_Inst:
-            case TokenType.sllv_Inst:
-            case TokenType.srav_Inst:
-                instructions.Add(parseRegInst());
-                break;
-            case TokenType.movI_Inst:
-            case TokenType.addI_Inst:
-            case TokenType.subI_Inst:
-            case TokenType.multI_Inst:
-            case TokenType.divI_Inst:
-            case TokenType.andI_Inst:
-            case TokenType.orI_Inst:
-            case TokenType.xorI_Inst:
-            case TokenType.sll_Inst:
-            case TokenType.sra_Inst:
-                instructions.Add(parseImmInst());
-                break;
-            case TokenType.lb_Inst:
-            case TokenType.lw_Inst:
-            case TokenType.sb_Inst:
-            case TokenType.sw_Inst:
-                instructions.Add(parseMemInst());
-                break;
-            case TokenType.jmpL_Reg_Inst:
-            case TokenType.jmpRet_Inst:
-                instructions.Add(parseJmpRegInst());
-                break;
-            case TokenType.jmp_Inst:
-            case TokenType.jmpL_Inst:
-                instructions.Add(parseJmpLabelInst());
-                break;
-            case TokenType.bEq_Inst:
-            case TokenType.bNe_Inst:
-            case TokenType.bLt_Inst:
-            case TokenType.bGt_Inst:
-                instructions.Add(parseJmpBranchInst());
-                break;
-            case TokenType.identifier:
-                instructions.Add(parseLabelInst());
-                break;
-            case TokenType.halt_Inst:
-                instructions.Add(parseInterruptInst());
-                break;
-            case TokenType.printw_Int_Inst:
-            case TokenType.printw_Hex_Inst:
-            case TokenType.printw_Bin_Inst:
-                instructions.Add(parseInterruptRegInst());
-                break;
-            case TokenType.EOF:
-                return instructions;
-            default:
-                throw new Exception(String.Format("Line {0}: {1} is not a valid instruction name",
-                    tokenQueue.Peek().lineCount, tokenQueue.Peek().lexeme
-                ));
+        while (tokenQueue.Count > 0) {
+            switch(tokenQueue.Peek().type) {
+                case TokenType.mov_Inst:
+                case TokenType.add_Inst:
+                case TokenType.sub_Inst:
+                case TokenType.mult_Inst:
+                case TokenType.div_Inst:
+                case TokenType.and_Inst:
+                case TokenType.or_Inst:
+                case TokenType.xor_Inst:
+                case TokenType.not_Inst:
+                case TokenType.nor_Inst:
+                case TokenType.sllv_Inst:
+                case TokenType.srav_Inst:
+                    instructions.Add(parseRegInst());
+                    break;
+                case TokenType.movI_Inst:
+                case TokenType.addI_Inst:
+                case TokenType.subI_Inst:
+                case TokenType.multI_Inst:
+                case TokenType.divI_Inst:
+                case TokenType.andI_Inst:
+                case TokenType.orI_Inst:
+                case TokenType.xorI_Inst:
+                case TokenType.sll_Inst:
+                case TokenType.sra_Inst:
+                    instructions.Add(parseImmInst());
+                    break;
+                case TokenType.lb_Inst:
+                case TokenType.lw_Inst:
+                case TokenType.sb_Inst:
+                case TokenType.sw_Inst:
+                    instructions.Add(parseMemInst());
+                    break;
+                case TokenType.jmpL_Reg_Inst:
+                case TokenType.jmpRet_Inst:
+                    instructions.Add(parseJmpRegInst());
+                    break;
+                case TokenType.jmp_Inst:
+                case TokenType.jmpL_Inst:
+                    instructions.Add(parseJmpLabelInst());
+                    break;
+                case TokenType.bEq_Inst:
+                case TokenType.bNe_Inst:
+                case TokenType.bLt_Inst:
+                case TokenType.bGt_Inst:
+                    instructions.Add(parseJmpBranchInst());
+                    break;
+                case TokenType.identifier:
+                    instructions.Add(parseLabelInst());
+                    break;
+                case TokenType.halt_Inst:
+                    instructions.Add(parseInterruptInst());
+                    break;
+                case TokenType.printw_Int_Inst:
+                case TokenType.printw_Hex_Inst:
+                case TokenType.printw_Bin_Inst:
+                    instructions.Add(parseInterruptRegInst());
+                    break;
+                case TokenType.EOF:
+                    return instructions;
+                    throw new Exception(String.Format("Line {0}: {1} is not a valid instruction name",
+                        tokenQueue.Peek().lineCount, tokenQueue.Peek().lexeme
+                    ));
+            }
         }
-
-        List<Inst> nextInstructions = parse();
-        return instructions.Concat(nextInstructions).ToList();
+        return instructions;
     }
     /**
      * Parsing the form:
