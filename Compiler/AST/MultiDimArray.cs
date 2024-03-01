@@ -16,14 +16,14 @@ public class MultiDimArrayAST : NodeAST {
         PrimitiveType type,
         ExprAST[][] initialValues,
         int lineNumber, int columnNumber
-        
+
     ) : base(lineNumber, columnNumber) {
 
         this.name = name;
         this.rowSize = rowSize;
         this.colSize = colSize;
         this.type = new MultiDimArrayType<PrimitiveType>(type);
-
+        
         this.initialValues = initialValues;
     }
 }
