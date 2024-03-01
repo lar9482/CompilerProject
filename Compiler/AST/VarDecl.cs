@@ -1,12 +1,12 @@
 using CompilerProj.AST;
 using CompilerProj.Types;
 
-public class VarDecl : NodeAST {
+public class VarDeclAST : NodeAST {
     public string name;
     public ExprAST? initialValue;
     public PrimitiveType type;
 
-    public VarDecl(
+    public VarDeclAST(
         string name, 
         ExprAST? initialValue, 
         PrimitiveType type,

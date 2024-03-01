@@ -1,13 +1,13 @@
 using CompilerProj.AST;
 
 public class ProgramAST : NodeAST {
-    public List<VarDecl>? varDecls;
-    public List<MultiVarDecl>? multiVarDecls;
+    public List<VarDeclAST>? varDecls;
+    public List<MultiVarDeclAST>? multiVarDecls;
     public List<FuncDecl> funcDecls;
 
     public ProgramAST(
-        List<VarDecl>? varDecls, 
-        List<MultiVarDecl>? multiVarDecls,
+        List<VarDeclAST>? varDecls, 
+        List<MultiVarDeclAST>? multiVarDecls,
         List<FuncDecl> funcDecls,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {

@@ -5,19 +5,20 @@ public class FuncDecl : NodeAST {
     public string name;
     public List<ParameterAST> parameters;
     public List<LangType> returnTypes;
-    public List<StmtAST> statements;
+    
+    public BlockAST block;
 
     public FuncDecl(
         string name,
         List<ParameterAST> parameters,
         List<LangType> returnTypes,
-        List<StmtAST> statements,
+        BlockAST block,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {
 
         this.name = name;
         this.parameters = parameters;
         this.returnTypes = returnTypes;
-        this.statements = statements;
+        this.block = block;
     }
 }

@@ -1,5 +1,5 @@
 main(args:int[][]) {
-    n: int     = 500; // # of runs.
+    n: int = 500; // # of runs.
     LIMIT: int = 90000;
     flags: bool[LIMIT + 1];
 
