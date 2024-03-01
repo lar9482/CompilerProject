@@ -1,7 +1,7 @@
 using CompilerProj.AST;
 using CompilerProj.Types;
 
-public class MultiVarDecl : NodeAST{
+public class MultiVarDecl : NodeAST {
     public List<string> names;
     public List<ExprAST>? initialValues;
     public List<PrimitiveType> types;

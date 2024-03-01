@@ -23,3 +23,12 @@ public class ArrayType<T> : LangType where T : PrimitiveType {
         this.baseType = baseType;
     }
 }
+
+public class MultiDimArrayType<T> : LangType where T : PrimitiveType {
+    public override string TypeTag => "multiDimArray";
+    public T baseType { get; }
+
+    public MultiDimArrayType(T baseType) {
+        this.baseType = baseType;
+    }
+}
