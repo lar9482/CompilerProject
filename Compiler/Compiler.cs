@@ -1,4 +1,5 @@
 using CompilerProj.Lex;
+using CompilerProj.Parse;
 using CompilerProj.Tokens;
 
 namespace CompilerProj;
@@ -11,6 +12,7 @@ public class Compiler {
         Lexer lexer = new Lexer();
         Queue<Token> tokenQueue = lexer.lexProgram(sr.ReadToEnd());
 
-        Console.WriteLine();
+        Parser parser = new Parser(tokenQueue);
+        parser.parseProgram();
     }
 }

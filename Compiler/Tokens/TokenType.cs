@@ -42,5 +42,6 @@ public enum TokenType {
     
     identifier,
     number,
+    global,
     EOF,
 }
