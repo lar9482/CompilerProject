@@ -1,0 +1,16 @@
+:global variable1: int;
+:global variable2: bool;
+
+:global
+variable7: int, variable8: bool;
+
+:global variable3: int[10];
+
+:global 
+variable4: int[10][10];
+
+:global 
+variable5: bool[10];
+
+:global 
+variable6: bool[10][10];
