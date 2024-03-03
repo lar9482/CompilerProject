@@ -7,14 +7,14 @@ public class MultiDimArrayAST : NodeAST {
     public int colSize;
     public MultiDimArrayType<PrimitiveType> type;
 
-    public ExprAST[][] initialValues;
+    public ExprAST[][]? initialValues;
 
     public MultiDimArrayAST(
         string name,
         int rowSize,
         int colSize,
         PrimitiveType type,
-        ExprAST[][] initialValues,
+        ExprAST[][]? initialValues,
         int lineNumber, int columnNumber
 
     ) : base(lineNumber, columnNumber) {

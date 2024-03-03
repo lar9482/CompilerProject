@@ -5,13 +5,13 @@ public class ArrayAST : NodeAST {
     public string name;
     public int size;
     public ArrayType<PrimitiveType> type;
-    public ExprAST[] initialValues;
+    public ExprAST[]? initialValues;
 
     public ArrayAST(
         string name,
         int size,
         PrimitiveType type,
-        ExprAST[] initialValues,
+        ExprAST[]? initialValues,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {
 
