@@ -375,23 +375,26 @@ public class Parser {
     private void parseFunctionDeclaration() {
         Token functionNameToken = consume(TokenType.identifier);
         consume(TokenType.startParen);
-        List<ParameterAST> parameters = parseParamsOptional();
+        List<ParameterAST> parameters = parseParams();
         consume(TokenType.endParen);
 
         consume(TokenType.colon);
+        List<LangType> returnTypes = parseReturnTypes();
+        Console.WriteLine();
     }
 
     /*
-     * ⟨paramsOptional ⟩ ::= ⟨identifier ⟩ ⟨Type⟩ ⟨paramsList⟩
+     * ⟨params⟩ ::= ⟨identifier ⟩ `:' ⟨Type⟩ ⟨paramsList⟩
      * | EPSILON
      */
-    private List<ParameterAST> parseParamsOptional() {
+    private List<ParameterAST> parseParams() {
         List<ParameterAST> parameters = new List<ParameterAST>();
         if (tokenQueue.Peek().type != TokenType.identifier) {
             return parameters;
         }
 
         Token parameterNameToken = consume(TokenType.identifier);
+        consume(TokenType.colon);
         LangType type = parseType();
         ParameterAST firstParameter = new ParameterAST(
             parameterNameToken.lexeme,
@@ -407,7 +410,7 @@ public class Parser {
     }
 
     /*
-     * ⟨paramsList⟩ ::= ‘,’ ⟨identifier ⟩ ⟨Type⟩ ⟨paramsList⟩
+     * ⟨paramsList⟩ ::= ‘,’ ⟨identifier ⟩ `:' ⟨Type⟩ ⟨paramsList⟩
      * | EPSILON
      */
     private List<ParameterAST> parseParamsList() {
@@ -418,6 +421,8 @@ public class Parser {
         consume(TokenType.comma);
 
         Token parameterNameToken = consume(TokenType.identifier);
+        consume(TokenType.colon);
+
         LangType type = parseType();
         ParameterAST parameter = new ParameterAST(
             parameterNameToken.lexeme,
@@ -434,11 +439,9 @@ public class Parser {
     }
 
     /*
-     * <Type> ::= `:' <primitiveType> <typeArray>
+     * <Type> ::= <primitiveType> <typeArray>
      */
     private LangType parseType() {
-        consume(TokenType.colon);
-
         PrimitiveType primitiveType = parsePrimitiveType();
         LangType? arrayType = parseTypeArray(primitiveType);
 
@@ -478,6 +481,46 @@ public class Parser {
         consume(TokenType.startBracket);
         consume(TokenType.endBracket);
         return true;
+    }
+
+    /*
+     * ⟨returnTypes⟩ ::= ⟨Type⟩ ⟨returnTypeList⟩
+     * | EPSILON
+     */
+    private List<LangType> parseReturnTypes() {
+        List<LangType> types = new List<LangType>();
+        if (tokenQueue.Peek().type != TokenType.reserved_int 
+        && tokenQueue.Peek().type != TokenType.reserved_bool
+        ) {
+            return types;
+        }
+
+        LangType type = parseType();
+        types.Add(type);
+
+        List<LangType> nextTypes = parseReturnTypeList();
+
+        return types.Concat(nextTypes).ToList();
+    }
+
+    /* 
+     * ⟨returnTypeList⟩ ::= ‘,’ ⟨Type⟩ ⟨returnTypeList⟩
+     * | EPSILON
+     */
+    private List<LangType> parseReturnTypeList() {
+        List<LangType> types = new List<LangType>();
+
+        if (tokenQueue.Peek().type != TokenType.comma) {
+            return types;
+        }
+        
+        consume(TokenType.comma);
+        LangType type = parseType();
+        types.Add(type);
+
+        List<LangType> nextTypes = parseReturnTypeList();
+
+        return types.Concat(nextTypes).ToList();
     }
 
     private Token consume(TokenType currTokenType) {
