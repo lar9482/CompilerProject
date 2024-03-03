@@ -44,9 +44,10 @@ public class Parser {
                 default:
                     throw new Exception(
                         String.Format(
-                            "Line {0}:{1}, expected an identifier or :global", 
+                            "Line {0}:{1}, expected an identifier or :global, not {2}", 
                             currToken.line.ToString(), 
-                            currToken.column.ToString()
+                            currToken.column.ToString(),
+                            currToken.lexeme
                         )
                     );
             }
@@ -111,7 +112,14 @@ public class Parser {
                 );
                 break;
             default:
-                break;
+                throw new Exception(
+                    String.Format(
+                        "Line {0}:{1}, expected an identifer, not {2}", 
+                        tokenQueue.Peek().line.ToString(), 
+                        tokenQueue.Peek().column.ToString(),
+                        tokenQueue.Peek().lexeme
+                    )
+                );
         }
     }
     /*
@@ -140,9 +148,10 @@ public class Parser {
             default:
                 throw new Exception(
                     String.Format(
-                        "Line {0}:{1}, expected int or bool", 
+                        "Line {0}:{1}, expected int or bool, not {2}", 
                         tokenQueue.Peek().line.ToString(), 
-                        tokenQueue.Peek().column.ToString()
+                        tokenQueue.Peek().column.ToString(),
+                        tokenQueue.Peek().lexeme
                     )
                 );
         }
@@ -168,9 +177,10 @@ public class Parser {
             default:
                 throw new Exception(
                     String.Format(
-                        "Line {0}:{1}, Expected a ; or =", 
+                        "Line {0}:{1}, Expected a ; or =, not {2}", 
                         tokenQueue.Peek().line.ToString(), 
-                        tokenQueue.Peek().column.ToString()
+                        tokenQueue.Peek().column.ToString(),
+                        tokenQueue.Peek().lexeme
                     )
                 );
         }
@@ -283,9 +293,10 @@ public class Parser {
             default:
                 throw new Exception(
                     String.Format(
-                        "Line {0}:{1}, Expected a ] or a number", 
+                        "Line {0}:{1}, Expected a ] or a number, not {2}", 
                         tokenQueue.Peek().line.ToString(), 
-                        tokenQueue.Peek().column.ToString()
+                        tokenQueue.Peek().column.ToString(),
+                        tokenQueue.Peek().lexeme
                     )
                 );
         }
@@ -314,9 +325,10 @@ public class Parser {
             default:
                 throw new Exception(
                     String.Format(
-                        "Line {0}:{1}, Expected = or [", 
+                        "Line {0}:{1}, Expected = or [, not {2}", 
                         tokenQueue.Peek().line.ToString(), 
-                        tokenQueue.Peek().column.ToString()
+                        tokenQueue.Peek().column.ToString(),
+                        tokenQueue.Peek().lexeme
                     )
                 );
         }
@@ -528,7 +540,7 @@ public class Parser {
         if (expectedToken.type == currTokenType) {
             return tokenQueue.Dequeue();
         } else {
-            throw new Exception(String.Format("Line {0}:{1} {2} does not match with the expected token {3}", 
+            throw new Exception(String.Format("Line {0}:{1}, The lexeme {2} does not match with the expected token {3}", 
                 expectedToken.line.ToString(), expectedToken.column.ToString(), currTokenType.ToString(), expectedToken.type.ToString()
             ));
         }

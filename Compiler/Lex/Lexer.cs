@@ -25,7 +25,7 @@ public class Lexer {
         this.matchComment = new Regex(@"^//");
         this.matchGlobalFlag = new Regex(@"^:global");
 
-        this.columnCounter = 1;
+        this.columnCounter = 0;
         this.lineCounter = 1;
     }
 
@@ -57,7 +57,7 @@ public class Lexer {
                     break;
                 case "matchWhitespace":
                     if (matchedLexeme == "\n") {
-                        columnCounter = 1;
+                        columnCounter = 0;
                         lineCounter++;
                     } 
                     break;
