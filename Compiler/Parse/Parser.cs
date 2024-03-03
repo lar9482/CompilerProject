@@ -121,17 +121,22 @@ public class Parser {
 
         Token identifierToken = consume(TokenType.identifier);
         consume(TokenType.colon);
-        PrimitiveType primitiveType;
+        PrimitiveType primitiveType = parsePrimitiveType();
 
+        return Tuple.Create<Token, PrimitiveType>(identifierToken, primitiveType);
+    }
+
+    /*
+     * ⟨primitive type⟩ ::= "int" | "bool"
+     */
+    private PrimitiveType parsePrimitiveType() {
         switch (tokenQueue.Peek().type) {
             case TokenType.reserved_int:
                 consume(TokenType.reserved_int);
-                primitiveType = new IntType();
-                break;
+                return new IntType();
             case TokenType.reserved_bool:
                 consume(TokenType.reserved_bool);
-                primitiveType = new BoolType();
-                break;
+                return new BoolType();
             default:
                 throw new Exception(
                     String.Format(
@@ -141,8 +146,6 @@ public class Parser {
                     )
                 );
         }
-
-        return Tuple.Create<Token, PrimitiveType>(identifierToken, primitiveType);
     }
 
     /*
@@ -366,8 +369,115 @@ public class Parser {
         }
     }
 
+    /*
+     * ⟨functionDeclaration⟩ ::= ⟨identifier ⟩ ‘(’ ⟨paramsOptional ⟩ ‘)’ ‘:’ ⟨returnTypesOptional ⟩ ⟨Block ⟩
+     */
     private void parseFunctionDeclaration() {
+        Token functionNameToken = consume(TokenType.identifier);
+        consume(TokenType.startParen);
+        List<ParameterAST> parameters = parseParamsOptional();
+        consume(TokenType.endParen);
 
+        consume(TokenType.colon);
+    }
+
+    /*
+     * ⟨paramsOptional ⟩ ::= ⟨identifier ⟩ ⟨Type⟩ ⟨paramsList⟩
+     * | EPSILON
+     */
+    private List<ParameterAST> parseParamsOptional() {
+        List<ParameterAST> parameters = new List<ParameterAST>();
+        if (tokenQueue.Peek().type != TokenType.identifier) {
+            return parameters;
+        }
+
+        Token parameterNameToken = consume(TokenType.identifier);
+        LangType type = parseType();
+        ParameterAST firstParameter = new ParameterAST(
+            parameterNameToken.lexeme,
+            type,
+            parameterNameToken.line,
+            parameterNameToken.column
+        );
+
+        parameters.Add(firstParameter);
+        List<ParameterAST> nextParameters = parseParamsList();
+
+        return parameters.Concat(nextParameters).ToList();
+    }
+
+    /*
+     * ⟨paramsList⟩ ::= ‘,’ ⟨identifier ⟩ ⟨Type⟩ ⟨paramsList⟩
+     * | EPSILON
+     */
+    private List<ParameterAST> parseParamsList() {
+        List<ParameterAST> parameters = new List<ParameterAST>();
+        if (tokenQueue.Peek().type != TokenType.comma) {
+            return parameters;
+        }
+        consume(TokenType.comma);
+
+        Token parameterNameToken = consume(TokenType.identifier);
+        LangType type = parseType();
+        ParameterAST parameter = new ParameterAST(
+            parameterNameToken.lexeme,
+            type,
+            parameterNameToken.line,
+            parameterNameToken.column
+        );
+
+        parameters.Add(parameter);
+
+        List<ParameterAST> nextParameters = parseParamsList();
+
+        return parameters.Concat(nextParameters).ToList();
+    }
+
+    /*
+     * <Type> ::= `:' <primitiveType> <typeArray>
+     */
+    private LangType parseType() {
+        consume(TokenType.colon);
+
+        PrimitiveType primitiveType = parsePrimitiveType();
+        LangType? arrayType = parseTypeArray(primitiveType);
+
+        return (arrayType == null) ? (primitiveType) : (arrayType);
+    }
+
+    /*
+     * <typeArray> ::=  `[' `]' <typeMultiDimArray>
+     * | `[' `]'
+     * | EPSILON
+     */
+
+    private LangType? parseTypeArray(PrimitiveType type) {
+        if (tokenQueue.Peek().type != TokenType.startBracket) {
+            return null;
+        }
+
+        consume(TokenType.startBracket);
+        consume(TokenType.endBracket);
+
+        return (parseTypeMultiDimArray()) ? (
+            new MultiDimArrayType<PrimitiveType>(type)
+        ) : (
+            new ArrayType<PrimitiveType>(type)
+        );
+    }
+
+    /*
+     * <typeMultiDimArray> ::= `[' `]'
+     *| EPSILON
+     */
+    private bool parseTypeMultiDimArray() {
+        if (tokenQueue.Peek().type != TokenType.startBracket) {
+            return false;
+        }
+
+        consume(TokenType.startBracket);
+        consume(TokenType.endBracket);
+        return true;
     }
 
     private Token consume(TokenType currTokenType) {
