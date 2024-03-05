@@ -1,0 +1,11 @@
+:global
+exprVar1: int = 1 + 2 + 3 + 4;
+
+:global
+exprVar2: int = 55 * 5 + (10 / 2);
+
+:global 
+exprVar3: int = -(5 * 3) - (10 / 2);
+
+:global 
+exprVar4: bool = true && false || true;
