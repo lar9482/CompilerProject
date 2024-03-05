@@ -44,4 +44,8 @@ public enum TokenType {
     number,
     global,
     EOF,
+
+    //Context dependent tokens(assigned in the parser phase)
+    minusNegation,
+    minusSubtraction
 }
