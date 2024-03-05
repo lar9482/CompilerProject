@@ -1,6 +1,6 @@
 using CompilerProj.Tokens;
 
-namespace Compiler.Parse;
+namespace CompilerProj.Parse;
 /*
  * Utilizing the expression grammars to determine which tokens are apart of the expression
  */
@@ -21,7 +21,15 @@ public class ExprScanner {
     public void scanExpr() {
         switch (topLvlTokens.Peek().type) {
             case TokenType.minus:
-                consume(TokenType.minus);
+                Token minusToken = topLvlTokens.Dequeue();
+                exprTokens.Enqueue(
+                    new Token(
+                        minusToken.lexeme,
+                        minusToken.line,
+                        minusToken.column,
+                        TokenType.minusNegation
+                    )
+                );
                 scanExpr();
                 scanExprFollowUp();
                 break;
@@ -55,8 +63,18 @@ public class ExprScanner {
      */
     private void scanExprFollowUp() {
         switch(topLvlTokens.Peek().type) {
+            case TokenType.minus:
+                Token minusToken = topLvlTokens.Dequeue();
+                exprTokens.Enqueue(
+                    new Token(
+                        minusToken.lexeme,
+                        minusToken.line,
+                        minusToken.column,
+                        TokenType.minusSubtraction
+                    )
+                );
+                break;
             case TokenType.plus: consume(TokenType.plus); break;
-            case TokenType.minus: consume(TokenType.minus); break;
             case TokenType.multiply: consume(TokenType.multiply); break;
             case TokenType.divide: consume(TokenType.divide); break;
             case TokenType.modus: consume(TokenType.modus); break;
