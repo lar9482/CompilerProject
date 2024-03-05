@@ -13,10 +13,10 @@ public enum BinaryExprType {
     SUB, 
     MULT, 
     DIV,
-    MODOP
+    MOD
 }
 
 public enum UnaryExprType {
     NEGATE,
-    NOTOP,
+    NOT,
 }

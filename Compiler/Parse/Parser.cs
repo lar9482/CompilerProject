@@ -552,10 +552,8 @@ public class Parser {
     }
 
     private ExprAST parseExpr() {
-        ExprScanner scanner = new ExprScanner(tokenQueue);
-        scanner.scanExpr();
-        Queue<Token> exprTokens = scanner.exprTokens;
-        return new IntLiteralAST(0, 0, 0);
+        ExprParser exprParser = new ExprParser(tokenQueue);
+        return exprParser.parseByShuntingYard();
     }
     
 
