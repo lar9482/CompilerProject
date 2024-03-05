@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+using Compiler.Parse;
 using CompilerProj.AST;
 using CompilerProj.Tokens;
 using CompilerProj.Types;
@@ -163,8 +163,18 @@ public class Parser {
      */
     private VarDeclAST parseVarDecl(Token identifierToken, PrimitiveType primitiveType) {
         switch(tokenQueue.Peek().type) {
-            case TokenType.assign:                
-                //Parse expressions later
+            case TokenType.assign:
+                consume(TokenType.assign);
+                ExprAST expression = parseExpr();
+                consume(TokenType.semicolon);
+
+                return new VarDeclAST(
+                    identifierToken.lexeme,
+                    expression,
+                    primitiveType,
+                    identifierToken.line,
+                    identifierToken.column
+                );
             case TokenType.semicolon:
                 consume(TokenType.semicolon);
                 return new VarDeclAST(
@@ -534,6 +544,21 @@ public class Parser {
 
         return types.Concat(nextTypes).ToList();
     }
+    /*
+     */
+    private void parseBlock() {
+        consume(TokenType.startCurly);
+
+        consume(TokenType.endCurly);
+    }
+
+    private ExprAST parseExpr() {
+        ExprScanner scanner = new ExprScanner(tokenQueue);
+        scanner.scanExpr();
+        Queue<Token> exprTokens = scanner.exprTokens;
+        return new IntLiteralAST(0, 0, 0);
+    }
+    
 
     private Token consume(TokenType currTokenType) {
         Token expectedToken = tokenQueue.Peek();
