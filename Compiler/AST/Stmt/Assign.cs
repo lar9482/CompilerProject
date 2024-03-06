@@ -1,13 +1,13 @@
 public class AssignAST : StmtAST{
-    public string variableName;
+    public VarAccessAST variable;
     public ExprAST value;
 
     public AssignAST (
-        string variableName,
+        VarAccessAST variable,
         ExprAST value,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {
-        this.variableName = variableName;
+        this.variable = variable;
         this.value = value;
     }
 }

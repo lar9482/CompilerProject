@@ -20,6 +20,7 @@ public class ExprScanner {
      */
     public void scanExpr() {
         switch (topLvlTokens.Peek().type) {
+            //Resolve cases where minus isn't assigned context yet.
             case TokenType.minus:
                 Token minusToken = topLvlTokens.Dequeue();
                 exprTokens.Enqueue(
@@ -30,6 +31,11 @@ public class ExprScanner {
                         TokenType.minusNegation
                     )
                 );
+                scanExpr();
+                scanExprFollowUp();
+                break;
+            case TokenType.minusNegation:
+                consume(TokenType.minusNegation);
                 scanExpr();
                 scanExprFollowUp();
                 break;
@@ -63,6 +69,7 @@ public class ExprScanner {
      */
     private void scanExprFollowUp() {
         switch(topLvlTokens.Peek().type) {
+            //Resolve cases where minus isn't assigned context yet.
             case TokenType.minus:
                 Token minusToken = topLvlTokens.Dequeue();
                 exprTokens.Enqueue(
@@ -74,6 +81,7 @@ public class ExprScanner {
                     )
                 );
                 break;
+            case TokenType.minusSubtraction: consume(TokenType.minusSubtraction); break;
             case TokenType.plus: consume(TokenType.plus); break;
             case TokenType.multiply: consume(TokenType.multiply); break;
             case TokenType.divide: consume(TokenType.divide); break;
@@ -118,26 +126,34 @@ public class ExprScanner {
     }
 
     /*
-     * <IdentifierHeader> ::= <identifier> ⟨ArrayAccess⟩
+     * <IdentifierHeader> ::= <identifier> ⟨Access⟩
      * | <identifier> ⟨ProcedureCall ⟩
      */
     private void scanIdentifierHeader() {
         consume(TokenType.identifier);
         switch (topLvlTokens.Peek().type) {
-            case TokenType.startBracket:
-                scanArrayAccess();
-                break;
             case TokenType.startParen:
                 scanProcedureCallBody();
+                break;
+            default:
+                scanAccess();
                 break;
         }
     }
 
     /*
-     * ⟨ArrayAccess⟩ ::= ‘[’ ⟨Expr⟩ ‘]’
+     * ⟨Access⟩ ::= ‘[’ ⟨Expr⟩ ‘]’ (‘[’ ⟨Expr⟩ ‘]’)?
      * | EPSILON
      */
-    private void scanArrayAccess() {
+    private void scanAccess() {
+        if (topLvlTokens.Peek().type != TokenType.startBracket) {
+            return;
+        }
+
+        consume(TokenType.startBracket);
+        scanExpr();
+        consume(TokenType.endBracket);
+
         if (topLvlTokens.Peek().type != TokenType.startBracket) {
             return;
         }
