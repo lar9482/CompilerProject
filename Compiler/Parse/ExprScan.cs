@@ -179,12 +179,14 @@ public class ExprScanner {
     private void scanArgsOptional() {
         switch(topLvlTokens.Peek().type) {
             case TokenType.minus:
+            case TokenType.minusNegation:
             case TokenType.not:
             case TokenType.identifier:
             case TokenType.number:
             case TokenType.reserved_true:
             case TokenType.reserved_false:
                 scanExpr();
+                scanArgsList();
                 break;
             default:
                 return;
