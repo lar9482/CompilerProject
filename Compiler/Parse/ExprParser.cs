@@ -84,6 +84,7 @@ public class ExprParser {
     private ExprAST parseOperand() {
         switch(exprTokens.Peek().type) {
             case TokenType.identifier:
+                return parseAccessOrProcedureCall();
             case TokenType.number:
             case TokenType.reserved_true: 
             case TokenType.reserved_false:
@@ -97,6 +98,70 @@ public class ExprParser {
         }
     }
 
+    /*
+     * <ArrayOrProcedureCall> ::= <identifier> ⟨Access⟩
+     * | <identifier> ⟨ProcedureCall ⟩
+     */
+    private ExprAST parseAccessOrProcedureCall() {
+        Token identifierToken = consume(TokenType.identifier);
+        switch(exprTokens.Peek().type) {
+            case TokenType.startParen:
+                return parseProcedureCall();
+            default:
+                return parseAccess(identifierToken);
+        }
+    }
+
+    /*
+     * ⟨Access⟩ ::= ‘[’ ⟨Expr⟩ ‘]’ (‘[’ ⟨Expr⟩ ‘]’)?
+     * | EPSILON
+     */
+    private ExprAST parseAccess(Token identifier) {
+        if (exprTokens.Peek().type != TokenType.startBracket) {
+            return new VarAccessAST(
+                identifier.lexeme,
+                identifier.line,
+                identifier.column
+            );
+        }
+
+        consume(TokenType.startBracket);
+        ExprParser firstParser = new ExprParser(exprTokens);
+        ExprAST firstAccess = firstParser.parseByShuntingYard();
+        consume(TokenType.endBracket);
+
+        if (exprTokens.Peek().type != TokenType.startBracket) {
+            return new ArrayAccessAST(
+                identifier.lexeme,
+                firstAccess,
+                identifier.line,
+                identifier.column
+            );
+        }
+
+        consume(TokenType.startBracket);
+        ExprParser secondParser = new ExprParser(exprTokens);
+        ExprAST secondAccess = secondParser.parseByShuntingYard();
+        consume(TokenType.endBracket);
+
+        return new MultiDimArrayAccessAST(
+            identifier.lexeme,
+            firstAccess,
+            secondAccess,
+            identifier.line,
+            identifier.column
+        );
+    }
+
+    private ExprAST parseProcedureCall() {
+        return new IntLiteralAST(0, 0, 0);
+    }
+
+    /*
+     * ⟨Literal⟩ ::= <number>
+     * | true
+     * | false
+     */
     private ExprAST parseLiteral() {
         switch(exprTokens.Peek().type) {
             case TokenType.number:

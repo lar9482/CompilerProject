@@ -9,3 +9,6 @@ exprVar3: int = -(5 * 3) - (10 / 2);
 
 :global 
 exprVar4: bool = true && false || true;
+
+:global
+exprVar5: int = exprVar1 + array1[55 + 55] + array2[0][-101 - (5 * 3) - (10 / 2)];
