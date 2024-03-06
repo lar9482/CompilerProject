@@ -106,7 +106,7 @@ public class ExprParser {
         Token identifierToken = consume(TokenType.identifier);
         switch(exprTokens.Peek().type) {
             case TokenType.startParen:
-                return parseProcedureCall();
+                return parseProcedureCall(identifierToken);
             default:
                 return parseAccess(identifierToken);
         }
@@ -153,8 +153,67 @@ public class ExprParser {
         );
     }
 
-    private ExprAST parseProcedureCall() {
-        return new IntLiteralAST(0, 0, 0);
+    /*
+     * ⟨ProcedureCallBody⟩ ::= ‘(’ ⟨ArgsOptional ⟩ ‘)’
+     */
+    private ProcedureCallAST parseProcedureCall(Token identifier) {
+        consume(TokenType.startParen);
+        List<ExprAST> args = parseArgsOptional();
+        consume(TokenType.endParen);
+
+        return new ProcedureCallAST(
+            identifier.lexeme,
+            args,
+            identifier.line,
+            identifier.column
+        );
+    }
+
+
+    /*
+     * ⟨ArgsOptional ⟩ ::= ⟨Expr⟩ ⟨ArgsList⟩
+     * | EPSILON
+     */
+    private List<ExprAST> parseArgsOptional() {
+        List<ExprAST> args = new List<ExprAST>();
+
+        switch(exprTokens.Peek().type) {
+            case TokenType.minus:
+            case TokenType.minusNegation:
+            case TokenType.not:
+            case TokenType.identifier:
+            case TokenType.number:
+            case TokenType.reserved_true:
+            case TokenType.reserved_false:
+                ExprParser exprParser = new ExprParser(exprTokens);
+                ExprAST arg = exprParser.parseByShuntingYard();
+                args.Add(arg);
+
+                List<ExprAST> nextArgs = parseArgsList();
+                return args.Concat<ExprAST>(nextArgs).ToList<ExprAST>();
+            default:
+                return args;
+        }
+    }
+
+    /*
+     * ⟨ArgsList⟩ ::= ‘,’ ⟨Expr⟩ ⟨ArgsList⟩
+     * | EPSILON
+     */
+    private List<ExprAST> parseArgsList() {
+        List<ExprAST> args = new List<ExprAST>();
+        if (exprTokens.Peek().type != TokenType.comma) {
+            return args;
+        }
+
+        consume(TokenType.comma);
+        ExprParser exprParser = new ExprParser(exprTokens);
+        ExprAST expr = exprParser.parseByShuntingYard();
+        args.Add(expr);
+
+        List<ExprAST> nextArgs = parseArgsList();
+
+        return args.Concat<ExprAST>(nextArgs).ToList();
     }
 
     /*
