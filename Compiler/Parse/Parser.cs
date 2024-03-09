@@ -678,6 +678,8 @@ public class Parser {
         switch(tokenQueue.Peek().type) {
             case TokenType.assign:
                 return parseAssign(firstIdentifier);
+            case TokenType.comma:
+                return parseMultiAssign(firstIdentifier);
             default:
                 throw new Exception(
                     String.Format(
@@ -704,6 +706,82 @@ public class Parser {
             identifier.line, 
             identifier.column
         );
+    }
+
+    /*
+    <multiAssign> ::= ‘,’ ⟨identifierList⟩ ‘=’ ⟨Expr ⟩ ‘,’ ⟨ExprList⟩ ‘;’
+    */
+    private MultiAssignAST parseMultiAssign(Token firstIdentifier) {
+        List<Token> variableNames = new List<Token>();
+        variableNames.Add(firstIdentifier);
+        consume(TokenType.comma);
+
+        variableNames = variableNames.Concat(parseIdentifierList()).ToList<Token>();
+
+        consume(TokenType.assign);
+
+        List<ExprAST> exprs = new List<ExprAST>();
+        exprs.Add(parseExpr());
+        
+        consume(TokenType.comma);
+        exprs = exprs.Concat(parseExprList()).ToList<ExprAST>();
+
+        consume(TokenType.semicolon);
+
+        Dictionary<VarAccessAST, ExprAST> assignments = new Dictionary<VarAccessAST, ExprAST>();
+        for (int index = 0; index < variableNames.Count; index++) {
+            assignments.Add(
+                new VarAccessAST(
+                    variableNames[index].lexeme, 
+                    variableNames[index].line, 
+                    variableNames[index].column
+                ),
+                exprs[index]
+            );
+        }
+        
+        return new MultiAssignAST(
+            assignments,
+            firstIdentifier.line, 
+            firstIdentifier.column
+        );
+    }
+
+     /* ⟨identifierList⟩ ::= ⟨identifier ⟩ ‘,’ ⟨identifierList⟩
+      * | ⟨identifier ⟩
+      */
+    private List<Token> parseIdentifierList() {
+        List<Token> identifiers = new List<Token>();
+        Token identifier = consume(TokenType.identifier);
+        identifiers.Add(identifier);
+
+        if (tokenQueue.Peek().type != TokenType.comma) {
+            return identifiers;
+        }
+        consume(TokenType.comma);
+
+        List<Token> nextIdentifiers = parseIdentifierList();
+
+        return identifiers.Concat(nextIdentifiers).ToList<Token>();
+    }
+
+    /*
+     * ⟨ExprList⟩ ::= ⟨Expr ⟩ ‘,’ ⟨ExprList⟩
+     * | ⟨Expr ⟩
+     */
+    private List<ExprAST> parseExprList() {
+        List<ExprAST> exprs = new List<ExprAST>();
+        exprs.Add(parseExpr());
+
+        if (tokenQueue.Peek().type != TokenType.comma) {
+            return exprs;
+        }
+
+        consume(TokenType.comma);
+        
+        List<ExprAST> nextExprs = parseExprList();
+
+        return exprs.Concat(nextExprs).ToList<ExprAST>();
     }
 
     private ExprAST parseExpr() {
