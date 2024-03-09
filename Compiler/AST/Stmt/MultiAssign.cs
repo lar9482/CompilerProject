@@ -1,13 +1,12 @@
 public class MultiAssignAST : StmtAST{
-    public List<string> variableName;
-    public List<ExprAST> value;
+
+    public Dictionary<VarAccessAST, ExprAST> assignments;
 
     public MultiAssignAST (
-        List<string> variableName,
-        List<ExprAST> value,
+        Dictionary<VarAccessAST, ExprAST> assignments,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {
-        this.variableName = variableName;
-        this.value = value;
+        
+        this.assignments = assignments;
     }
 }
