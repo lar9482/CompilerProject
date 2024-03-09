@@ -6,14 +6,14 @@ public class ProgramAST : NodeAST {
     public List<ArrayAST> arrayDecls;
     public List<MultiDimArrayAST> multiDimArrayDecls;
 
-    public List<FuncDecl> funcDecls;
+    public List<FuncDeclAST> funcDecls;
 
     public ProgramAST(
         List<VarDeclAST> varDecls, 
         List<MultiVarDeclAST> multiVarDecls,
         List<ArrayAST> arrayDecls,
         List<MultiDimArrayAST> multiDimArrayDecls,
-        List<FuncDecl> funcDecls,
+        List<FuncDeclAST> funcDecls,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {
         
