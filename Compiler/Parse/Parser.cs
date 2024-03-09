@@ -1,3 +1,4 @@
+using System.Data.Common;
 using CompilerProj.AST;
 using CompilerProj.Tokens;
 using CompilerProj.Types;
@@ -8,7 +9,7 @@ public class Parser {
 
     private Queue<Token> tokenQueue;
 
-    private List<FuncDecl> topLvl_FuncDecls;
+    private List<FuncDeclAST> topLvl_FuncDecls;
     private List<VarDeclAST> topLvl_VarDecls;
     private List<MultiVarDeclAST> topLvl_MultiVarDecls;
     private List<ArrayAST> topLvl_ArrayDecls;
@@ -17,7 +18,7 @@ public class Parser {
     public Parser(Queue<Token> tokenQueue) {
         this.tokenQueue = tokenQueue;
 
-        this.topLvl_FuncDecls = new List<FuncDecl>();
+        this.topLvl_FuncDecls = new List<FuncDeclAST>();
 
         this.topLvl_VarDecls = new List<VarDeclAST>();
         this.topLvl_MultiVarDecls = new List<MultiVarDeclAST>();
@@ -35,7 +36,7 @@ public class Parser {
             Token currToken = tokenQueue.Peek();
             switch(currToken.type) {
                 case TokenType.identifier:
-                    parseFunctionDeclaration();
+                    topLvl_FuncDecls.Add(parseFunctionDeclaration());
                     break;
                 case TokenType.global:
                     parseGlobalDeclaration();
@@ -66,11 +67,14 @@ public class Parser {
     }
 
     /*
-     * ⟨global declaration⟩ ::= ‘:global’ ⟨declaration⟩
+     * ⟨global declaration⟩ ::= ‘:global’ ⟨identifierDecl⟩ ⟨declaration⟩
      */
     private void parseGlobalDeclaration() {
         consume(TokenType.global);
+        Tuple<Token, PrimitiveType> identifierAndType = parseIdentifierDeclaration();
         parseDeclaration(
+            identifierAndType.Item1,
+            identifierAndType.Item2,
             topLvl_VarDecls,
             topLvl_MultiVarDecls,
             topLvl_ArrayDecls,
@@ -79,33 +83,34 @@ public class Parser {
     }
 
     /*
-     * ⟨declaration⟩ ::= ⟨identifierDecl⟩ ⟨varDecl ⟩
-     *   | ⟨identifierDecl⟩ ⟨multiVarDecl ⟩
+     * ⟨declaration⟩ ::= ⟨varDecl ⟩
+     *   | ⟨multiVarDecl ⟩
      *   | ⟨identifierDecl⟩ ⟨arrayDeclaration⟩
      */
     private void parseDeclaration(
+        Token firstIdentifier,
+        PrimitiveType firstType,
         List<VarDeclAST> varDecls,
         List<MultiVarDeclAST> multiVarDecls,
         List<ArrayAST> arrayDecls,
         List<MultiDimArrayAST> multiDimArrayDecls
     ) {
-        Tuple<Token, PrimitiveType> firstIdentifierType = parseIdentifierDeclaration();
         switch(tokenQueue.Peek().type) {
             case TokenType.assign:
             case TokenType.semicolon:
-                VarDeclAST varDecl = parseVarDecl(firstIdentifierType.Item1, firstIdentifierType.Item2);
+                VarDeclAST varDecl = parseVarDecl(firstIdentifier, firstType);
                 varDecls.Add(varDecl);
                 break;
             case TokenType.comma:
                 MultiVarDeclAST multiVarDecl = parseMultiVarDecls(
-                    firstIdentifierType.Item1, 
-                    firstIdentifierType.Item2
+                    firstIdentifier, 
+                    firstType
                 );
                 multiVarDecls.Add(multiVarDecl);
                 break;
             case TokenType.startBracket:
                 parseArrayDeclaration(
-                    firstIdentifierType.Item1, firstIdentifierType.Item2,
+                    firstIdentifier, firstType,
                     arrayDecls, 
                     multiDimArrayDecls
                 );
@@ -122,17 +127,25 @@ public class Parser {
         }
     }
     /*
-     * ⟨identifierDecl⟩ ::= ⟨identifier ⟩ ‘:’ ⟨primitive type⟩
+     * ⟨identifierDecl⟩ ::= ⟨identifier ⟩ <IdentifierType>
      */
     private Tuple<Token, PrimitiveType> parseIdentifierDeclaration() {
 
         Token identifierToken = consume(TokenType.identifier);
-        consume(TokenType.colon);
-        PrimitiveType primitiveType = parsePrimitiveType();
+        PrimitiveType primitiveType = parseIdentifierType();
 
         return Tuple.Create<Token, PrimitiveType>(identifierToken, primitiveType);
     }
 
+    /*
+     * <IdentifierType> ::= ‘:’ ⟨primitive type⟩
+     */
+    private PrimitiveType parseIdentifierType() {
+        consume(TokenType.colon);
+        PrimitiveType primitiveType = parsePrimitiveType();
+
+        return primitiveType;
+    }
     /*
      * ⟨primitive type⟩ ::= "int" | "bool"
      */
@@ -393,7 +406,7 @@ public class Parser {
     /*
      * ⟨functionDeclaration⟩ ::= ⟨identifier ⟩ ‘(’ ⟨paramsOptional ⟩ ‘)’ ‘:’ ⟨returnTypesOptional ⟩ ⟨Block ⟩
      */
-    private void parseFunctionDeclaration() {
+    private FuncDeclAST parseFunctionDeclaration() {
         Token functionNameToken = consume(TokenType.identifier);
         consume(TokenType.startParen);
         List<ParameterAST> parameters = parseParams();
@@ -401,7 +414,17 @@ public class Parser {
 
         consume(TokenType.colon);
         List<LangType> returnTypes = parseReturnTypes();
-        Console.WriteLine();
+
+        BlockAST block = parseBlock();
+
+        return new FuncDeclAST(
+            functionNameToken.lexeme,
+            parameters,
+            returnTypes,
+            block,
+            functionNameToken.line,
+            functionNameToken.column
+        );
     }
 
     /*
@@ -544,11 +567,72 @@ public class Parser {
         return types.Concat(nextTypes).ToList();
     }
     /*
+     * <Block> ::= ‘{’ <statements> ‘}’
      */
-    private void parseBlock() {
-        consume(TokenType.startCurly);
-
+    private BlockAST parseBlock() {
+        Token startCurlyToken = consume(TokenType.startCurly);
+        BlockAST blockContent = parseStatements(
+            startCurlyToken.line, startCurlyToken.column
+        );
         consume(TokenType.endCurly);
+
+        return blockContent;
+    }
+
+    /*
+     *
+     */
+    private BlockAST parseStatements(int line, int column) {
+        List<VarDeclAST> varDecls = new List<VarDeclAST>();
+        List<MultiVarDeclAST> multiVarDecls = new List<MultiVarDeclAST>();
+        List<ArrayAST> arrayDecls = new List<ArrayAST>();
+        List<MultiDimArrayAST> multiDimArrayDecls = new List<MultiDimArrayAST>();
+        List<StmtAST> statements = new List<StmtAST>();
+
+
+        return new BlockAST(
+            varDecls,
+            multiVarDecls,
+            arrayDecls,
+            multiDimArrayDecls,
+            statements,
+            line, column
+        );
+    }
+
+    /*
+     * <DeclarationOrAssignment> ::= <identifier> ‘:’ <primitiveType> <declaration>
+     * | <identifier> <assignment>
+     */
+    private void parseDeclarationOrAssignment(
+        List<VarDeclAST> varDecls,
+        List<MultiVarDeclAST> multiVarDecls,
+        List<ArrayAST> arrayDecls,
+        List<MultiDimArrayAST> multiDimArrayDecls,
+        List<StmtAST> assignStmts
+    ) {
+        Token firstIdentifer = consume(TokenType.identifier);
+        switch(tokenQueue.Peek().type) {
+            case TokenType.colon:
+                PrimitiveType firstType = parseIdentifierType();
+                parseDeclaration(
+                    firstIdentifer,
+                    firstType,
+                    varDecls,
+                    multiVarDecls,
+                    arrayDecls,
+                    multiDimArrayDecls
+                );
+                break;
+            case TokenType.assign:
+            case TokenType.comma:
+                parseAssignment(firstIdentifer);
+                break;
+        } 
+    }
+
+    private void parseAssignment(Token firstIdentifier) {
+
     }
 
     private ExprAST parseExpr() {
