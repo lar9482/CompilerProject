@@ -589,6 +589,13 @@ public class Parser {
         List<MultiDimArrayAST> multiDimArrayDecls = new List<MultiDimArrayAST>();
         List<StmtAST> statements = new List<StmtAST>();
 
+        parseStatement(
+            varDecls,
+            multiVarDecls,
+            arrayDecls,
+            multiDimArrayDecls,
+            statements
+        );
 
         return new BlockAST(
             varDecls,
@@ -600,6 +607,35 @@ public class Parser {
         );
     }
 
+    private void parseStatement(
+        List<VarDeclAST> varDecls,
+        List<MultiVarDeclAST> multiVarDecls,
+        List<ArrayAST> arrayDecls,
+        List<MultiDimArrayAST> multiDimArrayDecls,
+        List<StmtAST> statements
+    ) {
+        switch(tokenQueue.Peek().type) {
+            case TokenType.identifier:
+                parseDeclarationOrAssignment(
+                    varDecls,
+                    multiVarDecls,
+                    arrayDecls,
+                    multiDimArrayDecls,
+                    statements
+                );
+                break;
+            default:
+                return;
+        }
+
+        parseStatement(
+            varDecls,
+            multiVarDecls,
+            arrayDecls,
+            multiDimArrayDecls,
+            statements
+        );
+    }
     /*
      * <DeclarationOrAssignment> ::= <identifier> ‘:’ <primitiveType> <declaration>
      * | <identifier> <assignment>
@@ -626,13 +662,48 @@ public class Parser {
                 break;
             case TokenType.assign:
             case TokenType.comma:
-                parseAssignment(firstIdentifer);
+            case TokenType.startBracket:
+                assignStmts.Add(parseAssignment(firstIdentifer));
                 break;
         } 
     }
 
-    private void parseAssignment(Token firstIdentifier) {
+    /*
+     * ⟨assignment⟩ ::= ⟨assign⟩
+     * | ⟨multiAssign⟩
+     * | ⟨arrayAssign⟩
+     * | ⟨multiDimArrayAssign⟩
+     */
+    private StmtAST parseAssignment(Token firstIdentifier) {
+        switch(tokenQueue.Peek().type) {
+            case TokenType.assign:
+                return parseAssign(firstIdentifier);
+            default:
+                throw new Exception(
+                    String.Format(
+                        "Line {0}:{1}, Expected = , [ but not {2}", 
+                        tokenQueue.Peek().line.ToString(), 
+                        tokenQueue.Peek().column.ToString(),
+                        tokenQueue.Peek().lexeme
+                    )
+                );
+        }
+    }
 
+    /*
+     * ⟨assign⟩ ::= ‘=’ ⟨Expr ⟩ `;'
+     */
+    private AssignAST parseAssign(Token identifier) {
+        consume(TokenType.assign);
+        ExprAST expr = parseExpr();
+        consume(TokenType.semicolon);
+
+        return new AssignAST(
+            new VarAccessAST(identifier.lexeme, identifier.line, identifier.column),
+            expr,
+            identifier.line, 
+            identifier.column
+        );
     }
 
     private ExprAST parseExpr() {

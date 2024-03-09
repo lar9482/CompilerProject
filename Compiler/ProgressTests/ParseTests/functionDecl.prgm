@@ -1,3 +1,4 @@
 function(param1: int, param2: bool, param3: int[], param4: int[][]): int, bool, int[], int[][] {
-    
+    x = 0;
+    x = 1 + 2 + 3 * 5;
 }

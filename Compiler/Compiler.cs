@@ -15,6 +15,8 @@ public class Compiler {
         Queue<Token> tokenQueue = lexer.lexProgram(programText);
 
         Parser parser = new Parser(tokenQueue);
-        parser.parseProgram();
+        ProgramAST programAST = parser.parseProgram();
+
+        Console.WriteLine();
     }
 }
