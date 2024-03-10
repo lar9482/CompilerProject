@@ -353,7 +353,20 @@ public class Parser {
                 consume(TokenType.endBracket);
                 consume(TokenType.assign);
                 consume(TokenType.startCurly);
-                //Parse multiDimArrayInitial later. Requires the expression parser.
+                List<ExprAST[]> arrayOfExprs = parseMultiDimArrayInitial();
+                verifyMultiDimArrayColumnSize(arrayOfExprs);
+                consume(TokenType.endCurly);
+                consume(TokenType.semicolon);
+                MultiDimArrayAST multiDimArray = new MultiDimArrayAST(
+                    identifierToken.lexeme,
+                    arrayOfExprs.Count,
+                    arrayOfExprs[0].Length,
+                    primitiveType,
+                    arrayOfExprs.ToArray(),
+                    identifierToken.line,
+                    identifierToken.column
+                );
+                multiDimArrayDecls.Add(multiDimArray);
                 break;
             default:
                 throw new Exception(
@@ -367,6 +380,22 @@ public class Parser {
         }
     }
 
+    private void verifyMultiDimArrayColumnSize(List<ExprAST[]> arrayOfExprs) {
+        int expectedColumnSize = arrayOfExprs[0].Length;
+        for (int i = 0; i < arrayOfExprs.Count; i++) {
+            if (arrayOfExprs[i].Length != expectedColumnSize) {
+                int lineNumber = arrayOfExprs[i][0].lineNumber;
+                int columnNumber = arrayOfExprs[i][0].lineNumber;
+                throw new Exception(
+                    String.Format("Line {0}:{1}, The length of the sub-array doesn't match with {3}", 
+                        lineNumber.ToString(), 
+                        columnNumber.ToString(),
+                        expectedColumnSize
+                    )
+                );
+            }
+        }
+    }
     /*
      * ⟨singleOrMulti Array Static⟩ ::= ‘;’
      * | ‘[’ ⟨number ⟩ ‘]’ ‘;’
@@ -424,6 +453,25 @@ public class Parser {
 
         return exprs.ToArray<ExprAST>();
     }
+
+    /*
+     * ⟨multiDimArrayInitial ⟩ ::= ⟨arrayInitial ⟩ ‘,’ ⟨multiDimArrayInitial ⟩
+     * | ⟨arrayInitial ⟩
+     */
+    private List<ExprAST[]> parseMultiDimArrayInitial() {
+        List<ExprAST[]> arrayInitials = new List<ExprAST[]>();
+        arrayInitials.Add(parseArrayInitial());
+
+        if (tokenQueue.Peek().type != TokenType.comma) {
+            return arrayInitials;
+        }
+
+        consume(TokenType.comma);
+        List<ExprAST[]> nextInitialValues = parseMultiDimArrayInitial();
+
+        return arrayInitials.Concat(nextInitialValues).ToList();
+    }
+
     /*
      * ⟨functionDeclaration⟩ ::= ⟨identifier ⟩ ‘(’ ⟨paramsOptional ⟩ ‘)’ ‘:’ ⟨returnTypesOptional ⟩ ⟨Block ⟩
      */
@@ -600,9 +648,6 @@ public class Parser {
         return blockContent;
     }
 
-    /*
-     *
-     */
     private BlockAST parseStatements(int line, int column) {
         List<VarDeclAST> varDecls = new List<VarDeclAST>();
         List<MultiVarDeclAST> multiVarDecls = new List<MultiVarDeclAST>();
@@ -628,6 +673,11 @@ public class Parser {
         );
     }
 
+    /*
+     * ⟨statements⟩ ::= ⟨DeclarationOrAssignment⟩
+     * | ⟨Conditional ⟩
+     * | ⟨WhileLoop⟩
+     */
     private void parseStatement(
         List<VarDeclAST> varDecls,
         List<MultiVarDeclAST> multiVarDecls,
@@ -645,6 +695,8 @@ public class Parser {
                     statements
                 );
                 break;
+            case TokenType.reserved_if:
+            case TokenType.reserved_while:
             default:
                 return;
         }
