@@ -3,6 +3,9 @@ using System.Text.RegularExpressions;
 using CompilerProj.Tokens;
 namespace CompilerProj.Lex;
 
+/*
+ * A simple Lexer that uses longest matching with regular expressions.
+ */
 public class Lexer {
     private readonly Regex matchIdentifier;
     private readonly Regex matchNumber;

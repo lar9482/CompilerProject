@@ -2,6 +2,10 @@ using CompilerProj.Tokens;
 
 namespace CompilerProj.Parse;
 
+/*
+ * The parsing routine for expressions using shunting yard.
+ * This will factor in operator precedence.
+ */
 public class ExprParser {
     private Queue<Token> exprTokens;
     public ExprParser(Queue<Token> topLvlTokens) {
