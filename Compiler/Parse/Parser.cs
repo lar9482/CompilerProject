@@ -680,6 +680,15 @@ public class Parser {
                 return parseAssign(firstIdentifier);
             case TokenType.comma:
                 return parseMultiAssign(firstIdentifier);
+            case TokenType.startBracket:
+                consume(TokenType.startBracket);
+                ExprAST firstAccess = parseExpr();
+                consume(TokenType.endBracket);
+                if (tokenQueue.Peek().type != TokenType.startBracket) {
+                    return parseArrayAssign(firstIdentifier, firstAccess);
+                } else {
+                    return parseMultiDimArrayAssign(firstIdentifier, firstAccess);
+                }
             default:
                 throw new Exception(
                     String.Format(
@@ -722,7 +731,7 @@ public class Parser {
 
         List<ExprAST> exprs = new List<ExprAST>();
         exprs.Add(parseExpr());
-        
+
         consume(TokenType.comma);
         exprs = exprs.Concat(parseExprList()).ToList<ExprAST>();
 
@@ -782,6 +791,53 @@ public class Parser {
         List<ExprAST> nextExprs = parseExprList();
 
         return exprs.Concat(nextExprs).ToList<ExprAST>();
+    }
+
+    /*
+     * ⟨arrayAssign⟩ ::= ‘[’ ⟨Expr ⟩ ‘]’ ‘=’ ⟨Expr ⟩ ‘;’
+     */
+    private ArrayAssignAST parseArrayAssign(Token identifier, ExprAST access) {
+
+        consume(TokenType.assign);
+        ExprAST value = parseExpr();
+        consume(TokenType.semicolon);
+
+        return new ArrayAssignAST(
+            new ArrayAccessAST(
+                identifier.lexeme, 
+                access,
+                identifier.line,
+                identifier.column
+            ),
+            value,
+            identifier.line,
+            identifier.column
+        );
+    }
+
+    /*
+     * ⟨multiDimArrayAssign⟩ ::= ‘[’ ⟨Expr ⟩ ‘]’ ‘[’ ⟨Expr ⟩ ‘]’ ‘=’ ⟨Expr ⟩ ‘;’
+     */
+    private MultiDimArrayAssignAST parseMultiDimArrayAssign(Token identifier, ExprAST firstAccess) {
+        consume(TokenType.startBracket);
+        ExprAST secondAccess = parseExpr();
+        consume(TokenType.endBracket);
+        consume(TokenType.assign);
+        ExprAST value = parseExpr();
+        consume(TokenType.semicolon);
+
+        return new MultiDimArrayAssignAST(
+            new MultiDimArrayAccessAST(
+                identifier.lexeme,
+                firstAccess,
+                secondAccess,
+                identifier.line,
+                identifier.column
+            ),
+            value,
+            identifier.line,
+            identifier.column
+        );
     }
 
     private ExprAST parseExpr() {
