@@ -5,6 +5,9 @@ using CompilerProj.Types;
 
 namespace CompilerProj.Parse;
 
+/*
+ * A simple recursive descent parser with building out the Abstract Syntax Tree
+ */
 public class Parser {
 
     private Queue<Token> tokenQueue;

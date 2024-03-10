@@ -2,7 +2,9 @@ using CompilerProj.Tokens;
 
 namespace CompilerProj.Parse;
 /*
- * Utilizing the expression grammars to determine which tokens are apart of the expression
+ * Utilizing the expression grammars to determine which tokens are apart of the expression.
+ * This will be utilized in ExprParser.cs for parsing the expression with shunting yard.
+ * Why? The shunting yard algorithm requires the number of tokens to be known.
  */
 public class ExprScanner {
 
