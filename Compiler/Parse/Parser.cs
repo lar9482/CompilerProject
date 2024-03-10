@@ -324,8 +324,8 @@ public class Parser {
         }
     }
 
-    /*  ⟨singleOrMulti Array Expr ⟩ ::= ‘=’ ⟨arrayInitial ⟩
-     *  | ‘[’ ‘]’ ‘=’ ‘{’ ⟨multiDimArrayInitial ⟩ ‘}’
+    /*  ⟨singleOrMulti Array Expr ⟩ ::= ‘=’ ⟨arrayInitial ⟩ ‘;’
+     *  | ‘[’ ‘]’ ‘=’ ‘{’ ⟨multiDimArrayInitial ⟩ ‘}’ ‘;’
      */
     private void parse_SingleOrMulti_Array_Expr(
         Token identifierToken, PrimitiveType primitiveType,
@@ -335,7 +335,18 @@ public class Parser {
         switch(tokenQueue.Peek().type) {
             case TokenType.assign:
                 consume(TokenType.assign);
-                //Parse array initial later. Requires the expression parser.
+                ExprAST[] exprs = parseArrayInitial();
+                consume(TokenType.semicolon);
+
+                ArrayAST array = new ArrayAST(
+                    identifierToken.lexeme,
+                    exprs.Length,
+                    primitiveType,
+                    exprs,
+                    identifierToken.line,
+                    identifierToken.column
+                );
+                arrayDecls.Add(array);
                 break;
             case TokenType.startBracket:
                 consume(TokenType.startBracket);
@@ -403,6 +414,16 @@ public class Parser {
         }
     }
 
+    /*
+     * ⟨arrayInitial ⟩ ::= ‘{’ <ExprList> ‘}’
+     */
+    private ExprAST[] parseArrayInitial() {
+        consume(TokenType.startCurly);
+        List<ExprAST> exprs = parseExprList();
+        consume(TokenType.endCurly);
+
+        return exprs.ToArray<ExprAST>();
+    }
     /*
      * ⟨functionDeclaration⟩ ::= ⟨identifier ⟩ ‘(’ ⟨paramsOptional ⟩ ‘)’ ‘:’ ⟨returnTypesOptional ⟩ ⟨Block ⟩
      */
