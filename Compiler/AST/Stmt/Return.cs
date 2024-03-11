@@ -1,8 +1,8 @@
 public class ReturnAST : StmtAST {
-    public List<ExprAST> returnValues;
+    public List<ExprAST>? returnValues;
 
     public ReturnAST(
-        List<ExprAST> returnValues,
+        List<ExprAST>? returnValues,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {
 
