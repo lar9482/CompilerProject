@@ -476,7 +476,7 @@ public class Parser {
     }
 
     /*
-     * ⟨functionDeclaration⟩ ::= ⟨identifier ⟩ ‘(’ ⟨paramsOptional ⟩ ‘)’ ‘:’ ⟨returnTypesOptional ⟩ ⟨Block ⟩
+     * ⟨functionDeclaration⟩ ::= ⟨identifier ⟩ ‘(’ ⟨paramsOptional ⟩ ‘)’ ⟨returnTypesOptional ⟩ ⟨Block ⟩
      */
     private FuncDeclAST parseFunctionDeclaration() {
         Token functionNameToken = consume(TokenType.identifier);
@@ -484,7 +484,6 @@ public class Parser {
         List<ParameterAST> parameters = parseParams();
         consume(TokenType.endParen);
 
-        consume(TokenType.colon);
         List<LangType> returnTypes = parseReturnTypes();
 
         BlockAST block = parseBlock();
@@ -600,17 +599,16 @@ public class Parser {
     }
 
     /*
-     * ⟨returnTypes⟩ ::= ⟨Type⟩ ⟨returnTypeList⟩
+     * ⟨returnTypes⟩ ::= ‘:’ ⟨Type⟩ ⟨returnTypeList⟩
      * | EPSILON
      */
     private List<LangType> parseReturnTypes() {
         List<LangType> types = new List<LangType>();
-        if (tokenQueue.Peek().type != TokenType.reserved_int 
-        && tokenQueue.Peek().type != TokenType.reserved_bool
-        ) {
+        if (tokenQueue.Peek().type != TokenType.colon) {
             return types;
         }
 
+        consume(TokenType.colon);
         LangType type = parseType();
         types.Add(type);
 
@@ -699,6 +697,9 @@ public class Parser {
                 );
                 break;
             case TokenType.reserved_if:
+                ConditionalAST conditional = parseConditional();
+                statements.Add(conditional);
+                break;
             case TokenType.reserved_while:
             default:
                 return;
@@ -914,6 +915,92 @@ public class Parser {
             identifier.line,
             identifier.column
         );
+    }
+    
+    /*
+     * ⟨Conditional ⟩ ::= ‘if’ ‘(’ ⟨Expr ⟩ ‘)’ ⟨block ⟩ ⟨elseIfConditional ⟩ ⟨elseConditional ⟩
+     */
+    private ConditionalAST parseConditional() {
+        ExprAST ifCondition;
+        BlockAST ifBlock;
+        Dictionary<ExprAST, BlockAST>? elseIfConditionalBlocks = null;
+        BlockAST? elseBlock = null;
+
+        Token ifToken = consume(TokenType.reserved_if);
+        consume(TokenType.startParen);
+        ifCondition = parseExpr();
+        consume(TokenType.endParen);
+        ifBlock = parseBlock();
+
+        if (tokenQueue.Peek().type != TokenType.reserved_else) {
+            return new ConditionalAST(
+                ifCondition,
+                ifBlock,
+                elseIfConditionalBlocks,
+                elseBlock,
+                ifToken.line,
+                ifToken.column
+            );
+        }
+
+        elseIfConditionalBlocks = new Dictionary<ExprAST, BlockAST>();
+        bool seenElseBlock = false;
+
+        while (tokenQueue.Peek().type == TokenType.reserved_else) {
+            if (seenElseBlock) {
+                throw new Exception(String.Format(
+                    "Line {0}:{1}, no 'else if' or 'else' conditionals can exist after the 1st 'else' conditional",
+                    tokenQueue.Peek().line.ToString(),
+                    tokenQueue.Peek().column.ToString()
+                ));
+            }
+
+            consume(TokenType.reserved_else);
+            switch(tokenQueue.Peek().type) {
+                case TokenType.reserved_if:
+                    Tuple<ExprAST, BlockAST> elseIfConditional = parseElseIfConditional();
+                    elseIfConditionalBlocks.Add(
+                        elseIfConditional.Item1,
+                        elseIfConditional.Item2
+                    );
+                    break;
+                case TokenType.startCurly:
+                    seenElseBlock = true;
+                    elseBlock = parseBlock();
+                    break;
+                default:
+                    throw new Exception(
+                        String.Format(
+                            "Line {0}:{1}, Expected 'if' or '{' ,but not {2}", 
+                            tokenQueue.Peek().line.ToString(), 
+                            tokenQueue.Peek().column.ToString(),
+                            tokenQueue.Peek().lexeme
+                        )
+                    );
+            }
+        }
+
+        return new ConditionalAST(
+            ifCondition,
+            ifBlock,
+            elseIfConditionalBlocks,
+            elseBlock,
+            ifToken.line,
+            ifToken.column
+        );
+    }
+
+    /*
+     * ⟨elseIfConditional ⟩ ::= ‘else’ ‘if’ ‘(’ ⟨Expr ⟩ ‘)’ ⟨block ⟩
+     */
+    private Tuple<ExprAST, BlockAST> parseElseIfConditional() {
+        consume(TokenType.reserved_if);
+        consume(TokenType.startParen);
+        ExprAST condition = parseExpr();
+        consume(TokenType.endParen);
+        BlockAST block = parseBlock();
+
+        return Tuple.Create<ExprAST, BlockAST>(condition, block);
     }
 
     private ExprAST parseExpr() {
