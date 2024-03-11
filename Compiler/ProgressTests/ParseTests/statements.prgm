@@ -28,4 +28,8 @@ function() {
     } else {
         z = -1;
     }
+
+    while (a > 0) {
+        b = true;
+    }
 }
