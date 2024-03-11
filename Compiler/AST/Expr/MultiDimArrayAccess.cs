@@ -1,10 +1,10 @@
-public class MultiDimArrayAccessAST : ExprAST {
+internal sealed class MultiDimArrayAccessAST : ExprAST {
 
-    public string arrayName;
-    public ExprAST firstIndex;
-    public ExprAST secondIndex;
+    internal string arrayName;
+    internal ExprAST firstIndex;
+    internal ExprAST secondIndex;
 
-    public MultiDimArrayAccessAST(
+    internal MultiDimArrayAccessAST(
         string arrayName,
         ExprAST firstIndex,
         ExprAST secondIndex,

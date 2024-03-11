@@ -1,8 +1,8 @@
-public class WhileLoopAST : StmtAST {
-    public ExprAST condition;
-    public BlockAST body;
+internal sealed class WhileLoopAST : StmtAST {
+    internal ExprAST condition;
+    internal BlockAST body;
 
-    public WhileLoopAST(
+    internal WhileLoopAST(
         ExprAST condition,
         BlockAST body,
         int lineNumber, int columnNumber

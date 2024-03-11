@@ -1,8 +1,8 @@
-public class ArrayAssignAST : StmtAST{
-    public ArrayAccessAST arrayAccess;
-    public ExprAST value;
+internal sealed class ArrayAssignAST : StmtAST{
+    internal ArrayAccessAST arrayAccess;
+    internal ExprAST value;
 
-    public ArrayAssignAST (
+    internal ArrayAssignAST (
         ArrayAccessAST arrayAccess,
         ExprAST value,
         int lineNumber, int columnNumber

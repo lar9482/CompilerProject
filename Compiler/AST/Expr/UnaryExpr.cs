@@ -1,8 +1,8 @@
-public class UnaryExprAST : ExprAST {
-    public ExprAST operand;
-    public UnaryExprType exprType;
+internal sealed class UnaryExprAST : ExprAST {
+    internal ExprAST operand;
+    internal UnaryExprType exprType;
 
-    public UnaryExprAST(
+    internal UnaryExprAST(
         ExprAST operand,
         UnaryExprType exprType,
         int lineNumber, int columnNumber

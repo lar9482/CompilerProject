@@ -1,14 +1,14 @@
 using CompilerProj.AST;
 using CompilerProj.Types;
 
-public class FuncDeclAST : NodeAST {
-    public string name;
-    public List<ParameterAST> parameters;
-    public List<LangType> returnTypes;
+internal sealed class FuncDeclAST : NodeAST {
+    internal string name;
+    internal List<ParameterAST> parameters;
+    internal List<LangType> returnTypes;
     
-    public BlockAST block;
+    internal BlockAST block;
 
-    public FuncDeclAST(
+    internal FuncDeclAST(
         string name,
         List<ParameterAST> parameters,
         List<LangType> returnTypes,

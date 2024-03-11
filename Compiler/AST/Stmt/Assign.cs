@@ -1,8 +1,8 @@
-public class AssignAST : StmtAST{
-    public VarAccessAST variable;
-    public ExprAST value;
+internal sealed class AssignAST : StmtAST{
+    internal VarAccessAST variable;
+    internal ExprAST value;
 
-    public AssignAST (
+    internal AssignAST (
         VarAccessAST variable,
         ExprAST value,
         int lineNumber, int columnNumber

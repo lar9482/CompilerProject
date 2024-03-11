@@ -1,12 +1,12 @@
 namespace CompilerProj.Tokens;
 
-public class Token {
-    public string lexeme { get; }
-    public int line { get; }
-    public int column { get; }
-    public TokenType type { get; }
+internal sealed class Token {
+    internal string lexeme { get; }
+    internal int line { get; }
+    internal int column { get; }
+    internal TokenType type { get; }
 
-    public Token(string lexeme, int line, int column, TokenType type) {
+    internal Token(string lexeme, int line, int column, TokenType type) {
         this.lexeme = lexeme;
         this.line = line;
         this.column = column;

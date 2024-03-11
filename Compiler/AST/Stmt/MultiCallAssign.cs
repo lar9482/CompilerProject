@@ -1,8 +1,8 @@
-public class MultiCallAST : StmtAST {
-    public List<string> variableNames;
-    public ProcedureCallAST call;
+internal sealed class MultiCallAST : StmtAST {
+    internal List<string> variableNames;
+    internal ProcedureCallAST call;
 
-    public MultiCallAST(
+    internal MultiCallAST(
         List<string> variableNames,
         ProcedureCallAST call,
         int lineNumber, int columnNumber

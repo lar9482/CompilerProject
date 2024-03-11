@@ -1,6 +1,6 @@
 namespace CompilerProj.Tokens;
 
-public enum TokenType {
+internal enum TokenType {
     //Reserved words
     reserved_if, 
     reserved_while, 

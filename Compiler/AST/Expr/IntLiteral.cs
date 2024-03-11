@@ -1,10 +1,10 @@
 using CompilerProj.Types;
 
-public class IntLiteralAST : ExprAST {
-    public int value;
-    public IntType type => new IntType();
+internal sealed class IntLiteralAST : ExprAST {
+    internal int value;
+    internal IntType type => new IntType();
 
-    public IntLiteralAST(
+    internal IntLiteralAST(
         int value,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {

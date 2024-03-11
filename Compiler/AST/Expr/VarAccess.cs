@@ -1,8 +1,8 @@
-public class VarAccessAST : ExprAST {
+internal sealed class VarAccessAST : ExprAST {
 
-    public string variableName;
+    internal string variableName;
 
-    public VarAccessAST(
+    internal VarAccessAST(
         string variableName,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {

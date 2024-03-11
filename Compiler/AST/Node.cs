@@ -1,10 +1,10 @@
 namespace CompilerProj.AST;
 
-public abstract class NodeAST {
-    public int lineNumber;
-    public int columnNumber;
+internal abstract class NodeAST {
+    internal int lineNumber;
+    internal int columnNumber;
 
-    public NodeAST(int lineNumber, int columnNumber) {
+    internal NodeAST(int lineNumber, int columnNumber) {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
     }

@@ -1,8 +1,8 @@
-public class MultiAssignAST : StmtAST{
+internal sealed class MultiAssignAST : StmtAST{
 
-    public Dictionary<VarAccessAST, ExprAST> assignments;
+    internal Dictionary<VarAccessAST, ExprAST> assignments;
 
-    public MultiAssignAST (
+    internal MultiAssignAST (
         Dictionary<VarAccessAST, ExprAST> assignments,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {

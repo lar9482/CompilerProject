@@ -1,8 +1,8 @@
 using CompilerProj.AST;
 
-public abstract class StmtAST : NodeAST {
+internal abstract class StmtAST : NodeAST {
     
-    public StmtAST(int lineNumber, int columnNumber) : base(lineNumber, columnNumber) {
+    internal StmtAST(int lineNumber, int columnNumber) : base(lineNumber, columnNumber) {
 
     }
 }
