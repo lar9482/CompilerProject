@@ -1,11 +1,11 @@
 using CompilerProj.Types;
 
-public class StrLiteralAST : ExprAST {
-    public string value;
-    public int[] asciiValues;
-    public ArrayType<IntType> type => new ArrayType<IntType>(new IntType());
+internal sealed class StrLiteralAST : ExprAST {
+    internal string value;
+    internal int[] asciiValues;
+    internal ArrayType<IntType> type => new ArrayType<IntType>(new IntType());
 
-    public StrLiteralAST(
+    internal StrLiteralAST(
         string value,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {

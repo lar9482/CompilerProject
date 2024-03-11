@@ -1,9 +1,9 @@
-public class ArrayAccessAST : ExprAST {
+internal sealed class ArrayAccessAST : ExprAST {
 
-    public string arrayName;
-    public ExprAST accessValue;
+    internal string arrayName;
+    internal ExprAST accessValue;
 
-    public ArrayAccessAST(
+    internal ArrayAccessAST(
         string arrayName,
         ExprAST accessValue,
         int lineNumber, int columnNumber

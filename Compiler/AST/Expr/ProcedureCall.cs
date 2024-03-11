@@ -1,8 +1,8 @@
-public class ProcedureCallAST : ExprAST {
-    public string procedureName;
-    public List<ExprAST> args;
+internal sealed class ProcedureCallAST : ExprAST {
+    internal string procedureName;
+    internal List<ExprAST> args;
 
-    public ProcedureCallAST(
+    internal ProcedureCallAST(
         string procedureName,
         List<ExprAST> args,
         int lineNumber, int columnNumber

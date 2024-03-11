@@ -1,14 +1,14 @@
 using CompilerProj.AST;
 
-public class ProgramAST : NodeAST {
-    public List<VarDeclAST> varDecls;
-    public List<MultiVarDeclAST> multiVarDecls;
-    public List<ArrayAST> arrayDecls;
-    public List<MultiDimArrayAST> multiDimArrayDecls;
+internal sealed class ProgramAST : NodeAST {
+    internal List<VarDeclAST> varDecls;
+    internal List<MultiVarDeclAST> multiVarDecls;
+    internal List<ArrayAST> arrayDecls;
+    internal List<MultiDimArrayAST> multiDimArrayDecls;
 
-    public List<FuncDeclAST> funcDecls;
+    internal List<FuncDeclAST> funcDecls;
 
-    public ProgramAST(
+    internal ProgramAST(
         List<VarDeclAST> varDecls, 
         List<MultiVarDeclAST> multiVarDecls,
         List<ArrayAST> arrayDecls,

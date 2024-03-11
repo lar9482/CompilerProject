@@ -1,11 +1,11 @@
 using CompilerProj.AST;
 using CompilerProj.Types;
 
-public class ParameterAST : NodeAST {
-    public string name;
-    public LangType type;
+internal sealed class ParameterAST : NodeAST {
+    internal string name;
+    internal LangType type;
     
-    public ParameterAST(
+    internal ParameterAST(
         string name, LangType type,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber){

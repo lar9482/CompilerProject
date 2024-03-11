@@ -8,7 +8,7 @@ namespace CompilerProj.Parse;
 /*
  * A simple recursive descent parser with building out the Abstract Syntax Tree
  */
-public class Parser {
+internal sealed class Parser {
 
     private Queue<Token> tokenQueue;
 
@@ -18,7 +18,7 @@ public class Parser {
     private List<ArrayAST> topLvl_ArrayDecls;
     private List<MultiDimArrayAST> topLvl_MultiDimArrayDecls;
 
-    public Parser(Queue<Token> tokenQueue) {
+    internal Parser(Queue<Token> tokenQueue) {
         this.tokenQueue = tokenQueue;
 
         this.topLvl_FuncDecls = new List<FuncDeclAST>();
@@ -34,7 +34,7 @@ public class Parser {
      *   | ⟨global declaration⟩ ⟨definitions⟩
      *   | EPSILON
      */
-    public ProgramAST parseProgram() {
+    internal ProgramAST parseProgram() {
         while (tokenQueue.Peek().type != TokenType.EOF) {
             Token currToken = tokenQueue.Peek();
             switch(currToken.type) {
@@ -249,7 +249,7 @@ public class Parser {
      *   ⟨identifierDeclList⟩ ::= ⟨identifierDecl ⟩ ‘,’ ⟨identifierDeclList ⟩
      *   | ⟨identifierDecl ⟩
      */
-    public Dictionary<string, PrimitiveType> parseIdentifierDeclList() {
+    internal Dictionary<string, PrimitiveType> parseIdentifierDeclList() {
         Dictionary<string, PrimitiveType> identifierTypeMap = new Dictionary<string, PrimitiveType>();
         Tuple<Token, PrimitiveType> identifierTypePair = parseIdentifierDeclaration();
 

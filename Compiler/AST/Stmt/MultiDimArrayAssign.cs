@@ -1,8 +1,8 @@
-public class MultiDimArrayAssignAST : StmtAST{
-    public MultiDimArrayAccessAST arrayAccess;
-    public ExprAST value;
+internal sealed class MultiDimArrayAssignAST : StmtAST{
+    internal MultiDimArrayAccessAST arrayAccess;
+    internal ExprAST value;
 
-    public MultiDimArrayAssignAST(
+    internal MultiDimArrayAssignAST(
         MultiDimArrayAccessAST arrayAccess,
         ExprAST value,
         int lineNumber, int columnNumber

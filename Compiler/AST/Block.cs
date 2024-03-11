@@ -1,14 +1,14 @@
 using CompilerProj.AST;
 
-public class BlockAST : NodeAST {
-    public List<VarDeclAST> varDecls;
-    public List<MultiVarDeclAST> multiVarDecls;
-    public List<ArrayAST> arrays;
-    public List<MultiDimArrayAST> multiDimArrays;
+internal sealed class BlockAST : NodeAST {
+    internal List<VarDeclAST> varDecls;
+    internal List<MultiVarDeclAST> multiVarDecls;
+    internal List<ArrayAST> arrays;
+    internal List<MultiDimArrayAST> multiDimArrays;
 
-    public List<StmtAST> statements;
+    internal List<StmtAST> statements;
 
-    public BlockAST(
+    internal BlockAST(
         List<VarDeclAST> varDecls,
         List<MultiVarDeclAST> multiVarDecls,
         List<ArrayAST> arrays,

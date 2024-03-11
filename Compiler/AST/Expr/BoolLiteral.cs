@@ -1,10 +1,10 @@
 using CompilerProj.Types;
 
-public class BoolLiteralAST : ExprAST {
-    public bool value;
-    public BoolType type => new BoolType();
+internal class BoolLiteralAST : ExprAST {
+    internal bool value;
+    internal BoolType type => new BoolType();
 
-    public BoolLiteralAST(
+    internal BoolLiteralAST(
         bool value,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {
