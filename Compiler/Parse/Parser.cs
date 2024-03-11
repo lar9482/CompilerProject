@@ -704,6 +704,10 @@ public class Parser {
                 WhileLoopAST whileLoop = parseWhileLoop();
                 statements.Add(whileLoop);
                 break;
+            case TokenType.reserved_return:
+                ReturnAST returnStmt = parseReturn();
+                statements.Add(returnStmt);
+                break;
             default:
                 return;
         }
@@ -1022,6 +1026,35 @@ public class Parser {
             whileBlock,
             whileToken.line,
             whileToken.column
+        );
+    }
+
+    /*
+     * ⟨return⟩ ::= ‘return’ ⟨ExprList⟩? ‘;’
+     */
+    private ReturnAST parseReturn() {
+        Token returnToken = consume(TokenType.reserved_return);
+        List<ExprAST>? returnValues = null;
+
+        switch(tokenQueue.Peek().type) {
+            case TokenType.minus:
+            case TokenType.minusNegation:
+            case TokenType.not:
+            case TokenType.startParen:
+            case TokenType.identifier:
+            case TokenType.number:
+            case TokenType.reserved_true:
+            case TokenType.reserved_false:
+                returnValues = parseExprList();
+                break;
+        }
+
+        consume(TokenType.semicolon);
+
+        return new ReturnAST(
+            returnValues,
+            returnToken.line,
+            returnToken.column
         );
     }
 
