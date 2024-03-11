@@ -701,6 +701,9 @@ public class Parser {
                 statements.Add(conditional);
                 break;
             case TokenType.reserved_while:
+                WhileLoopAST whileLoop = parseWhileLoop();
+                statements.Add(whileLoop);
+                break;
             default:
                 return;
         }
@@ -1001,6 +1004,25 @@ public class Parser {
         BlockAST block = parseBlock();
 
         return Tuple.Create<ExprAST, BlockAST>(condition, block);
+    }
+
+    /*
+     * ⟨whileLoop⟩ ::= ‘while’ ‘(’ ⟨Expr ⟩ ‘)’ ⟨block ⟩
+     */
+    private WhileLoopAST parseWhileLoop() {
+        Token whileToken = consume(TokenType.reserved_while);
+        consume(TokenType.startParen);
+        ExprAST whileCondition = parseExpr();
+        consume(TokenType.endParen);
+
+        BlockAST whileBlock = parseBlock();
+
+        return new WhileLoopAST(
+            whileCondition,
+            whileBlock,
+            whileToken.line,
+            whileToken.column
+        );
     }
 
     private ExprAST parseExpr() {
