@@ -7,6 +7,35 @@ namespace CompilerProj.Parse;
 
 /*
  * A simple recursive descent parser with building out the Abstract Syntax Tree
+ * 
+ * NOTE: This isn't a pure recursive descent parser, because there are parts were ambiguity is kind of abused.
+ *
+ * For example, if there is a grammar rule
+ * <A> ::= 'b' <B>
+ * | 'b' <C>
+ *
+ * instead of writing the grammar completing context free, you may see something like
+ * 
+ * parseA() {
+ *   Token bToken = consume('b')
+ *   switch(tokenQueue.Peek().type) {
+ *      case TokenThatIndicatesB:
+ *          parseB(bToken)
+ *      case TokenThatIndicatesC:
+ *          parseC(bToken)
+ *   }
+ * }
+ * 
+ * parseB(Token bToken) {
+ *   //Consume <B> tokens
+ * }
+ *
+ * parseC(Token cToken) {
+ *   //Consume <C> tokens
+ * }
+ *
+ * This case is especially prevalent with declarations, procedure calls, and assignments, because they all start with
+ * an identifier token.
  */
 internal sealed class Parser {
 
@@ -269,7 +298,7 @@ internal sealed class Parser {
     }
 
     /**
-     *  ⟨optional multiple value⟩ ::= ‘=’ ⟨Expr ⟩ ‘,’ ⟨exprList⟩ ‘;’
+     *  ⟨optional multiple values⟩ ::= ‘=’ ⟨Expr ⟩ ‘,’ ⟨exprList⟩ ‘;’
      *   | ‘;’
      */
     private List<ExprAST> parseOptionalMultipleValues() {
