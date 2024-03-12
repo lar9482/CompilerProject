@@ -36,6 +36,23 @@ namespace CompilerProj.Parse;
  *
  * This case is especially prevalent with declarations, procedure calls, and assignments, because they all start with
  * an identifier token.
+ *
+ * Also, if the grammar rule has an EPSILON such as
+ * <A> :: 'a' 'b'
+ *  | EPSILON
+ * 
+ * you may see something like
+ * parseA() {
+ *     if (tokenQueue.Peek() != 'a') {
+ *          return;
+ *     }
+ *     consume('a')
+ *     consume('b')
+ * }
+ *
+ *
+
+ }
  */
 internal sealed class Parser {
 
@@ -117,7 +134,7 @@ internal sealed class Parser {
     /*
      * ⟨declaration⟩ ::= ⟨varDecl ⟩
      *   | ⟨multiVarDecl ⟩
-     *   | ⟨identifierDecl⟩ ⟨arrayDeclaration⟩
+     *   | ⟨arrayDeclaration⟩
      */
     private void parseDeclaration(
         Token firstIdentifier,
