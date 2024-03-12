@@ -8,7 +8,7 @@ namespace CompilerProj.Parse;
 /*
  * A simple recursive descent parser with building out the Abstract Syntax Tree
  * 
- * NOTE: This isn't a pure recursive descent parser, because there are parts were ambiguity is kind of abused.
+ * NOTE: This isn't a pure recursive descent parser, because there are parts where ambiguity is kind of abused.
  *
  * For example, if there is a grammar rule
  * <A> ::= 'b' <B>
