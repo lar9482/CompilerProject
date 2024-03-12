@@ -1,9 +1,9 @@
-internal sealed class MultiCallAST : StmtAST {
-    internal List<string> variableNames;
+internal sealed class MultiAssignCallAST : StmtAST {
+    internal List<VarAccessAST> variableNames;
     internal ProcedureCallAST call;
 
-    internal MultiCallAST(
-        List<string> variableNames,
+    internal MultiAssignCallAST(
+        List<VarAccessAST> variableNames,
         ProcedureCallAST call,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {
