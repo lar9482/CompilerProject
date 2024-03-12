@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuntimeTests", "RuntimeTest
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compiler", "Compiler\Compiler.csproj", "{EAA43951-EE58-4852-8C41-0A33B877816D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompilerTests", "CompilerTests\CompilerTests.csproj", "{51104F0F-A527-41CD-8116-ACE7AAC12DAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{EAA43951-EE58-4852-8C41-0A33B877816D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EAA43951-EE58-4852-8C41-0A33B877816D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EAA43951-EE58-4852-8C41-0A33B877816D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51104F0F-A527-41CD-8116-ACE7AAC12DAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51104F0F-A527-41CD-8116-ACE7AAC12DAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51104F0F-A527-41CD-8116-ACE7AAC12DAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51104F0F-A527-41CD-8116-ACE7AAC12DAE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
