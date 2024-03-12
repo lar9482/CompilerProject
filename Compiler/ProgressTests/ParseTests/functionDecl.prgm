@@ -7,6 +7,9 @@ function(param1: int, param2: bool, param3: int[], param4: int[][]): int, bool, 
     x = 0;
     x = 1 + 2 + 3 * 5;
 
+    //Multi-Assignment Procedure Call
+    x, y, z = procedure();
+    
     //Multi-Assignment variables
     x, y, z = 1, 2, 3;
 

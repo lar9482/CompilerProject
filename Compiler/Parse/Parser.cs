@@ -763,7 +763,7 @@ internal sealed class Parser {
             case TokenType.assign:
                 return parseAssign(firstIdentifier);
             case TokenType.comma:
-                return parseMultiAssign(firstIdentifier);
+                return parseMultiAssign_Or_MultiCallAssign(firstIdentifier);
             case TokenType.startBracket:
                 consume(TokenType.startBracket);
                 ExprAST firstAccess = parseExpr();
@@ -802,9 +802,10 @@ internal sealed class Parser {
     }
 
     /*
-    <multiAssign> ::= ‘,’ ⟨identifierList⟩ ‘=’ ⟨Expr ⟩ ‘,’ ⟨ExprList⟩ ‘;’
-    */
-    private MultiAssignAST parseMultiAssign(Token firstIdentifier) {
+     * <multiAssign_Or_MultiCallAssign> ::= ‘,’ ⟨identifierList⟩ ‘=’ ⟨Expr ⟩ ‘,’ ⟨ExprList⟩ ‘;’
+     * | ‘,’ ⟨identifierList⟩ ‘=’ <ProcedureCall> ‘;’
+     */
+    private StmtAST parseMultiAssign_Or_MultiCallAssign(Token firstIdentifier) {
         List<Token> variableNames = new List<Token>();
         variableNames.Add(firstIdentifier);
         consume(TokenType.comma);
@@ -813,8 +814,46 @@ internal sealed class Parser {
 
         consume(TokenType.assign);
 
+        ExprAST firstExpr = parseExpr();
+
+        if (tokenQueue.Peek().type == TokenType.comma) {
+            return parseMultiAssign(variableNames, firstExpr);
+        } else if (firstExpr.GetType() == typeof(ProcedureCallAST)) {
+            
+            consume(TokenType.semicolon);
+            List<VarAccessAST> variableAssigns = new List<VarAccessAST>();
+            foreach (Token variableName in variableNames) {
+                variableAssigns.Add(
+                    new VarAccessAST(
+                        variableName.lexeme,
+                        variableName.line,
+                        variableName.column
+                    )
+                );
+            }
+            return new MultiAssignCallAST(
+                variableAssigns,
+                (ProcedureCallAST) firstExpr,
+                variableAssigns[0].lineNumber,
+                variableAssigns[0].columnNumber
+            );
+        } else {
+            throw new Exception(
+                String.Format(
+                    "Line {0}:{1}: Expected a list of expressions, or just one procedure call",
+                    firstIdentifier.line,
+                    firstIdentifier.column
+                )
+            );
+        }
+    }
+
+    /*
+    <multiAssign> ::= ‘,’ ⟨identifierList⟩ ‘=’ ⟨Expr ⟩ ‘,’ ⟨ExprList⟩ ‘;’
+    */
+    private MultiAssignAST parseMultiAssign(List<Token> variableNames, ExprAST firstExpr) {
         List<ExprAST> exprs = new List<ExprAST>();
-        exprs.Add(parseExpr());
+        exprs.Add(firstExpr);
 
         consume(TokenType.comma);
         exprs = exprs.Concat(parseExprList()).ToList<ExprAST>();
@@ -835,8 +874,8 @@ internal sealed class Parser {
         
         return new MultiAssignAST(
             assignments,
-            firstIdentifier.line, 
-            firstIdentifier.column
+            variableNames[0].line, 
+            variableNames[1].column
         );
     }
 
