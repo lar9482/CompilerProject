@@ -30,7 +30,7 @@ namespace CompilerProj.Parse;
  *   //Consume <B> tokens
  * }
  *
- * parseC(Token cToken) {
+ * parseC(Token bToken) {
  *   //Consume <C> tokens
  * }
  *
