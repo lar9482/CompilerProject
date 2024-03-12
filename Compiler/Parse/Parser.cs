@@ -278,7 +278,14 @@ internal sealed class Parser {
         switch(tokenQueue.Peek().type) {
             case TokenType.assign:
                 consume(TokenType.assign);
-                //Parse multiple expressions later.
+                initialValues.Add(parseExpr());
+
+                consume(TokenType.comma);
+                
+                List<ExprAST> nextExprs = parseExprList();
+                initialValues = initialValues.Concat<ExprAST>(nextExprs).ToList<ExprAST>();
+
+                consume(TokenType.semicolon);
                 break;
             case TokenType.semicolon:
                 consume(TokenType.semicolon);
@@ -819,7 +826,7 @@ internal sealed class Parser {
         if (tokenQueue.Peek().type == TokenType.comma) {
             return parseMultiAssign(variableNames, firstExpr);
         } else if (firstExpr.GetType() == typeof(ProcedureCallAST)) {
-            
+
             consume(TokenType.semicolon);
             List<VarAccessAST> variableAssigns = new List<VarAccessAST>();
             foreach (Token variableName in variableNames) {
