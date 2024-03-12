@@ -14,7 +14,7 @@ namespace CompilerProj.Parse;
  * <A> ::= 'b' <B>
  * | 'b' <C>
  *
- * instead of writing the grammar completing context free, you may see something like
+ * instead of writing the grammar completely context free, you may see something like
  * 
  * parseA() {
  *   Token bToken = consume('b')
