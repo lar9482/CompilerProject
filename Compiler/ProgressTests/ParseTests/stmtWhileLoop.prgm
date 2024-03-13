@@ -1,0 +1,5 @@
+function() {
+    while (a > 0) {
+        b = true;
+    }
+}
