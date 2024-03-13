@@ -1,0 +1,16 @@
+function() {
+    //Single assignment variable
+    x = 0;
+    x = 1 + 2 + 3 * 5;
+
+    //Multi-Assignment variables
+    x, y, z = 1, 2, 3;
+
+    //Multi-Assignment variables(Procedure call)
+    x, y, z = procedure(0, 1, 2);
+    
+    //Array assignments
+    a[5 * 3] = 0;
+    b[0][10 / 2 * 5] = 0;
+
+}
