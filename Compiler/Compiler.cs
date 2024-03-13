@@ -16,6 +16,13 @@ public class Compiler {
         return tokenQueue;
     }
 
+    internal static ProgramAST dumpParse(string filePath) {
+        Queue<Token> tokens = dumpLex(filePath);
+        Parser parser = new Parser(tokens);
+        
+        return parser.parseProgram();
+    }
+
     public static void compileFile(string filePath) {
         StreamReader sr = new StreamReader(filePath);
         string programText = sr.ReadToEnd();
