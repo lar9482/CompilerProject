@@ -1,6 +1,8 @@
+using CompilerProj.Visitors;
+
 namespace CompilerProj.AST;
 
-internal abstract class NodeAST {
+internal abstract class NodeAST : ASTVisitorAccept {
     internal int lineNumber;
     internal int columnNumber;
 
@@ -8,4 +10,6 @@ internal abstract class NodeAST {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
     }
+
+    public abstract void accept(ASTVisitor visitor);
 }

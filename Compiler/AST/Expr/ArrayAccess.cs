@@ -1,3 +1,5 @@
+using CompilerProj.Visitors;
+
 internal sealed class ArrayAccessAST : ExprAST {
 
     internal string arrayName;
@@ -11,5 +13,9 @@ internal sealed class ArrayAccessAST : ExprAST {
         
         this.arrayName = arrayName;
         this.accessValue = accessValue;
+    }
+
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

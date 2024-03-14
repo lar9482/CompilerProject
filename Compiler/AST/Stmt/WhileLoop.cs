@@ -1,3 +1,5 @@
+using CompilerProj.Visitors;
+
 internal sealed class WhileLoopAST : StmtAST {
     internal ExprAST condition;
     internal BlockAST body;
@@ -10,5 +12,9 @@ internal sealed class WhileLoopAST : StmtAST {
         
         this.condition = condition;
         this.body = body;
+    }
+
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

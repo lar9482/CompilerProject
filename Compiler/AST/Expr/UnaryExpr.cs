@@ -1,3 +1,5 @@
+using CompilerProj.Visitors;
+
 internal sealed class UnaryExprAST : ExprAST {
     internal ExprAST operand;
     internal UnaryExprType exprType;
@@ -10,5 +12,9 @@ internal sealed class UnaryExprAST : ExprAST {
         
         this.operand = operand;
         this.exprType = exprType;
+    }
+    
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

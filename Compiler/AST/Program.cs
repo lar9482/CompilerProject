@@ -1,4 +1,5 @@
 using CompilerProj.AST;
+using CompilerProj.Visitors;
 
 internal sealed class ProgramAST : NodeAST {
     internal List<VarDeclAST> varDecls;
@@ -22,5 +23,9 @@ internal sealed class ProgramAST : NodeAST {
         this.arrayDecls = arrayDecls;
         this.multiDimArrayDecls = multiDimArrayDecls;
         this.funcDecls = funcDecls;
+    }
+
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

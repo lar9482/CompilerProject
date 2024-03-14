@@ -1,3 +1,5 @@
+using CompilerProj.Visitors;
+
 internal sealed class ReturnAST : StmtAST {
     internal List<ExprAST>? returnValues;
 
@@ -7,5 +9,9 @@ internal sealed class ReturnAST : StmtAST {
     ) : base(lineNumber, columnNumber) {
 
         this.returnValues = returnValues;
+    }
+
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

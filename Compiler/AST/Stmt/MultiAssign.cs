@@ -1,3 +1,5 @@
+using CompilerProj.Visitors;
+
 internal sealed class MultiAssignAST : StmtAST{
 
     internal Dictionary<VarAccessAST, ExprAST> assignments;
@@ -8,5 +10,9 @@ internal sealed class MultiAssignAST : StmtAST{
     ) : base(lineNumber, columnNumber) {
         
         this.assignments = assignments;
+    }
+
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

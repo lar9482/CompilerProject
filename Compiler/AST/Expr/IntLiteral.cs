@@ -1,4 +1,5 @@
 using CompilerProj.Types;
+using CompilerProj.Visitors;
 
 internal sealed class IntLiteralAST : ExprAST {
     internal int value;
@@ -9,5 +10,9 @@ internal sealed class IntLiteralAST : ExprAST {
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {
         this.value = value;
+    }
+
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

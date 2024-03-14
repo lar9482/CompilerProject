@@ -1,5 +1,6 @@
 using CompilerProj.AST;
 using CompilerProj.Types;
+using CompilerProj.Visitors;
 
 internal sealed class ParameterAST : NodeAST {
     internal string name;
@@ -11,5 +12,9 @@ internal sealed class ParameterAST : NodeAST {
     ) : base(lineNumber, columnNumber){
         this.name = name;
         this.type = type;
+    }
+
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

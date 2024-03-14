@@ -1,5 +1,6 @@
 using CompilerProj.AST;
 using CompilerProj.Types;
+using CompilerProj.Visitors;
 
 internal sealed class VarDeclAST : NodeAST {
     internal string name;
@@ -17,5 +18,9 @@ internal sealed class VarDeclAST : NodeAST {
         this.name = name;
         this.initialValue = initialValue;
         this.type = type;
+    }
+
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

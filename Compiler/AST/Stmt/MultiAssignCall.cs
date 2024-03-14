@@ -1,3 +1,5 @@
+using CompilerProj.Visitors;
+
 internal sealed class MultiAssignCallAST : StmtAST {
     internal List<VarAccessAST> variableNames;
     internal ProcedureCallAST call;
@@ -10,5 +12,9 @@ internal sealed class MultiAssignCallAST : StmtAST {
 
         this.variableNames = variableNames;
         this.call = call;
+    }
+
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

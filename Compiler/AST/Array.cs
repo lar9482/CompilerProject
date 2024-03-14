@@ -1,5 +1,6 @@
 using CompilerProj.AST;
 using CompilerProj.Types;
+using CompilerProj.Visitors;
 
 internal sealed class ArrayAST : NodeAST {
     internal string name;
@@ -19,5 +20,9 @@ internal sealed class ArrayAST : NodeAST {
         this.size = size;
         this.type = new ArrayType<PrimitiveType>(type);
         this.initialValues = initialValues;
+    }
+
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }
