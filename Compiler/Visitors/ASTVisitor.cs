@@ -4,34 +4,34 @@ namespace CompilerProj.Visitors;
 
 internal interface ASTVisitor {
     // Top level nodes
-    void visit(ProgramAST program);
-    void visit(VarDeclAST varDecl);
-    void visit(MultiVarDeclAST multiVarDecl);
-    void visit(ArrayAST array);
-    void visit(MultiDimArrayAST multiDimArray);
-    void visit(FuncDeclAST function);
-    void visit(ParameterAST parameter);
-    void visit(BlockAST block);
+    public void visit(ProgramAST program);
+    public void visit(VarDeclAST varDecl);
+    public void visit(MultiVarDeclAST multiVarDecl);
+    public void visit(ArrayAST array);
+    public void visit(MultiDimArrayAST multiDimArray);
+    public void visit(FuncDeclAST function);
+    public void visit(ParameterAST parameter);
+    public void visit(BlockAST block);
 
     // Stmt nodes
-    void visit(AssignAST assign);
-    void visit(MultiAssignAST multiAssign);
-    void visit(MultiAssignCallAST multiAssignCall);
-    void visit(ArrayAssignAST arrayAssign);
-    void visit(MultiDimArrayAssignAST multiDimArrayAssign);
-    void visit(ConditionalAST conditional);
-    void visit(WhileLoopAST whileLoop);
-    void visit(ReturnAST returnStmt);
+    public void visit(AssignAST assign);
+    public void visit(MultiAssignAST multiAssign);
+    public void visit(MultiAssignCallAST multiAssignCall);
+    public void visit(ArrayAssignAST arrayAssign);
+    public void visit(MultiDimArrayAssignAST multiDimArrayAssign);
+    public void visit(ConditionalAST conditional);
+    public void visit(WhileLoopAST whileLoop);
+    public void visit(ReturnAST returnStmt);
 
     // Expr Nodes
-    void visit(BinaryExprAST binaryExpr);
-    void visit(UnaryExprAST unaryExpr);
-    void visit(VarAccessAST varAccess);
-    void visit(ArrayAccessAST arrayAccess);
-    void visit(MultiDimArrayAccessAST multiDimArrayAccess);
-    void visit(ProcedureCallAST procedureCall);
-    void visit(IntLiteralAST intLiteral);
-    void visit(BoolLiteralAST boolLiteral);
-    void visit(CharLiteralAST charLiteral);
-    void visit(StrLiteralAST strLiteral);
+    public void visit(BinaryExprAST binaryExpr);
+    public void visit(UnaryExprAST unaryExpr);
+    public void visit(VarAccessAST varAccess);
+    public void visit(ArrayAccessAST arrayAccess);
+    public void visit(MultiDimArrayAccessAST multiDimArrayAccess);
+    public void visit(ProcedureCallAST procedureCall);
+    public void visit(IntLiteralAST intLiteral);
+    public void visit(BoolLiteralAST boolLiteral);
+    public void visit(CharLiteralAST charLiteral);
+    public void visit(StrLiteralAST strLiteral);
 }
