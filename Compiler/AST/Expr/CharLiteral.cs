@@ -1,4 +1,5 @@
 using CompilerProj.Types;
+using CompilerProj.Visitors;
 
 internal class CharLiteralAST : ExprAST {
     internal char charValue;
@@ -11,5 +12,9 @@ internal class CharLiteralAST : ExprAST {
     ) : base(lineNumber, columnNumber) {
         this.charValue = charValue;
         this.asciiValue = (int) charValue;
+    }
+
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

@@ -1,3 +1,5 @@
+using CompilerProj.Visitors;
+
 internal sealed class ProcedureCallAST : ExprAST {
     internal string procedureName;
     internal List<ExprAST> args;
@@ -10,5 +12,9 @@ internal sealed class ProcedureCallAST : ExprAST {
 
         this.procedureName = procedureName;
         this.args = args;
+    }
+
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

@@ -1,3 +1,5 @@
+using CompilerProj.Visitors;
+
 internal sealed class ArrayAssignAST : StmtAST{
     internal ArrayAccessAST arrayAccess;
     internal ExprAST value;
@@ -10,5 +12,9 @@ internal sealed class ArrayAssignAST : StmtAST{
 
         this.arrayAccess = arrayAccess;
         this.value = value;
+    }
+
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

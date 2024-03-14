@@ -1,5 +1,6 @@
 using CompilerProj.AST;
 using CompilerProj.Types;
+using CompilerProj.Visitors;
 
 internal sealed class MultiDimArrayAST : NodeAST {
     internal string name;
@@ -25,5 +26,9 @@ internal sealed class MultiDimArrayAST : NodeAST {
         this.type = new MultiDimArrayType<PrimitiveType>(type);
         
         this.initialValues = initialValues;
+    }
+
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

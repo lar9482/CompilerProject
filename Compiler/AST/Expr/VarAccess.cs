@@ -1,3 +1,5 @@
+using CompilerProj.Visitors;
+
 internal sealed class VarAccessAST : ExprAST {
 
     internal string variableName;
@@ -8,5 +10,9 @@ internal sealed class VarAccessAST : ExprAST {
     ) : base(lineNumber, columnNumber) {
         
         this.variableName = variableName;
+    }
+
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

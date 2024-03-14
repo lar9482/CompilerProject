@@ -1,5 +1,6 @@
 using CompilerProj.AST;
 using CompilerProj.Types;
+using CompilerProj.Visitors;
 
 internal sealed class MultiVarDeclAST : NodeAST {
     internal List<string> names;
@@ -16,5 +17,9 @@ internal sealed class MultiVarDeclAST : NodeAST {
         this.names = names;
         this.initialValues = initialValues;
         this.types = types;
+    }
+
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

@@ -32,4 +32,6 @@ internal interface ASTVisitor {
     void visit(ProcedureCallAST procedureCall);
     void visit(IntLiteralAST intLiteral);
     void visit(BoolLiteralAST boolLiteral);
+    void visit(CharLiteralAST charLiteral);
+    void visit(StrLiteralAST strLiteral);
 }

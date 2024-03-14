@@ -1,4 +1,5 @@
 using CompilerProj.Types;
+using CompilerProj.Visitors;
 
 internal sealed class StrLiteralAST : ExprAST {
     internal string value;
@@ -16,5 +17,9 @@ internal sealed class StrLiteralAST : ExprAST {
         for (int i = 0; i < value.Length; i++) {
             this.asciiValues[i] = value[i];
         }
+    }
+
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

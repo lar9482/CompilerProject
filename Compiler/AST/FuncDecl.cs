@@ -1,5 +1,6 @@
 using CompilerProj.AST;
 using CompilerProj.Types;
+using CompilerProj.Visitors;
 
 internal sealed class FuncDeclAST : NodeAST {
     internal string name;
@@ -20,5 +21,9 @@ internal sealed class FuncDeclAST : NodeAST {
         this.parameters = parameters;
         this.returnTypes = returnTypes;
         this.block = block;
+    }
+
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

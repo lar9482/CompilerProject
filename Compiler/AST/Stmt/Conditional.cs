@@ -1,4 +1,5 @@
 using CompilerProj.AST;
+using CompilerProj.Visitors;
 
 internal sealed class ConditionalAST : StmtAST {
     internal ExprAST ifCondition;
@@ -19,5 +20,9 @@ internal sealed class ConditionalAST : StmtAST {
         this.ifBlock = ifBlock;
         this.elseIfConditionalBlocks = elseIfConditionalBlocks;
         this.elseBlock = elseBlock;
+    }
+
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }

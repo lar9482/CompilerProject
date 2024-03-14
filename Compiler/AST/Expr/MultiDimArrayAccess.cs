@@ -1,3 +1,5 @@
+using CompilerProj.Visitors;
+
 internal sealed class MultiDimArrayAccessAST : ExprAST {
 
     internal string arrayName;
@@ -14,5 +16,9 @@ internal sealed class MultiDimArrayAccessAST : ExprAST {
         this.arrayName = arrayName;
         this.firstIndex = firstIndex;
         this.secondIndex = secondIndex;
+    }
+
+    public override void accept(ASTVisitor visitor) {
+        visitor.visit(this);
     }
 }
