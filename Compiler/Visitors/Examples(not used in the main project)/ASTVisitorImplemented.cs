@@ -1,7 +1,6 @@
-using System.Security.Cryptography.X509Certificates;
 using CompilerProj.Visitors;
 
-internal class ASTVisitorImplemented : ASTVisitor {
+internal sealed class ASTVisitorImplemented : ASTVisitor {
     public void visit(ProgramAST program) { }
     public void visit(VarDeclAST varDecl) { }
     public void visit(MultiVarDeclAST multiVarDecl) { }
