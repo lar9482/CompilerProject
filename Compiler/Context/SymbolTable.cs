@@ -7,7 +7,7 @@ using CompilerProj.Types;
  */
 internal sealed class SymbolTable {
 
-    internal Dictionary<string, LangType> table;
+    private Dictionary<string, LangType> table;
     internal SymbolTable? parentTable;
     
     internal SymbolTable(SymbolTable? parentTable) {
