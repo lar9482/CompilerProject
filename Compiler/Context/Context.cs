@@ -10,7 +10,7 @@ using CompilerProj.Types;
 
 internal sealed class Context {
 
-    Stack<SymbolTable> environment;
+    private Stack<SymbolTable> environment;
 
     internal Context() {
         this.environment = new Stack<SymbolTable>();
