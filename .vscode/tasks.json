@@ -2,6 +2,16 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "CompilerTests",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-File",
+                "${workspaceFolder}/Compiler/enableCompilerTests.ps1"
+            ],
+            "group": "build"
+        },
+        {
             "label": "build",
             "command": "dotnet",
             "type": "process",
@@ -11,6 +21,7 @@
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
+            "dependsOn": "CompilerTests",
             "problemMatcher": "$msCompile"
         },
         {
