@@ -4,6 +4,9 @@ using CompilerProj.Parse;
 using CompilerProj.Tokens;
 namespace CompilerTests;
 
+/*
+ * Expression trees are tested by comparing the generated reverse polish notation.
+ */
 public class ExprParserTests {
     [SetUp]
     public void Setup() {
@@ -210,7 +213,7 @@ public class ExprParserTests {
         expectedRecord.Enqueue("+");
         expectedRecord.Enqueue("4");
         expectedRecord.Enqueue("+");
-        
+
         Queue<string> actualRecord = getActualTraversalRecord(text);
         Assert.IsTrue(matchingTraversalRecord(expectedRecord, actualRecord));
     }
