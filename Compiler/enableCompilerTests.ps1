@@ -1,41 +1,18 @@
 $filePath = "./Compiler/obj/Debug/net8.0/Compiler.AssemblyInfo.cs"
-
+# $filePath = "./obj/Debug/net8.0/Compiler.AssemblyInfo.cs"
 $fileContent = Get-Content $filePath -Raw
 
-$CompilerServiceDirective = "using System.Runtime.CompilerServices;`r`n"
-$firstAssemblyPattern = '\[assembly: System\.Reflection\.AssemblyCompanyAttribute\("Compiler"\)\]'
+$compilerServiceDirective = "using System.Runtime.CompilerServices;`r`n"
+$firstAssembly = '[assembly: System.Reflection.AssemblyCompanyAttribute("Compiler")]'
+$compilerTestsAssembly = '[assembly: InternalsVisibleTo("CompilerTests")]'
 
-# $compilerServicePattern 'using System\.Runtime\.CompilerServices;'
-# $compilerServiceMatch = [regex]::Match($fileContent, $compilerServicePattern)
-# $compilerTestPattern = '\[assembly: InternalsVisibleTo\("CompilerTests"\)\]'
-# if ($compilerServiceMatch.Success) {
-#     Write-Host "Compiler directive exists already."
-# } else {
-#     $firstAssemblyMatch = [regex]::Match($fileContent, $firstAssemblyPattern)
-#     if ($firstAssemblyMatch.Success) {
-#         $insertIndex = $match.Index
-#         $fileContent = $fileContent.Insert($insertIndex-1, $CompilerServiceDirective)
-#     }
-#     else {
-#         Write-Host "Pattern not found."
-#     }
-# }
-
-# $compilerTestMatch = [regex]::Match($fileContent, $compilerServicePattern)
-# if ($compilerTestMatch.Success) {
-#     Write-Host "Compiler tests exists already."
-# } else {
-#     $fileContent += $CompilerTestDirective
-# }
-
-$firstAssemblyMatch = [regex]::Match($fileContent, $firstAssemblyPattern)
-if ($firstAssemblyMatch.Success) {
-    $insertIndex = $match.Index
-    $fileContent = $fileContent.Insert($insertIndex, $CompilerServiceDirective)
-}
-else {
-    Write-Host "Pattern not found."
+if ($fileContent.IndexOf($compilerServiceDirective) -eq -1) {
+    $firstAssemblyIndex = $fileContent.IndexOf($firstAssembly + "`r`n")
+    $fileContent = $fileContent.Insert($firstAssemblyIndex, $CompilerServiceDirective)
 }
 
-$fileContent += "`r`n[assembly: InternalsVisibleTo(`"CompilerTests`")]"
+if ($fileContent.IndexOf($compilerTestsAssembly) -eq -1) {
+    $fileContent += "`r`n"
+    $fileContent += $compilerTestsAssembly
+}
 $fileContent | Set-Content $filePath -Force
