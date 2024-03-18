@@ -39,7 +39,7 @@ public class ExprParserTests {
     }
 
     [Test]
-    public void ExprParseTest1() {
+    public void ExprParseTest_Add_And_Subtraction() {
         string text = "1 - 2 + 3 - 4";
         Queue<string> expectedRecord = new Queue<string>();
         expectedRecord.Enqueue("1");
@@ -55,7 +55,7 @@ public class ExprParserTests {
     }
 
     [Test] 
-    public void ExprParseTest2() {
+    public void ExprParseTest_PEMDAS1() {
         string text = "(1 - 2) + (3 * 4 / 5)";
         Queue<string> expectedRecord = new Queue<string>();
         expectedRecord.Enqueue("1");
@@ -73,7 +73,7 @@ public class ExprParserTests {
     }
 
     [Test]
-    public void ExprParseTest3() {
+    public void ExprParseTest_PEMDAS2() {
         string text = "1 + (2 * 3)";
         Queue<string> expectedRecord = new Queue<string>();
         expectedRecord.Enqueue("1");
@@ -86,7 +86,7 @@ public class ExprParserTests {
     }
 
     [Test]
-    public void ExprParseTest4() {
+    public void ExprParseTest_ADD_AND_MODUS() {
         string text = "1 + 2 % 3";
         Queue<string> expectedRecord = new Queue<string>();
         expectedRecord.Enqueue("1");
@@ -99,7 +99,7 @@ public class ExprParserTests {
     }
 
     [Test]
-    public void ExprParseTest5() {
+    public void ExprParseTest_ADD_MODUS_NEGATION() {
         string text = "-1 + -(2 % 3)";
         Queue<string> expectedRecord = new Queue<string>();
         expectedRecord.Enqueue("1");
@@ -114,7 +114,7 @@ public class ExprParserTests {
     }
 
     [Test]
-    public void ExprParseTest6() {
+    public void ExprParseTest_BOOLEAN() {
         string text = "true || false && true";
 
         Queue<string> expectedRecord = new Queue<string>();
@@ -128,7 +128,7 @@ public class ExprParserTests {
     }
 
     [Test]
-    public void ExprParseTest7() {
+    public void ExprParseTest_ARRAY_ACCESS() {
         string text = "exprVar1 + array1[55 + 55] + array2[0][-101 - (5 * 3) - (10 / 2)]";
         Queue<string> expectedRecord = new Queue<string>();
 
@@ -161,6 +161,56 @@ public class ExprParserTests {
         //Combining everything with the +
         expectedRecord.Enqueue("+");
 
+        Queue<string> actualRecord = getActualTraversalRecord(text);
+        Assert.IsTrue(matchingTraversalRecord(expectedRecord, actualRecord));
+    }
+
+    [Test]
+    public void ExprParseTest_PROCEDURE_CALL() {
+        string text = "function( " +
+        "    array1[55 + 55] + array2[0][-101 - (5 * 3) - (10 / 2)], " +
+        "    -1 - 2 + 3 + 4 " +
+        ")";
+
+        Queue<string> expectedRecord = new Queue<string>();
+        
+        expectedRecord.Enqueue("function");
+        //For parameter1
+        expectedRecord.Enqueue("array1");
+        //Index calculation for array1
+        expectedRecord.Enqueue("55");
+        expectedRecord.Enqueue("55");
+        expectedRecord.Enqueue("+");
+
+
+        expectedRecord.Enqueue("array2");
+        //Array2's first index
+        expectedRecord.Enqueue("0"); 
+        //Array2's second index
+        expectedRecord.Enqueue("101");
+        expectedRecord.Enqueue("-");
+        expectedRecord.Enqueue("5");
+        expectedRecord.Enqueue("3");
+        expectedRecord.Enqueue("*");
+        expectedRecord.Enqueue("-");
+        expectedRecord.Enqueue("10");
+        expectedRecord.Enqueue("2");
+        expectedRecord.Enqueue("/");
+        expectedRecord.Enqueue("-");
+
+        //Combining array1 and array2 with +
+        expectedRecord.Enqueue("+");
+
+        //For parameter 2
+        expectedRecord.Enqueue("1");
+        expectedRecord.Enqueue("-");
+        expectedRecord.Enqueue("2");
+        expectedRecord.Enqueue("-");
+        expectedRecord.Enqueue("3");
+        expectedRecord.Enqueue("+");
+        expectedRecord.Enqueue("4");
+        expectedRecord.Enqueue("+");
+        
         Queue<string> actualRecord = getActualTraversalRecord(text);
         Assert.IsTrue(matchingTraversalRecord(expectedRecord, actualRecord));
     }
