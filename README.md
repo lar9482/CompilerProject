@@ -1,6 +1,6 @@
+# IN PROGRESS
 # What is this?
-This is my attempt at writing a compiler for my custom runtime
-IN-PROGRESS
+This is my attempt at writing a compiler for simple C-like imperative language that targets my custom [runtime.](https://github.com/lar9482/AssemblySimulator)
 
 # Goals for the compiler
 - [x] Lexical Analysis
