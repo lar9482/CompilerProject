@@ -22,7 +22,7 @@ public class LexerTests {
 
     [Test]
     public void IdentifierTest() {
-        string programFilePath = "../../../LexerTestFiles/identifier.prgm";
+        string programFilePath = "../../../LexerTesting/identifier.prgm";
         Queue<TokenType> expectedTokenTypes = new Queue<TokenType>();
         expectedTokenTypes.Enqueue(TokenType.reserved_if);
         expectedTokenTypes.Enqueue(TokenType.reserved_while);
@@ -47,7 +47,7 @@ public class LexerTests {
 
     [Test]
     public void numberTest() {
-        string programFilePath = "../../../LexerTestFiles/number.prgm";
+        string programFilePath = "../../../LexerTesting/number.prgm";
         Queue<TokenType> expectedTokenTypes = new Queue<TokenType>();
         expectedTokenTypes.Enqueue(TokenType.number);
         expectedTokenTypes.Enqueue(TokenType.number);
@@ -64,7 +64,7 @@ public class LexerTests {
 
     [Test]
     public void oneSymbolTest() {
-        string programFilePath = "../../../LexerTestFiles/oneSymbol.prgm";
+        string programFilePath = "../../../LexerTesting/oneSymbol.prgm";
         Queue<TokenType> expectedTokenTypes = new Queue<TokenType>();
         expectedTokenTypes.Enqueue(TokenType.startParen);
         expectedTokenTypes.Enqueue(TokenType.startCurly);
@@ -96,7 +96,7 @@ public class LexerTests {
 
     [Test]
     public void twoSymbolsTest() {
-        string programFilePath = "../../../LexerTestFiles/twoSymbol.prgm";
+        string programFilePath = "../../../LexerTesting/twoSymbol.prgm";
         Queue<TokenType> expectedTokenTypes = new Queue<TokenType>();
         expectedTokenTypes.Enqueue(TokenType.lessThanEqual);
         expectedTokenTypes.Enqueue(TokenType.greaterThanEqual);
@@ -115,7 +115,7 @@ public class LexerTests {
 
     [Test]
     public void combinedSymbolsTest() {
-        string programFilePath = "../../../LexerTestFiles/symbols.prgm";
+        string programFilePath = "../../../LexerTesting/symbols.prgm";
         Queue<TokenType> expectedTokenTypes = new Queue<TokenType>();
         expectedTokenTypes.Enqueue(TokenType.startParen);
         expectedTokenTypes.Enqueue(TokenType.startCurly);
