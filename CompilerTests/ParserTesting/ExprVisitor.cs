@@ -12,7 +12,6 @@ internal class ExprVisitor : ASTVisitor {
     }
 
     public void visit(ExprAST exprAST) {
-        var test = exprAST.GetType().ToString();
         switch(exprAST.GetType().ToString()) {
             case "BinaryExprAST": visit((BinaryExprAST) exprAST); break;
             case "UnaryExprAST": visit((UnaryExprAST) exprAST); break;

@@ -30,12 +30,15 @@ public class ExprParserTests {
         }
 
         string currentToken = expectedRecord.Dequeue();
-        while (expectedRecord.Count > 0) {
+        while (expectedRecord.Count >= 0) {
             if (actualRecord.Peek() != currentToken) {
                 return false;
             }
 
             actualRecord.Dequeue();
+            if (expectedRecord.Count == 0) {
+                break;
+            }
             currentToken = expectedRecord.Dequeue();
         }
         return true;

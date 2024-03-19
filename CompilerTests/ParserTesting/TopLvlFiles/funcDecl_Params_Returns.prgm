@@ -1,0 +1,10 @@
+function(
+    param1: int, 
+    param2: bool, 
+    param3: int[], 
+    param4: int[][], 
+    param5: bool[], 
+    param6: bool[][]
+): int, bool, int[], int[][], bool[], bool[][] {
+
+}
