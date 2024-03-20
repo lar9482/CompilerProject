@@ -1,8 +1,8 @@
 using CompilerProj.Visitors;
 
 /*
- * Making post order traversals from the expression AST to see if they were parsed correctly.
- * This will convert expressions into reverse polish notation to verify
+ * Making in-order traversals from the expression AST to see if they were parsed correctly.
+ * This will convert expressions trees back into their original form(without parenthesis).
  */
 internal class ExprVisitor : ASTVisitor {
     public Queue<string> traverseRecord;
@@ -12,27 +12,30 @@ internal class ExprVisitor : ASTVisitor {
     }
 
     public void visit(ExprAST exprAST) {
-        switch(exprAST.GetType().ToString()) {
-            case "BinaryExprAST": visit((BinaryExprAST) exprAST); break;
-            case "UnaryExprAST": visit((UnaryExprAST) exprAST); break;
-            case "VarAccessAST": visit((VarAccessAST) exprAST); break;
-            case "ArrayAccessAST": visit((ArrayAccessAST) exprAST); break;
-            case "MultiDimArrayAccessAST": visit((MultiDimArrayAccessAST) exprAST); break;
-            case "ProcedureCallAST": visit((ProcedureCallAST) exprAST); break;
-            case "IntLiteralAST": visit((IntLiteralAST) exprAST); break;
-            case "BoolLiteralAST": visit((BoolLiteralAST) exprAST); break;
+
+        switch (exprAST) {
+            case BinaryExprAST binaryExpr: visit(binaryExpr); break;
+            case UnaryExprAST unaryExpr: visit(unaryExpr); break;
+            case VarAccessAST varAccessAST: visit(varAccessAST); break;
+            case ArrayAccessAST arrayAccess: visit(arrayAccess); break;
+            case MultiDimArrayAccessAST multiDimArrayAccess: visit(multiDimArrayAccess); break;
+            case ProcedureCallAST procedureCall: visit(procedureCall); break;
+            case IntLiteralAST intLiteral: visit(intLiteral); break;
+            case BoolLiteralAST boolLiteral: visit(boolLiteral); break;
+            default:
+                throw new Exception("Unsupported type");
         }
     }
 
     public void visit(BinaryExprAST binaryExpr) { 
         binaryExpr.leftOperand.accept(this);
-        binaryExpr.rightOperand.accept(this);
         traverseRecord.Enqueue(binaryOpToString(binaryExpr.exprType));
+        binaryExpr.rightOperand.accept(this);
     }
 
     public void visit(UnaryExprAST unaryExpr) {
-        unaryExpr.operand.accept(this); 
         traverseRecord.Enqueue(unaryOpToString(unaryExpr.exprType));
+        unaryExpr.operand.accept(this); 
     }
 
     public void visit(VarAccessAST varAccess) { 
