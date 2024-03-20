@@ -1,6 +1,8 @@
 
 /*
- * Basically the wrapper for the symbol tables.
+ * Basically the wrapper for the symbol tables, 
+ * which implements static scoping via a stack of symbol tables.
+ *
  * Each symbol table represents a "scope" environment.
  * 
  * For example, each function block, if-statement block, and while loop block will
