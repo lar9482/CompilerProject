@@ -5,7 +5,8 @@ using CompilerProj.Tokens;
 namespace CompilerTests;
 
 /*
- * Expression trees are tested by comparing the generated reverse polish notation.
+ * The expression parser is tested to see if it produced a tree that can be correctly reconstructed 
+ * using in-order traversal.
  */
 public class ExprParserTests {
     [SetUp]
@@ -49,12 +50,12 @@ public class ExprParserTests {
         string text = "1 - 2 + 3 - 4";
         Queue<string> expectedRecord = new Queue<string>();
         expectedRecord.Enqueue("1");
+        expectedRecord.Enqueue("-");
         expectedRecord.Enqueue("2");
-        expectedRecord.Enqueue("-");
-        expectedRecord.Enqueue("3");
         expectedRecord.Enqueue("+");
-        expectedRecord.Enqueue("4");
+        expectedRecord.Enqueue("3");
         expectedRecord.Enqueue("-");
+        expectedRecord.Enqueue("4");
 
         Queue<string> actualRecord = getActualTraversalRecord(text);
         Assert.IsTrue(matchingTraversalRecord(expectedRecord, actualRecord));
@@ -65,14 +66,14 @@ public class ExprParserTests {
         string text = "(1 - 2) + (3 * 4 / 5)";
         Queue<string> expectedRecord = new Queue<string>();
         expectedRecord.Enqueue("1");
-        expectedRecord.Enqueue("2");
         expectedRecord.Enqueue("-");
-        expectedRecord.Enqueue("3");
-        expectedRecord.Enqueue("4");
-        expectedRecord.Enqueue("*");
-        expectedRecord.Enqueue("5");
-        expectedRecord.Enqueue("/");
+        expectedRecord.Enqueue("2");
         expectedRecord.Enqueue("+");
+        expectedRecord.Enqueue("3");
+        expectedRecord.Enqueue("*");
+        expectedRecord.Enqueue("4");
+        expectedRecord.Enqueue("/");
+        expectedRecord.Enqueue("5");
 
         Queue<string> actualRecord = getActualTraversalRecord(text);
         Assert.IsTrue(matchingTraversalRecord(expectedRecord, actualRecord));
@@ -83,10 +84,10 @@ public class ExprParserTests {
         string text = "1 + (2 * 3)";
         Queue<string> expectedRecord = new Queue<string>();
         expectedRecord.Enqueue("1");
-        expectedRecord.Enqueue("2");
-        expectedRecord.Enqueue("3");
-        expectedRecord.Enqueue("*");
         expectedRecord.Enqueue("+");
+        expectedRecord.Enqueue("2");
+        expectedRecord.Enqueue("*");
+        expectedRecord.Enqueue("3");
         Queue<string> actualRecord = getActualTraversalRecord(text);
         Assert.IsTrue(matchingTraversalRecord(expectedRecord, actualRecord));
     }
@@ -96,10 +97,10 @@ public class ExprParserTests {
         string text = "1 + 2 % 3";
         Queue<string> expectedRecord = new Queue<string>();
         expectedRecord.Enqueue("1");
-        expectedRecord.Enqueue("2");
-        expectedRecord.Enqueue("3");
-        expectedRecord.Enqueue("%");
         expectedRecord.Enqueue("+");
+        expectedRecord.Enqueue("2");
+        expectedRecord.Enqueue("%");
+        expectedRecord.Enqueue("3");
         Queue<string> actualRecord = getActualTraversalRecord(text);
         Assert.IsTrue(matchingTraversalRecord(expectedRecord, actualRecord));
     }
@@ -108,13 +109,13 @@ public class ExprParserTests {
     public void ExprParseTest_ADD_MODUS_NEGATION() {
         string text = "-1 + -(2 % 3)";
         Queue<string> expectedRecord = new Queue<string>();
+        expectedRecord.Enqueue("-");
         expectedRecord.Enqueue("1");
+        expectedRecord.Enqueue("+");
         expectedRecord.Enqueue("-");
         expectedRecord.Enqueue("2");
-        expectedRecord.Enqueue("3");
         expectedRecord.Enqueue("%");
-        expectedRecord.Enqueue("-");
-        expectedRecord.Enqueue("+");
+        expectedRecord.Enqueue("3");
         Queue<string> actualRecord = getActualTraversalRecord(text);
         Assert.IsTrue(matchingTraversalRecord(expectedRecord, actualRecord));
     }
@@ -125,10 +126,10 @@ public class ExprParserTests {
 
         Queue<string> expectedRecord = new Queue<string>();
         expectedRecord.Enqueue("True");
-        expectedRecord.Enqueue("False");
-        expectedRecord.Enqueue("True");
-        expectedRecord.Enqueue("&&");
         expectedRecord.Enqueue("||");
+        expectedRecord.Enqueue("False");
+        expectedRecord.Enqueue("&&");
+        expectedRecord.Enqueue("True");
         Queue<string> actualRecord = getActualTraversalRecord(text);
         Assert.IsTrue(matchingTraversalRecord(expectedRecord, actualRecord));
     }
@@ -139,33 +140,30 @@ public class ExprParserTests {
         Queue<string> expectedRecord = new Queue<string>();
 
         expectedRecord.Enqueue("exprVar1");
+        expectedRecord.Enqueue("+");
 
         expectedRecord.Enqueue("array1");
         //Index calculation for array1
         expectedRecord.Enqueue("55");
+        expectedRecord.Enqueue("+");
         expectedRecord.Enqueue("55");
-        expectedRecord.Enqueue("+");
-        //Combining exprVar1 and array2 with the +
-        expectedRecord.Enqueue("+");
 
+        expectedRecord.Enqueue("+");
 
         expectedRecord.Enqueue("array2");
         //First index
         expectedRecord.Enqueue("0"); 
         //Second index
+        expectedRecord.Enqueue("-");
         expectedRecord.Enqueue("101");
         expectedRecord.Enqueue("-");
         expectedRecord.Enqueue("5");
-        expectedRecord.Enqueue("3");
         expectedRecord.Enqueue("*");
+        expectedRecord.Enqueue("3");
         expectedRecord.Enqueue("-");
         expectedRecord.Enqueue("10");
-        expectedRecord.Enqueue("2");
         expectedRecord.Enqueue("/");
-        expectedRecord.Enqueue("-");
-
-        //Combining everything with the +
-        expectedRecord.Enqueue("+");
+        expectedRecord.Enqueue("2");
 
         Queue<string> actualRecord = getActualTraversalRecord(text);
         Assert.IsTrue(matchingTraversalRecord(expectedRecord, actualRecord));
@@ -185,37 +183,35 @@ public class ExprParserTests {
         expectedRecord.Enqueue("array1");
         //Index calculation for array1
         expectedRecord.Enqueue("55");
+        expectedRecord.Enqueue("+");
         expectedRecord.Enqueue("55");
+
         expectedRecord.Enqueue("+");
 
-
         expectedRecord.Enqueue("array2");
-        //Array2's first index
+        //First index
         expectedRecord.Enqueue("0"); 
-        //Array2's second index
+        //Second index
+        expectedRecord.Enqueue("-");
         expectedRecord.Enqueue("101");
         expectedRecord.Enqueue("-");
         expectedRecord.Enqueue("5");
-        expectedRecord.Enqueue("3");
         expectedRecord.Enqueue("*");
+        expectedRecord.Enqueue("3");
         expectedRecord.Enqueue("-");
         expectedRecord.Enqueue("10");
-        expectedRecord.Enqueue("2");
         expectedRecord.Enqueue("/");
-        expectedRecord.Enqueue("-");
-
-        //Combining array1 and array2 with +
-        expectedRecord.Enqueue("+");
+        expectedRecord.Enqueue("2");
 
         //For parameter 2
+        expectedRecord.Enqueue("-");
         expectedRecord.Enqueue("1");
         expectedRecord.Enqueue("-");
         expectedRecord.Enqueue("2");
-        expectedRecord.Enqueue("-");
+        expectedRecord.Enqueue("+");
         expectedRecord.Enqueue("3");
         expectedRecord.Enqueue("+");
         expectedRecord.Enqueue("4");
-        expectedRecord.Enqueue("+");
 
         Queue<string> actualRecord = getActualTraversalRecord(text);
         Assert.IsTrue(matchingTraversalRecord(expectedRecord, actualRecord));
