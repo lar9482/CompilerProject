@@ -35,7 +35,7 @@ internal class TopLvlVisitor : ASTVisitor {
     }
 
     public void visit(VarDeclAST varDecl) { 
-        traversalRecord.Enqueue(String.Format("{0}: {1}", varDecl.name, LangTypeToString(varDecl.type)));
+        traversalRecord.Enqueue(String.Format("{0}: {1}", varDecl.name, SimpleTypeToString(varDecl.type)));
         if (varDecl.initialValue != null) {
             traversalRecord.Enqueue("EXPR");
         }
@@ -44,7 +44,7 @@ internal class TopLvlVisitor : ASTVisitor {
     public void visit(MultiVarDeclAST multiVarDecl) { 
         foreach (KeyValuePair<string, PrimitiveType> pair in multiVarDecl.types) {
             traversalRecord.Enqueue(
-                String.Format("{0}: {1}", pair.Key, LangTypeToString(pair.Value))
+                String.Format("{0}: {1}", pair.Key, SimpleTypeToString(pair.Value))
             );
 
             ExprAST? initialValue;
@@ -58,7 +58,7 @@ internal class TopLvlVisitor : ASTVisitor {
     public void visit(ArrayAST array) {  
         traversalRecord.Enqueue(
             String.Format("{0}: {1} SIZE:{2}", 
-            array.name, LangTypeToString(array.type), array.size
+            array.name, SimpleTypeToString(array.type), array.size
         ));
 
         if (array.initialValues != null) {
@@ -69,7 +69,7 @@ internal class TopLvlVisitor : ASTVisitor {
     public void visit(MultiDimArrayAST multiDimArray) { 
         traversalRecord.Enqueue(
             String.Format("{0}: {1} ROW:{2} COL:{3}", 
-            multiDimArray.name, LangTypeToString(multiDimArray.type), 
+            multiDimArray.name, SimpleTypeToString(multiDimArray.type), 
             multiDimArray.rowSize, multiDimArray.colSize
         ));
 
@@ -86,14 +86,14 @@ internal class TopLvlVisitor : ASTVisitor {
         }
 
         foreach (var returnType in function.returnTypes) {
-            traversalRecord.Enqueue(LangTypeToString(returnType));
+            traversalRecord.Enqueue(SimpleTypeToString(returnType));
         }
 
         function.block.accept(this);
     }
 
     public void visit(ParameterAST parameter) { 
-        traversalRecord.Enqueue(String.Format("{0}: {1}", parameter.name, LangTypeToString(parameter.type)));
+        traversalRecord.Enqueue(String.Format("{0}: {1}", parameter.name, SimpleTypeToString(parameter.type)));
     }
 
     public void visit(BlockAST block) { 
@@ -185,7 +185,7 @@ internal class TopLvlVisitor : ASTVisitor {
         }
     }
 
-    private string LangTypeToString(LangType type) {
+    private string SimpleTypeToString(SimpleType type) {
         switch(type) {
             case IntType intType: return "int";
             case BoolType boolType: return "bool";
