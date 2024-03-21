@@ -2,12 +2,12 @@ using CompilerProj.AST;
 using CompilerProj.Types;
 using CompilerProj.Visitors;
 
-internal sealed class MultiVarDeclAST : NodeAST {
-    internal List<string> names;
-    internal Dictionary<string, ExprAST?> initialValues;
-    internal Dictionary<string, PrimitiveType> types;
+public sealed class MultiVarDeclAST : NodeAST {
+    public List<string> names;
+    public Dictionary<string, ExprAST?> initialValues;
+    public Dictionary<string, PrimitiveType> types;
 
-    internal MultiVarDeclAST(
+    public MultiVarDeclAST(
         List<string> names, 
         Dictionary<string, ExprAST?> initialValues,
         Dictionary<string, PrimitiveType> types,

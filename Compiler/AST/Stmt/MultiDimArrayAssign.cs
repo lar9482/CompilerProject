@@ -1,10 +1,10 @@
 using CompilerProj.Visitors;
 
-internal sealed class MultiDimArrayAssignAST : StmtAST{
-    internal MultiDimArrayAccessAST arrayAccess;
-    internal ExprAST value;
+public sealed class MultiDimArrayAssignAST : StmtAST{
+    public MultiDimArrayAccessAST arrayAccess;
+    public ExprAST value;
 
-    internal MultiDimArrayAssignAST(
+    public MultiDimArrayAssignAST(
         MultiDimArrayAccessAST arrayAccess,
         ExprAST value,
         int lineNumber, int columnNumber

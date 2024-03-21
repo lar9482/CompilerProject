@@ -1,6 +1,6 @@
 using CompilerProj.AST;
 
-internal enum BinaryExprType {
+public enum BinaryExprType {
     OR, 
     AND, 
     EQUAL, 
@@ -16,7 +16,7 @@ internal enum BinaryExprType {
     MOD
 }
 
-internal enum UnaryExprType {
+public enum UnaryExprType {
     NEGATE,
     NOT,
 }

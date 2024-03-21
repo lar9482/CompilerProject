@@ -1,33 +1,33 @@
 using CompilerProj.Types;
 
-internal abstract class SimpleType : LangType {
+public abstract class SimpleType : LangType {
 }
 
-internal abstract class PrimitiveType : SimpleType {
+public abstract class PrimitiveType : SimpleType {
 }
 
-internal sealed class IntType : PrimitiveType {
-    internal override string TypeTag => "int";
+public sealed class IntType : PrimitiveType {
+    public override string TypeTag => "int";
 }
 
-internal sealed class BoolType : PrimitiveType {
-    internal override string TypeTag => "bool";
+public sealed class BoolType : PrimitiveType {
+    public override string TypeTag => "bool";
 }
 
-internal sealed class ArrayType<T> : SimpleType where T : PrimitiveType {
-    internal override string TypeTag => "array";
-    internal T baseType { get; }
+public sealed class ArrayType<T> : SimpleType where T : PrimitiveType {
+    public override string TypeTag => "array";
+    public T baseType { get; }
 
-    internal ArrayType(T baseType) {
+    public ArrayType(T baseType) {
         this.baseType = baseType;
     }
 }
 
-internal sealed class MultiDimArrayType<T> : SimpleType where T : PrimitiveType {
-    internal override string TypeTag => "multiDimArray";
-    internal T baseType { get; }
+public sealed class MultiDimArrayType<T> : SimpleType where T : PrimitiveType {
+    public override string TypeTag => "multiDimArray";
+    public T baseType { get; }
 
-    internal MultiDimArrayType(T baseType) {
+    public MultiDimArrayType(T baseType) {
         this.baseType = baseType;
     }
 }

@@ -10,15 +10,15 @@
  */
 using CompilerProj.Types;
 
-internal sealed class Context {
+public sealed class Context {
 
     private Stack<SymbolTable> environment;
 
-    internal Context() {
+    public Context() {
         this.environment = new Stack<SymbolTable>();
     }
 
-    internal LangType? lookup(string identifier) {
+    public LangType? lookup(string identifier) {
         SymbolTable? currTable = environment.Peek();
         LangType? type = null;
         while (currTable != null) {
@@ -33,18 +33,18 @@ internal sealed class Context {
         return type;
     }
 
-    internal void put(String identifier, LangType type) {
+    public void put(String identifier, LangType type) {
         environment.Peek().put(identifier, type);
     }
 
-    internal void push() {
+    public void push() {
         if (environment.Count == 0) 
             environment.Push(new SymbolTable(null));
         else 
             environment.Push(new SymbolTable(environment.Peek()));
     }
 
-    internal void pop() {
+    public void pop() {
         environment.Pop();
     }
 }

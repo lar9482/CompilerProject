@@ -2,11 +2,11 @@ using CompilerProj.AST;
 using CompilerProj.Types;
 using CompilerProj.Visitors;
 
-internal sealed class ParameterAST : NodeAST {
-    internal string name;
-    internal SimpleType type;
+public sealed class ParameterAST : NodeAST {
+    public string name;
+    public SimpleType type;
     
-    internal ParameterAST(
+    public ParameterAST(
         string name, SimpleType type,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber){

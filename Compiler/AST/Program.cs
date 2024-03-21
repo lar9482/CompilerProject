@@ -1,17 +1,17 @@
 using CompilerProj.AST;
 using CompilerProj.Visitors;
 
-internal sealed class ProgramAST : NodeAST {
-    internal List<VarDeclAST> varDecls;
-    internal List<MultiVarDeclAST> multiVarDecls;
-    internal List<ArrayAST> arrayDecls;
-    internal List<MultiDimArrayAST> multiDimArrayDecls;
+public sealed class ProgramAST : NodeAST {
+    public List<VarDeclAST> varDecls;
+    public List<MultiVarDeclAST> multiVarDecls;
+    public List<ArrayAST> arrayDecls;
+    public List<MultiDimArrayAST> multiDimArrayDecls;
 
-    internal List<FuncDeclAST> funcDecls;
+    public List<FuncDeclAST> funcDecls;
 
-    internal SymbolTable? scope;
+    public SymbolTable? scope;
     
-    internal ProgramAST(
+    public ProgramAST(
         List<VarDeclAST> varDecls, 
         List<MultiVarDeclAST> multiVarDecls,
         List<ArrayAST> arrayDecls,

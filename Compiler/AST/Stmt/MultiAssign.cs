@@ -1,10 +1,10 @@
 using CompilerProj.Visitors;
 
-internal sealed class MultiAssignAST : StmtAST{
+public sealed class MultiAssignAST : StmtAST{
 
-    internal Dictionary<VarAccessAST, ExprAST> assignments;
+    public Dictionary<VarAccessAST, ExprAST> assignments;
 
-    internal MultiAssignAST (
+    public MultiAssignAST (
         Dictionary<VarAccessAST, ExprAST> assignments,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {

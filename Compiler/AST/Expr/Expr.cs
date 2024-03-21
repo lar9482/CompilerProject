@@ -1,9 +1,9 @@
 using CompilerProj.AST;
 
-internal abstract class ExprAST : NodeAST {
+public abstract class ExprAST : NodeAST {
     
-    internal SimpleType? type;
+    public SimpleType? type;
     
-    internal ExprAST(int lineNumber, int columnNumber) : base(lineNumber, columnNumber) {
+    public ExprAST(int lineNumber, int columnNumber) : base(lineNumber, columnNumber) {
     }
 }

@@ -1,10 +1,10 @@
 using CompilerProj.Visitors;
 
-internal sealed class ArrayAssignAST : StmtAST{
-    internal ArrayAccessAST arrayAccess;
-    internal ExprAST value;
+public sealed class ArrayAssignAST : StmtAST{
+    public ArrayAccessAST arrayAccess;
+    public ExprAST value;
 
-    internal ArrayAssignAST (
+    public ArrayAssignAST (
         ArrayAccessAST arrayAccess,
         ExprAST value,
         int lineNumber, int columnNumber

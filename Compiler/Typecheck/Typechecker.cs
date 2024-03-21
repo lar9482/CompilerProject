@@ -1,6 +1,6 @@
 using CompilerProj.Visitors;
 
-internal sealed class Typechecker : ASTVisitor {
+public sealed class Typechecker : ASTVisitor {
     public void visit(ProgramAST program) { }
     public void visit(VarDeclAST varDecl) { }
     public void visit(MultiVarDeclAST multiVarDecl) { }

@@ -2,13 +2,13 @@ using CompilerProj.AST;
 using CompilerProj.Types;
 using CompilerProj.Visitors;
 
-internal sealed class ArrayAST : NodeAST {
-    internal string name;
-    internal int size;
-    internal ArrayType<PrimitiveType> type;
-    internal ExprAST[]? initialValues;
+public sealed class ArrayAST : NodeAST {
+    public string name;
+    public int size;
+    public ArrayType<PrimitiveType> type;
+    public ExprAST[]? initialValues;
 
-    internal ArrayAST(
+    public ArrayAST(
         string name,
         int size,
         PrimitiveType type,

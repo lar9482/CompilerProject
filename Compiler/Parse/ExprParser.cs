@@ -6,17 +6,17 @@ namespace CompilerProj.Parse;
  * The parsing routine for expressions using shunting yard.
  * This will factor in operator precedence.
  */
-internal sealed class ExprParser {
+public sealed class ExprParser {
     private Queue<Token> exprTokens;
 
-    internal ExprParser(Queue<Token> topLvlTokens) {
+    public ExprParser(Queue<Token> topLvlTokens) {
         ExprScanner scanner = new ExprScanner(topLvlTokens);
         scanner.scanExpr();
 
         this.exprTokens = scanner.exprTokens;
     }
 
-    internal ExprAST parseByShuntingYard() {
+    public ExprAST parseByShuntingYard() {
         Stack<ExprAST> operandStack = new Stack<ExprAST>();
         Stack<Token> operatorStack = new Stack<Token>();
 

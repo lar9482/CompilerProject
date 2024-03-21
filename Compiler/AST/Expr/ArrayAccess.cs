@@ -1,11 +1,11 @@
 using CompilerProj.Visitors;
 
-internal sealed class ArrayAccessAST : ExprAST {
+public sealed class ArrayAccessAST : ExprAST {
 
-    internal string arrayName;
-    internal ExprAST accessValue;
+    public string arrayName;
+    public ExprAST accessValue;
 
-    internal ArrayAccessAST(
+    public ArrayAccessAST(
         string arrayName,
         ExprAST accessValue,
         int lineNumber, int columnNumber

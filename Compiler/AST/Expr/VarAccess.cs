@@ -1,10 +1,10 @@
 using CompilerProj.Visitors;
 
-internal sealed class VarAccessAST : ExprAST {
+public sealed class VarAccessAST : ExprAST {
 
-    internal string variableName;
+    public string variableName;
 
-    internal VarAccessAST(
+    public VarAccessAST(
         string variableName,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {

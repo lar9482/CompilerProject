@@ -21,7 +21,7 @@
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
-            "dependsOn": "CompilerTests",
+            // "dependsOn": "CompilerTests",
             "problemMatcher": "$msCompile"
         },
         {

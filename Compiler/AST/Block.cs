@@ -1,17 +1,17 @@
 using CompilerProj.AST;
 using CompilerProj.Visitors;
 
-internal sealed class BlockAST : NodeAST {
-    internal List<VarDeclAST> varDecls;
-    internal List<MultiVarDeclAST> multiVarDecls;
-    internal List<ArrayAST> arrays;
-    internal List<MultiDimArrayAST> multiDimArrays;
+public sealed class BlockAST : NodeAST {
+    public List<VarDeclAST> varDecls;
+    public List<MultiVarDeclAST> multiVarDecls;
+    public List<ArrayAST> arrays;
+    public List<MultiDimArrayAST> multiDimArrays;
 
-    internal List<StmtAST> statements;
+    public List<StmtAST> statements;
 
-    internal SymbolTable? scope;
+    public SymbolTable? scope;
 
-    internal BlockAST(
+    public BlockAST(
         List<VarDeclAST> varDecls,
         List<MultiVarDeclAST> multiVarDecls,
         List<ArrayAST> arrays,

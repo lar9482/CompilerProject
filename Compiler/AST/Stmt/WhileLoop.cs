@@ -1,10 +1,10 @@
 using CompilerProj.Visitors;
 
-internal sealed class WhileLoopAST : StmtAST {
-    internal ExprAST condition;
-    internal BlockAST body;
+public sealed class WhileLoopAST : StmtAST {
+    public ExprAST condition;
+    public BlockAST body;
 
-    internal WhileLoopAST(
+    public WhileLoopAST(
         ExprAST condition,
         BlockAST body,
         int lineNumber, int columnNumber
