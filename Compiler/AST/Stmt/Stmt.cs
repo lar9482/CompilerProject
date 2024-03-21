@@ -1,10 +1,10 @@
 using CompilerProj.AST;
 using CompilerProj.Types;
 
-internal abstract class StmtAST : NodeAST {
-    internal StmtType? type;
+public abstract class StmtAST : NodeAST {
+    public StmtType? type;
 
-    internal StmtAST(int lineNumber, int columnNumber) : base(lineNumber, columnNumber) {
+    public StmtAST(int lineNumber, int columnNumber) : base(lineNumber, columnNumber) {
 
     }
 }

@@ -1,11 +1,11 @@
 using CompilerProj.Visitors;
 
-internal sealed class BinaryExprAST : ExprAST {
-    internal ExprAST leftOperand;
-    internal ExprAST rightOperand;
-    internal BinaryExprType exprType;
+public sealed class BinaryExprAST : ExprAST {
+    public ExprAST leftOperand;
+    public ExprAST rightOperand;
+    public BinaryExprType exprType;
 
-    internal BinaryExprAST(
+    public BinaryExprAST(
         ExprAST leftOperand,
         ExprAST rightOperand,
         BinaryExprType exprType,

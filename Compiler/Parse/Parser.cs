@@ -54,7 +54,7 @@ namespace CompilerProj.Parse;
 
  }
  */
-internal sealed class Parser {
+public sealed class Parser {
 
     private Queue<Token> tokenQueue;
 
@@ -64,7 +64,7 @@ internal sealed class Parser {
     private List<ArrayAST> topLvl_ArrayDecls;
     private List<MultiDimArrayAST> topLvl_MultiDimArrayDecls;
 
-    internal Parser(Queue<Token> tokenQueue) {
+    public Parser(Queue<Token> tokenQueue) {
         this.tokenQueue = tokenQueue;
 
         this.topLvl_FuncDecls = new List<FuncDeclAST>();
@@ -80,7 +80,7 @@ internal sealed class Parser {
      *   | ⟨global declaration⟩ ⟨definitions⟩
      *   | EPSILON
      */
-    internal ProgramAST parseProgram() {
+    public ProgramAST parseProgram() {
         while (tokenQueue.Peek().type != TokenType.EOF) {
             Token currToken = tokenQueue.Peek();
             switch(currToken.type) {
@@ -295,7 +295,7 @@ internal sealed class Parser {
      *   ⟨identifierDeclList⟩ ::= ⟨identifierDecl ⟩ ‘,’ ⟨identifierDeclList ⟩
      *   | ⟨identifierDecl ⟩
      */
-    internal Dictionary<string, PrimitiveType> parseIdentifierDeclList() {
+    public Dictionary<string, PrimitiveType> parseIdentifierDeclList() {
         Dictionary<string, PrimitiveType> identifierTypeMap = new Dictionary<string, PrimitiveType>();
         Tuple<Token, PrimitiveType> identifierTypePair = parseIdentifierDeclaration();
 

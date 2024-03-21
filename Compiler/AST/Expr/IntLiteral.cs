@@ -1,10 +1,10 @@
 using CompilerProj.Types;
 using CompilerProj.Visitors;
 
-internal sealed class IntLiteralAST : ExprAST {
-    internal int value;
+public sealed class IntLiteralAST : ExprAST {
+    public int value;
 
-    internal IntLiteralAST(
+    public IntLiteralAST(
         int value,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {

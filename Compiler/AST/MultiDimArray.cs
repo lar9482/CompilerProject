@@ -2,15 +2,15 @@ using CompilerProj.AST;
 using CompilerProj.Types;
 using CompilerProj.Visitors;
 
-internal sealed class MultiDimArrayAST : NodeAST {
-    internal string name;
-    internal int rowSize;
-    internal int colSize;
-    internal MultiDimArrayType<PrimitiveType> type;
+public sealed class MultiDimArrayAST : NodeAST {
+    public string name;
+    public int rowSize;
+    public int colSize;
+    public MultiDimArrayType<PrimitiveType> type;
 
-    internal ExprAST[][]? initialValues;
+    public ExprAST[][]? initialValues;
 
-    internal MultiDimArrayAST(
+    public MultiDimArrayAST(
         string name,
         int rowSize,
         int colSize,

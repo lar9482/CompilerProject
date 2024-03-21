@@ -5,7 +5,7 @@ using CompilerProj.Tokens;
 namespace CompilerProj;
 
 public class Compiler {
-    internal static Queue<Token> dumpLex(string filePath) {
+    public static Queue<Token> dumpLex(string filePath) {
         StreamReader sr = new StreamReader(filePath);
         string programText = sr.ReadToEnd();
         sr.Close();
@@ -16,7 +16,7 @@ public class Compiler {
         return tokenQueue;
     }
 
-    internal static ProgramAST dumpParse(string filePath) {
+    public static ProgramAST dumpParse(string filePath) {
         Queue<Token> tokens = dumpLex(filePath);
         Parser parser = new Parser(tokens);
         

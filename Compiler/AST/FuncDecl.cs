@@ -2,16 +2,16 @@ using CompilerProj.AST;
 using CompilerProj.Types;
 using CompilerProj.Visitors;
 
-internal sealed class FuncDeclAST : NodeAST {
-    internal string name;
-    internal List<ParameterAST> parameters;
-    internal List<SimpleType> returnTypes;
+public sealed class FuncDeclAST : NodeAST {
+    public string name;
+    public List<ParameterAST> parameters;
+    public List<SimpleType> returnTypes;
     
-    internal BlockAST block;
+    public BlockAST block;
 
-    internal SymbolTable? scope;
+    public SymbolTable? scope;
     
-    internal FuncDeclAST(
+    public FuncDeclAST(
         string name,
         List<ParameterAST> parameters,
         List<SimpleType> returnTypes,

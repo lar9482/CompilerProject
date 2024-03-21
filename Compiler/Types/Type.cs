@@ -1,5 +1,5 @@
 namespace CompilerProj.Types;
 
-internal abstract class LangType {
-    internal abstract string TypeTag { get; }
+public abstract class LangType {
+    public abstract string TypeTag { get; }
 }

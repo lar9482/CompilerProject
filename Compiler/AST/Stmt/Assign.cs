@@ -1,10 +1,10 @@
 using CompilerProj.Visitors;
 
-internal sealed class AssignAST : StmtAST{
-    internal VarAccessAST variable;
-    internal ExprAST value;
+public sealed class AssignAST : StmtAST{
+    public VarAccessAST variable;
+    public ExprAST value;
 
-    internal AssignAST (
+    public AssignAST (
         VarAccessAST variable,
         ExprAST value,
         int lineNumber, int columnNumber

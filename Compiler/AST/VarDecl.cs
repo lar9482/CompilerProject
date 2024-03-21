@@ -2,12 +2,12 @@ using CompilerProj.AST;
 using CompilerProj.Types;
 using CompilerProj.Visitors;
 
-internal sealed class VarDeclAST : NodeAST {
-    internal string name;
-    internal ExprAST? initialValue;
-    internal PrimitiveType type;
+public sealed class VarDeclAST : NodeAST {
+    public string name;
+    public ExprAST? initialValue;
+    public PrimitiveType type;
 
-    internal VarDeclAST(
+    public VarDeclAST(
         string name, 
         ExprAST? initialValue, 
         PrimitiveType type,

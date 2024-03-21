@@ -1,9 +1,9 @@
 using CompilerProj.Visitors;
 
-internal sealed class ReturnAST : StmtAST {
-    internal List<ExprAST>? returnValues;
+public sealed class ReturnAST : StmtAST {
+    public List<ExprAST>? returnValues;
 
-    internal ReturnAST(
+    public ReturnAST(
         List<ExprAST>? returnValues,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {

@@ -6,7 +6,7 @@ namespace CompilerProj.Lex;
 /*
  * A simple Lexer that uses longest matching with regular expressions.
  */
-internal sealed class Lexer {
+public sealed class Lexer {
     private readonly Regex matchIdentifier;
     private readonly Regex matchNumber;
     private readonly Regex matchOneSymbol;
@@ -19,7 +19,7 @@ internal sealed class Lexer {
     private int lineCounter;
     private int columnCounter;
 
-    internal Lexer() {
+    public Lexer() {
         this.matchIdentifier = new Regex(@"\b^[a-zA-Z]{1}[a-zA-Z0-9_]*\b");
         this.matchNumber = new Regex(@"^\b\d+\b");
         this.matchOneSymbol = new Regex(@"^(\(|\{|\[|\]|\}|\)|,|;|=|\+|-|\*|\/|%|<|>|!|:|\"")");
@@ -32,7 +32,7 @@ internal sealed class Lexer {
         this.lineCounter = 1;
     }
 
-    internal Queue<Token> lexProgram(string programText) {
+    public Queue<Token> lexProgram(string programText) {
         Queue<Token> tokenQueue = new Queue<Token>();
 
         while (programText.Length > 0) {

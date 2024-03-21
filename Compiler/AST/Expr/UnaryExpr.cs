@@ -1,10 +1,10 @@
 using CompilerProj.Visitors;
 
-internal sealed class UnaryExprAST : ExprAST {
-    internal ExprAST operand;
-    internal UnaryExprType exprType;
+public sealed class UnaryExprAST : ExprAST {
+    public ExprAST operand;
+    public UnaryExprType exprType;
 
-    internal UnaryExprAST(
+    public UnaryExprAST(
         ExprAST operand,
         UnaryExprType exprType,
         int lineNumber, int columnNumber

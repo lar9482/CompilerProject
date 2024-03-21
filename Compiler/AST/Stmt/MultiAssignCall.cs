@@ -1,10 +1,10 @@
 using CompilerProj.Visitors;
 
-internal sealed class MultiAssignCallAST : StmtAST {
-    internal List<VarAccessAST> variableNames;
-    internal ProcedureCallAST call;
+public sealed class MultiAssignCallAST : StmtAST {
+    public List<VarAccessAST> variableNames;
+    public ProcedureCallAST call;
 
-    internal MultiAssignCallAST(
+    public MultiAssignCallAST(
         List<VarAccessAST> variableNames,
         ProcedureCallAST call,
         int lineNumber, int columnNumber

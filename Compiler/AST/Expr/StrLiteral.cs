@@ -1,11 +1,11 @@
 using CompilerProj.Types;
 using CompilerProj.Visitors;
 
-internal sealed class StrLiteralAST : ExprAST {
-    internal string value;
-    internal int[] asciiValues;
+public sealed class StrLiteralAST : ExprAST {
+    public string value;
+    public int[] asciiValues;
 
-    internal StrLiteralAST(
+    public StrLiteralAST(
         string value,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {

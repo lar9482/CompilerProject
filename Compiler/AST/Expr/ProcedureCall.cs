@@ -1,10 +1,10 @@
 using CompilerProj.Visitors;
 
-internal sealed class ProcedureCallAST : ExprAST {
-    internal string procedureName;
-    internal List<ExprAST> args;
+public sealed class ProcedureCallAST : ExprAST {
+    public string procedureName;
+    public List<ExprAST> args;
 
-    internal ProcedureCallAST(
+    public ProcedureCallAST(
         string procedureName,
         List<ExprAST> args,
         int lineNumber, int columnNumber

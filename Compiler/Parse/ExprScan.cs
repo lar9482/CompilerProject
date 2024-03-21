@@ -6,12 +6,12 @@ namespace CompilerProj.Parse;
  * This will be utilized in ExprParser.cs for parsing the expression with shunting yard.
  * Why? The shunting yard algorithm requires the number of tokens to be known.
  */
-internal sealed class ExprScanner {
+public sealed class ExprScanner {
 
-    internal Queue<Token> exprTokens { get; }
+    public Queue<Token> exprTokens { get; }
     private Queue<Token> topLvlTokens;
 
-    internal ExprScanner(Queue<Token> topLvlTokens) {
+    public ExprScanner(Queue<Token> topLvlTokens) {
         this.exprTokens = new Queue<Token>();
         this.topLvlTokens = topLvlTokens;
     }
@@ -20,7 +20,7 @@ internal sealed class ExprScanner {
      * ⟨Expr⟩ ::= UNOP ⟨Expr⟩ ⟨exprFollowUp⟩
      * | ⟨BaseExpr ⟩ ⟨exprFollowUp⟩
      */
-    internal void scanExpr() {
+    public void scanExpr() {
         switch (topLvlTokens.Peek().type) {
             //Resolve cases where minus isn't assigned context yet.
             case TokenType.minus:

@@ -1,12 +1,12 @@
 using CompilerProj.Visitors;
 
-internal sealed class MultiDimArrayAccessAST : ExprAST {
+public sealed class MultiDimArrayAccessAST : ExprAST {
 
-    internal string arrayName;
-    internal ExprAST firstIndex;
-    internal ExprAST secondIndex;
+    public string arrayName;
+    public ExprAST firstIndex;
+    public ExprAST secondIndex;
 
-    internal MultiDimArrayAccessAST(
+    public MultiDimArrayAccessAST(
         string arrayName,
         ExprAST firstIndex,
         ExprAST secondIndex,

@@ -1,14 +1,14 @@
 using CompilerProj.AST;
 using CompilerProj.Visitors;
 
-internal sealed class ConditionalAST : StmtAST {
-    internal ExprAST ifCondition;
-    internal BlockAST ifBlock;
+public sealed class ConditionalAST : StmtAST {
+    public ExprAST ifCondition;
+    public BlockAST ifBlock;
 
-    internal Dictionary<ExprAST, BlockAST>? elseIfConditionalBlocks;
-    internal BlockAST? elseBlock;
+    public Dictionary<ExprAST, BlockAST>? elseIfConditionalBlocks;
+    public BlockAST? elseBlock;
 
-    internal ConditionalAST(
+    public ConditionalAST(
         ExprAST ifCondition,
         BlockAST ifBlock,
         Dictionary<ExprAST, BlockAST>? elseIfConditionalBlocks,
