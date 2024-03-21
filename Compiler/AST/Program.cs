@@ -9,6 +9,8 @@ internal sealed class ProgramAST : NodeAST {
 
     internal List<FuncDeclAST> funcDecls;
 
+    internal SymbolTable? scope;
+    
     internal ProgramAST(
         List<VarDeclAST> varDecls, 
         List<MultiVarDeclAST> multiVarDecls,
