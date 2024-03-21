@@ -4,10 +4,10 @@ using CompilerProj.Visitors;
 
 internal sealed class ParameterAST : NodeAST {
     internal string name;
-    internal LangType type;
+    internal SimpleType type;
     
     internal ParameterAST(
-        string name, LangType type,
+        string name, SimpleType type,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber){
         this.name = name;

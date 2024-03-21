@@ -537,7 +537,7 @@ internal sealed class Parser {
         List<ParameterAST> parameters = parseParams();
         consume(TokenType.endParen);
 
-        List<LangType> returnTypes = parseReturnTypes();
+        List<SimpleType> returnTypes = parseReturnTypes();
 
         BlockAST block = parseBlock();
 
@@ -563,7 +563,7 @@ internal sealed class Parser {
 
         Token parameterNameToken = consume(TokenType.identifier);
         consume(TokenType.colon);
-        LangType type = parseType();
+        SimpleType type = parseType();
         ParameterAST firstParameter = new ParameterAST(
             parameterNameToken.lexeme,
             type,
@@ -591,7 +591,7 @@ internal sealed class Parser {
         Token parameterNameToken = consume(TokenType.identifier);
         consume(TokenType.colon);
 
-        LangType type = parseType();
+        SimpleType type = parseType();
         ParameterAST parameter = new ParameterAST(
             parameterNameToken.lexeme,
             type,
@@ -609,9 +609,9 @@ internal sealed class Parser {
     /*
      * <Type> ::= <primitiveType> <typeArray>
      */
-    private LangType parseType() {
+    private SimpleType parseType() {
         PrimitiveType primitiveType = parsePrimitiveType();
-        LangType? arrayType = parseTypeArray(primitiveType);
+        SimpleType? arrayType = parseTypeArray(primitiveType);
 
         return (arrayType == null) ? (primitiveType) : (arrayType);
     }
@@ -622,7 +622,7 @@ internal sealed class Parser {
      * | EPSILON
      */
 
-    private LangType? parseTypeArray(PrimitiveType type) {
+    private SimpleType? parseTypeArray(PrimitiveType type) {
         if (tokenQueue.Peek().type != TokenType.startBracket) {
             return null;
         }
@@ -655,17 +655,17 @@ internal sealed class Parser {
      * ⟨returnTypes⟩ ::= ‘:’ ⟨Type⟩ ⟨returnTypeList⟩
      * | EPSILON
      */
-    private List<LangType> parseReturnTypes() {
-        List<LangType> types = new List<LangType>();
+    private List<SimpleType> parseReturnTypes() {
+        List<SimpleType> types = new List<SimpleType>();
         if (tokenQueue.Peek().type != TokenType.colon) {
             return types;
         }
 
         consume(TokenType.colon);
-        LangType type = parseType();
+        SimpleType type = parseType();
         types.Add(type);
 
-        List<LangType> nextTypes = parseReturnTypeList();
+        List<SimpleType> nextTypes = parseReturnTypeList();
 
         return types.Concat(nextTypes).ToList();
     }
@@ -674,18 +674,18 @@ internal sealed class Parser {
      * ⟨returnTypeList⟩ ::= ‘,’ ⟨Type⟩ ⟨returnTypeList⟩
      * | EPSILON
      */
-    private List<LangType> parseReturnTypeList() {
-        List<LangType> types = new List<LangType>();
+    private List<SimpleType> parseReturnTypeList() {
+        List<SimpleType> types = new List<SimpleType>();
 
         if (tokenQueue.Peek().type != TokenType.comma) {
             return types;
         }
         
         consume(TokenType.comma);
-        LangType type = parseType();
+        SimpleType type = parseType();
         types.Add(type);
 
-        List<LangType> nextTypes = parseReturnTypeList();
+        List<SimpleType> nextTypes = parseReturnTypeList();
 
         return types.Concat(nextTypes).ToList();
     }
