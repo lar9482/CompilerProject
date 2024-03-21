@@ -5,14 +5,14 @@ using CompilerProj.Visitors;
 internal sealed class FuncDeclAST : NodeAST {
     internal string name;
     internal List<ParameterAST> parameters;
-    internal List<LangType> returnTypes;
+    internal List<SimpleType> returnTypes;
     
     internal BlockAST block;
 
     internal FuncDeclAST(
         string name,
         List<ParameterAST> parameters,
-        List<LangType> returnTypes,
+        List<SimpleType> returnTypes,
         BlockAST block,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {
