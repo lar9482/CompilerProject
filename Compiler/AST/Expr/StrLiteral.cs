@@ -4,7 +4,6 @@ using CompilerProj.Visitors;
 internal sealed class StrLiteralAST : ExprAST {
     internal string value;
     internal int[] asciiValues;
-    internal ArrayType<IntType> type => new ArrayType<IntType>(new IntType());
 
     internal StrLiteralAST(
         string value,
@@ -17,6 +16,7 @@ internal sealed class StrLiteralAST : ExprAST {
         for (int i = 0; i < value.Length; i++) {
             this.asciiValues[i] = value[i];
         }
+        this.type = new ArrayType<IntType>(new IntType());
     }
 
     public override void accept(ASTVisitor visitor) {
