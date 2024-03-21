@@ -9,6 +9,8 @@ internal sealed class BlockAST : NodeAST {
 
     internal List<StmtAST> statements;
 
+    internal SymbolTable? scope;
+
     internal BlockAST(
         List<VarDeclAST> varDecls,
         List<MultiVarDeclAST> multiVarDecls,

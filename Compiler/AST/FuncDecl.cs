@@ -9,6 +9,8 @@ internal sealed class FuncDeclAST : NodeAST {
     
     internal BlockAST block;
 
+    internal SymbolTable? scope;
+    
     internal FuncDeclAST(
         string name,
         List<ParameterAST> parameters,
