@@ -113,6 +113,15 @@ public sealed class ExprParser {
      */
     private ExprAST parseAccessOrProcedureCall() {
         Token identifierToken = consume(TokenType.identifier);
+
+        if (exprTokens.Count == 0) {
+            return new VarAccessAST(
+                identifierToken.lexeme,
+                identifierToken.line,
+                identifierToken.column
+            );
+        }
+        
         switch(exprTokens.Peek().type) {
             case TokenType.startParen:
                 return parseProcedureCall(identifierToken);
