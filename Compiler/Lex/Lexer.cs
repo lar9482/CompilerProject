@@ -172,7 +172,6 @@ public sealed class Lexer {
             case "for": return new Token(lexeme, lineCounter, columnCounter, TokenType.reserved_for);
             case "else": return new Token(lexeme, lineCounter, columnCounter, TokenType.reserved_else);
             case "return": return new Token(lexeme, lineCounter, columnCounter, TokenType.reserved_return); 
-            case "length": return new Token(lexeme, lineCounter, columnCounter, TokenType.reserved_length);
             case "int": return new Token(lexeme, lineCounter, columnCounter, TokenType.reserved_int);
             case "bool": return new Token(lexeme, lineCounter, columnCounter, TokenType.reserved_bool);
             case "true": return new Token(lexeme, lineCounter, columnCounter, TokenType.reserved_true);

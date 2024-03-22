@@ -29,7 +29,7 @@ public class LexerTests {
         expectedTokenTypes.Enqueue(TokenType.reserved_for);
         expectedTokenTypes.Enqueue(TokenType.reserved_else);
         expectedTokenTypes.Enqueue(TokenType.reserved_return);
-        expectedTokenTypes.Enqueue(TokenType.reserved_length);
+        expectedTokenTypes.Enqueue(TokenType.identifier);
         expectedTokenTypes.Enqueue(TokenType.reserved_int);
         expectedTokenTypes.Enqueue(TokenType.reserved_bool);
         expectedTokenTypes.Enqueue(TokenType.reserved_true);

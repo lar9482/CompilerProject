@@ -7,7 +7,6 @@ public enum TokenType {
     reserved_for,
     reserved_else, 
     reserved_return, 
-    reserved_length,
     reserved_int, 
     reserved_bool, 
     reserved_true, 
