@@ -4,7 +4,7 @@ matMult(A: int[][], B: int[][]): int[][] {
     colsA: int = length(A[0]); // aka rowsB
     colsB: int = length(B[0]);
 
-    out: int[rowsA][colsB];
+    out: int[600][500];
 
     outRow: int = 0;
     while (outRow < rowsA) {
