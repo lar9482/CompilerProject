@@ -10,6 +10,8 @@
  */
 using CompilerProj.Types;
 
+namespace CompilerProj.Context;
+
 public sealed class Context {
 
     private Stack<SymbolTable> environment;
@@ -18,23 +20,23 @@ public sealed class Context {
         this.environment = new Stack<SymbolTable>();
     }
 
-    public LangType? lookup(string identifier) {
+    public Symbol? lookup(string identifier) {
         SymbolTable? currTable = environment.Peek();
-        LangType? type = null;
+        Symbol? symbol = null;
         while (currTable != null) {
-            type = currTable.lookup(identifier);
-            if (type != null) {
-                return type;
+            symbol = currTable.lookup(identifier);
+            if (symbol != null) {
+                return symbol;
             }
 
             currTable = currTable.parentTable;
         }
 
-        return type;
+        return symbol;
     }
 
-    public void put(String identifier, LangType type) {
-        environment.Peek().put(identifier, type);
+    public void put(String identifier, Symbol symbol) {
+        environment.Peek().put(identifier, symbol);
     }
 
     public void push() {
