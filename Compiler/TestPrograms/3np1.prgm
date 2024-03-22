@@ -16,5 +16,7 @@ main(args: int[][]) {
             first = s;
         }
     }
-    println(unparseInt(first) + ":" + unparseInt(n));
+    print(unparseInt(first));
+    print(":");
+    print(unparseInt(n));
 }
