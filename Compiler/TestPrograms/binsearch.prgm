@@ -8,9 +8,14 @@ binary_search(a: int[], x: int): int {
     // decrementing function: r-l
     while (l < r) {
         m:int = (l+r)/2;
-        if (a[m] < x) l = m+1;
-        else r = m;
+        if (a[m] < x) {
+            l = m+1;
+        }
+        else {
+            r = m;
+        }
     }
+    
     return l;
 }
 

@@ -19,7 +19,7 @@ internal class ExprVisitor : ASTVisitor {
             case VarAccessAST varAccessAST: visit(varAccessAST); break;
             case ArrayAccessAST arrayAccess: visit(arrayAccess); break;
             case MultiDimArrayAccessAST multiDimArrayAccess: visit(multiDimArrayAccess); break;
-            case ProcedureCallAST procedureCall: visit(procedureCall); break;
+            case FunctionCallAST functionCall: visit(functionCall); break;
             case IntLiteralAST intLiteral: visit(intLiteral); break;
             case BoolLiteralAST boolLiteral: visit(boolLiteral); break;
             default:
@@ -53,10 +53,10 @@ internal class ExprVisitor : ASTVisitor {
         multiDimArrayAccess.secondIndex.accept(this);
     }
 
-    public void visit(ProcedureCallAST procedureCall) { 
-        traverseRecord.Enqueue(procedureCall.procedureName);
+    public void visit(FunctionCallAST functionCall) { 
+        traverseRecord.Enqueue(functionCall.functionName);
 
-        foreach (ExprAST arg in procedureCall.args) {
+        foreach (ExprAST arg in functionCall.args) {
             arg.accept(this);
         }
     }
@@ -118,4 +118,5 @@ internal class ExprVisitor : ASTVisitor {
     public void visit(ConditionalAST conditional) { throw new NotImplementedException("This visit is not implemented here."); }
     public void visit(WhileLoopAST whileLoop) { throw new NotImplementedException("This visit is not implemented here."); }
     public void visit(ReturnAST returnStmt) { throw new NotImplementedException("This visit is not implemented here."); }
+    public void visit(ProcedureCallAST procedureCall) { throw new NotImplementedException("This visit is not implemented here."); }
 }

@@ -1,6 +1,9 @@
 using CompilerProj.Visitors;
 
-public sealed class ProcedureCallAST : ExprAST {
+/*
+ * A function that will not return anything.
+ */
+public sealed class ProcedureCallAST : StmtAST {
     public string procedureName;
     public List<ExprAST> args;
 

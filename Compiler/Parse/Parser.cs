@@ -774,8 +774,9 @@ public sealed class Parser {
         );
     }
     /*
-     * <DeclarationOrAssignment> ::= <identifier> ‘:’ <primitiveType> <declaration>
+     * <Declaration_Assignment_ProcedureCall> ::= <identifier> ‘:’ <primitiveType> <declaration>
      * | <identifier> <assignment>
+     * | <identifier> <procedureCall>
      */
     private void parseDeclarationOrAssignment(
         List<VarDeclAST> varDecls,
@@ -801,6 +802,9 @@ public sealed class Parser {
             case TokenType.comma:
             case TokenType.startBracket:
                 assignStmts.Add(parseAssignment(firstIdentifer));
+                break;
+            case TokenType.startParen:
+                assignStmts.Add(parseProcedureCall(firstIdentifer));
                 break;
         } 
     }
@@ -856,7 +860,7 @@ public sealed class Parser {
 
     /*
      * <multiAssign_Or_MultiCallAssign> ::= ‘,’ ⟨identifierList⟩ ‘=’ ⟨Expr ⟩ ‘,’ ⟨ExprList⟩ ‘;’
-     * | ‘,’ ⟨identifierList⟩ ‘=’ <ProcedureCall> ‘;’
+     * | ‘,’ ⟨identifierList⟩ ‘=’ <FunctionCall> ‘;’
      */
     private StmtAST parseMultiAssign_Or_MultiCallAssign(Token firstIdentifier) {
         List<Token> variableNames = new List<Token>();
@@ -871,7 +875,7 @@ public sealed class Parser {
 
         if (tokenQueue.Peek().type == TokenType.comma) {
             return parseMultiAssign(variableNames, firstExpr);
-        } else if (firstExpr.GetType() == typeof(ProcedureCallAST)) {
+        } else if (firstExpr.GetType() == typeof(FunctionCallAST)) {
 
             consume(TokenType.semicolon);
             List<VarAccessAST> variableAssigns = new List<VarAccessAST>();
@@ -886,7 +890,7 @@ public sealed class Parser {
             }
             return new MultiAssignCallAST(
                 variableAssigns,
-                (ProcedureCallAST) firstExpr,
+                (FunctionCallAST) firstExpr,
                 variableAssigns[0].lineNumber,
                 variableAssigns[0].columnNumber
             );
@@ -948,6 +952,25 @@ public sealed class Parser {
         List<Token> nextIdentifiers = parseIdentifierList();
 
         return identifiers.Concat(nextIdentifiers).ToList<Token>();
+    }
+
+    /*
+     * <ProcedureCall > ::= <identifier> ‘(’ ⟨ExprList⟩ ‘)’ `;'
+     */
+    private ProcedureCallAST parseProcedureCall(Token identifier) {
+        consume(TokenType.startParen);
+
+        List<ExprAST> parameters = parseExprList();
+
+        consume(TokenType.endParen);
+        consume(TokenType.semicolon);
+
+        return new ProcedureCallAST(
+            identifier.lexeme,
+            parameters,
+            identifier.line,
+            identifier.column
+        );
     }
 
     /*

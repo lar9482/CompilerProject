@@ -2,11 +2,11 @@ using CompilerProj.Visitors;
 
 public sealed class MultiAssignCallAST : StmtAST {
     public List<VarAccessAST> variableNames;
-    public ProcedureCallAST call;
+    public FunctionCallAST call;
 
     public MultiAssignCallAST(
         List<VarAccessAST> variableNames,
-        ProcedureCallAST call,
+        FunctionCallAST call,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {
 
