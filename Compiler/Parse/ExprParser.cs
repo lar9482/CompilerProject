@@ -113,7 +113,10 @@ public sealed class ExprParser {
      */
     private ExprAST parseAccessOrProcedureCall() {
         Token identifierToken = consume(TokenType.identifier);
-
+        
+        /* 
+         * exprTokens.Count == 0 occurs if a variable access is at the end of an expression.
+         */
         if (exprTokens.Count == 0) {
             return new VarAccessAST(
                 identifierToken.lexeme,
@@ -148,7 +151,10 @@ public sealed class ExprParser {
         ExprAST firstAccess = firstParser.parseByShuntingYard();
         consume(TokenType.endBracket);
 
-        if (exprTokens.Peek().type != TokenType.startBracket) {
+        /*
+         * NOTE: exprTokens.Count == 0 occurs if an array access is at the end of an expression.
+         */
+        if (exprTokens.Count == 0 || exprTokens.Peek().type != TokenType.startBracket) {
             return new ArrayAccessAST(
                 identifier.lexeme,
                 firstAccess,

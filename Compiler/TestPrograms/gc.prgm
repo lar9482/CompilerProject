@@ -1,7 +1,7 @@
 main(args:int[][]) {
 	dim : int = 1024;
-	data:int[dim*dim];
-	i:int = 0 j:int = 0;
+	data: int[1048576];
+	i:int, j:int = 0, 0; 
 
 	while (i<dim*dim) {
 		data[i] = 0;
