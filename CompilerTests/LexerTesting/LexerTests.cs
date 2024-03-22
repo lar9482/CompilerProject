@@ -84,7 +84,6 @@ public class LexerTests {
         expectedTokenTypes.Enqueue(TokenType.greater);
         expectedTokenTypes.Enqueue(TokenType.not);
         expectedTokenTypes.Enqueue(TokenType.colon);
-        expectedTokenTypes.Enqueue(TokenType.doubleQuotes);
 
         Queue<Token> actualTokens = Compiler.dumpLex(programFilePath);
         
@@ -135,7 +134,6 @@ public class LexerTests {
         expectedTokenTypes.Enqueue(TokenType.greater);
         expectedTokenTypes.Enqueue(TokenType.not);
         expectedTokenTypes.Enqueue(TokenType.colon);
-        expectedTokenTypes.Enqueue(TokenType.doubleQuotes);
 
         expectedTokenTypes.Enqueue(TokenType.lessThanEqual);
         expectedTokenTypes.Enqueue(TokenType.greaterThanEqual);
@@ -143,6 +141,23 @@ public class LexerTests {
         expectedTokenTypes.Enqueue(TokenType.notEqualTo);
         expectedTokenTypes.Enqueue(TokenType.and);
         expectedTokenTypes.Enqueue(TokenType.or);
+        
+        Queue<Token> actualTokens = Compiler.dumpLex(programFilePath);
+        
+        Assert.DoesNotThrow(() => {
+            compareExpectedAndActualTokens(expectedTokenTypes, actualTokens);
+        });
+        Assert.IsTrue(expectedTokenTypes.Count == 0);
+    }
+
+    [Test] 
+    public void charAndStringTest() {
+        string programFilePath = "../../../LexerTesting/charAndString.prgm";
+        Queue<TokenType> expectedTokenTypes = new Queue<TokenType>();
+        expectedTokenTypes.Enqueue(TokenType.character);
+        expectedTokenTypes.Enqueue(TokenType.character);
+        expectedTokenTypes.Enqueue(TokenType.String);
+        expectedTokenTypes.Enqueue(TokenType.String);
         
         Queue<Token> actualTokens = Compiler.dumpLex(programFilePath);
         

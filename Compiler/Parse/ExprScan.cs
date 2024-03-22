@@ -51,6 +51,8 @@ public sealed class ExprScanner {
             case TokenType.number:
             case TokenType.reserved_true:
             case TokenType.reserved_false:
+            case TokenType.character:
+            case TokenType.String:
                 scanBaseExpr();
                 scanExprFollowUp();
                 break;
@@ -122,6 +124,8 @@ public sealed class ExprScanner {
             case TokenType.number:
             case TokenType.reserved_true:
             case TokenType.reserved_false:
+            case TokenType.character:
+            case TokenType.String:
                 scanLiteral();
                 break;
         }
@@ -212,12 +216,16 @@ public sealed class ExprScanner {
     /*
      * ⟨Lit⟩ ::= ⟨numberLiteral ⟩
      * | ⟨boolLiteral ⟩
+     * | <characterLiteral >
+     * | <stringLiteral >
      */
     private void scanLiteral() {
         switch(topLvlTokens.Peek().type) {
             case TokenType.number: consume(TokenType.number); break;
             case TokenType.reserved_true: consume(TokenType.reserved_true); break;
             case TokenType.reserved_false: consume(TokenType.reserved_false); break;
+            case TokenType.character: consume(TokenType.character); break;
+            case TokenType.String: consume(TokenType.String); break;
         }
     }
 

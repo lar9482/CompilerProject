@@ -1,6 +1,7 @@
 using CompilerProj.AST;
 using CompilerProj.Types;
 using CompilerProj.Visitors;
+using CompilerProj.Context;
 
 public sealed class FuncDeclAST : NodeAST {
     public string name;
