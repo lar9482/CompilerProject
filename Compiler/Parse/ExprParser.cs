@@ -84,6 +84,7 @@ public sealed class ExprParser {
     }
     /*
      * ⟨Operand ⟩ ::= <IdentifierHeader>
+     * | <array>
      * | ⟨Lit⟩
      */
     private ExprAST parseOperand() {
@@ -93,10 +94,13 @@ public sealed class ExprParser {
             case TokenType.number:
             case TokenType.reserved_true: 
             case TokenType.reserved_false:
+            case TokenType.character:
+            case TokenType.String:
+            case TokenType.startCurly:
                 return parseLiteral();
             default:
                 throw new Exception(
-                    String.Format("Line {0}:{1}, Expected <identifier> <number> true false, not {2}",
+                    String.Format("Line {0}:{1}, Expected <identifier> <number> true false { <character> <string>, not {2}",
                         exprTokens.Peek().line, exprTokens.Peek().column, exprTokens.Peek().lexeme
                     )
                 );
@@ -190,6 +194,9 @@ public sealed class ExprParser {
             case TokenType.number:
             case TokenType.reserved_true:
             case TokenType.reserved_false:
+            case TokenType.character:
+            case TokenType.String:
+            case TokenType.startCurly:
                 ExprParser exprParser = new ExprParser(exprTokens);
                 ExprAST arg = exprParser.parseByShuntingYard();
                 args.Add(arg);
@@ -225,6 +232,8 @@ public sealed class ExprParser {
      * ⟨Literal⟩ ::= <number>
      * | true
      * | false
+     * | <character>
+     * | <string>
      */
     private ExprAST parseLiteral() {
         switch(exprTokens.Peek().type) {
@@ -243,6 +252,20 @@ public sealed class ExprParser {
                     boolToken.line,
                     boolToken.column
                 );
+            case TokenType.character:
+                Token characterToken = consume(TokenType.character);
+                return new CharLiteralAST(
+                    characterToken.lexeme[1],
+                    characterToken.line,
+                    characterToken.column
+                );
+            case TokenType.String:
+                Token stringToken = consume(TokenType.String);
+                return new StrLiteralAST(
+                    stringToken.lexeme.Trim('\"'),
+                    stringToken.line,
+                    stringToken.column
+                );
             default:
                 throw new Exception(
                     String.Format("Line {0}:{1}, Expected <number> true false, not {2}",
@@ -258,6 +281,9 @@ public sealed class ExprParser {
             case TokenType.number:
             case TokenType.reserved_true:
             case TokenType.reserved_false:
+            case TokenType.character:
+            case TokenType.String:
+            case TokenType.startCurly:
                 return true;
             default:
                 return false;

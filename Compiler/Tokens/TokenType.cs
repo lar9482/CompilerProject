@@ -17,7 +17,6 @@ public enum TokenType {
     comma,
     colon,
     semicolon,
-    doubleQuotes,
     startParen,
     endParen,
     startBracket,
@@ -42,6 +41,8 @@ public enum TokenType {
     
     identifier,
     number,
+    character,
+    String,
     global,
     EOF,
 

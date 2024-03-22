@@ -1,5 +1,6 @@
 using CompilerProj.AST;
 using CompilerProj.Visitors;
+using CompilerProj.Context;
 
 public sealed class ProgramAST : NodeAST {
     public List<VarDeclAST> varDecls;

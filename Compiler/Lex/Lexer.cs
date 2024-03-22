@@ -16,17 +16,23 @@ public sealed class Lexer {
     
     private readonly Regex matchGlobalFlag;
 
+    private readonly Regex matchCharacter;
+    private readonly Regex matchString;
+
     private int lineCounter;
     private int columnCounter;
 
     public Lexer() {
         this.matchIdentifier = new Regex(@"\b^[a-zA-Z]{1}[a-zA-Z0-9_]*\b");
         this.matchNumber = new Regex(@"^\b\d+\b");
-        this.matchOneSymbol = new Regex(@"^(\(|\{|\[|\]|\}|\)|,|;|=|\+|-|\*|\/|%|<|>|!|:|\"")");
+        this.matchOneSymbol = new Regex(@"^(\(|\{|\[|\]|\}|\)|,|;|=|\+|-|\*|\/|%|<|>|!|:|)");
         this.matchTwoSymbol = new Regex(@"^(<=|>=|==|!=|&&|\|\|)");
         this.matchWhitespace = new Regex(@"^(\n|\t|\s|\r)");
         this.matchComment = new Regex(@"^//");
         this.matchGlobalFlag = new Regex(@"^:global");
+
+        this.matchCharacter = new Regex(@"^'.'");
+        this.matchString = new Regex(@"^\"".*\""");
 
         this.columnCounter = 0;
         this.lineCounter = 1;
@@ -68,6 +74,14 @@ public sealed class Lexer {
                     int newlineIndex = programText.IndexOf("\n");
                     programText = programText.Remove(0, newlineIndex);
                     continue;
+                case "matchCharacter":
+                    Token characterToken = new Token(matchedLexeme, lineCounter, columnCounter, TokenType.character);
+                    tokenQueue.Enqueue(characterToken);
+                    break;
+                case "matchString":
+                    Token stringToken = new Token(matchedLexeme, lineCounter, columnCounter, TokenType.String);
+                    tokenQueue.Enqueue(stringToken);
+                    break;
                 default:
                     throw new InvalidOperationException(
                         String.Format("Lexer: {0} is not a recognizable lexeme", matchedLexeme)
@@ -90,6 +104,8 @@ public sealed class Lexer {
         matches.Add("matchWhitespace", matchWhitespace.Match(programText).Value);
         matches.Add("matchComment", matchComment.Match(programText).Value);
         matches.Add("matchGlobalFlag", matchGlobalFlag.Match(programText).Value);
+        matches.Add("matchCharacter", matchCharacter.Match(programText).Value);
+        matches.Add("matchString", matchString.Match(programText).Value);
 
         int longestMatchLength = 0;
         string longestMatch = "";
@@ -126,7 +142,6 @@ public sealed class Lexer {
             case ">": return new Token(lexeme, lineCounter, columnCounter, TokenType.greater);
             case "!": return new Token(lexeme, lineCounter, columnCounter, TokenType.not);
             case ":": return new Token(lexeme, lineCounter, columnCounter, TokenType.colon);
-            case "\"": return new Token(lexeme, lineCounter, columnCounter, TokenType.doubleQuotes);
             default:
                 throw new Exception(
                     String.Format("Lexer: {0} is not a recognizable one symbol", lexeme)

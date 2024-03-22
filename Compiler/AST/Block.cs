@@ -1,5 +1,6 @@
 using CompilerProj.AST;
 using CompilerProj.Visitors;
+using CompilerProj.Context;
 
 public sealed class BlockAST : NodeAST {
     public List<VarDeclAST> varDecls;

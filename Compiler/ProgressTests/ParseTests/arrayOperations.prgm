@@ -1,0 +1,5 @@
+main(args: int[][]) {
+
+    // Characters will be represented as 'int'
+    number = 0 + 'a' + 'b';
+}
