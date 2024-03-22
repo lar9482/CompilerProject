@@ -22,6 +22,7 @@ public interface ASTVisitor {
     public void visit(ConditionalAST conditional);
     public void visit(WhileLoopAST whileLoop);
     public void visit(ReturnAST returnStmt);
+    public void visit(FunctionCallAST functionCall);
 
     // Expr Nodes
     public void visit(BinaryExprAST binaryExpr);

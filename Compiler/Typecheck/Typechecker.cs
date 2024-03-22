@@ -17,6 +17,7 @@ public sealed class Typechecker : ASTVisitor {
     public void visit(ConditionalAST conditional) { }
     public void visit(WhileLoopAST whileLoop) { }
     public void visit(ReturnAST returnStmt) { }
+    public void visit(FunctionCallAST functionCall) { }
     public void visit(BinaryExprAST binaryExpr) { }
     public void visit(UnaryExprAST unaryExpr) { }
     public void visit(VarAccessAST varAccess) { }

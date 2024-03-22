@@ -121,10 +121,10 @@ public sealed class ExprParser {
                 identifierToken.column
             );
         }
-        
+
         switch(exprTokens.Peek().type) {
             case TokenType.startParen:
-                return parseProcedureCall(identifierToken);
+                return parseFunctionCall(identifierToken);
             default:
                 return parseAccess(identifierToken);
         }
@@ -174,12 +174,12 @@ public sealed class ExprParser {
     /*
      * ⟨ProcedureCallBody⟩ ::= ‘(’ ⟨ArgsOptional ⟩ ‘)’
      */
-    private ProcedureCallAST parseProcedureCall(Token identifier) {
+    private FunctionCallAST parseFunctionCall(Token identifier) {
         consume(TokenType.startParen);
         List<ExprAST> args = parseArgsOptional();
         consume(TokenType.endParen);
 
-        return new ProcedureCallAST(
+        return new FunctionCallAST(
             identifier.lexeme,
             args,
             identifier.line,

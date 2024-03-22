@@ -120,6 +120,7 @@ internal class TopLvlVisitor : ASTVisitor {
                 case ConditionalAST conditional: conditional.accept(this); break;
                 case WhileLoopAST whileLoop: whileLoop.accept(this); break;
                 case ReturnAST returnStmt: returnStmt.accept(this); break;
+                case ProcedureCallAST procedureCall: procedureCall.accept(this); break;
                 default:
                     break;
             }
@@ -185,6 +186,14 @@ internal class TopLvlVisitor : ASTVisitor {
         }
     }
 
+    public void visit(ProcedureCallAST procedureCall) {
+        traversalRecord.Enqueue(procedureCall.procedureName);
+
+        foreach (var arg in procedureCall.args) {
+            traversalRecord.Enqueue("EXPR");
+        }
+    }
+
     private string SimpleTypeToString(SimpleType type) {
         switch(type) {
             case IntType intType: return "int";
@@ -214,10 +223,10 @@ internal class TopLvlVisitor : ASTVisitor {
         traversalRecord.Enqueue(String.Format("{0}[EXPR][EXPR]", multiDimArrayAccess.arrayName));
     }
 
-    public void visit(ProcedureCallAST procedureCall) {
-        traversalRecord.Enqueue(procedureCall.procedureName);
+    public void visit(FunctionCallAST functionCall) {
+        traversalRecord.Enqueue(functionCall.functionName);
 
-        foreach (var arg in procedureCall.args) {
+        foreach (var arg in functionCall.args) {
             traversalRecord.Enqueue("EXPR");
         }
     }
