@@ -4,6 +4,7 @@ using CompilerProj.Visitors;
 
 /*
  * This pass will build the symbol tables, then annotate the AST with them.
+ * Error messages will be reported if symbols are already defined.
  */
 public sealed class TypecheckerP1 : ASTVisitor {
 
@@ -130,6 +131,11 @@ public sealed class TypecheckerP1 : ASTVisitor {
         }
         function.block.accept(this);
 
+        SymbolReturn symbolRet = new SymbolReturn(
+            function.returnTypes.ToArray<SimpleType>()
+        );
+        context.put("return", symbolRet);
+        
         function.scope = context.pop();
     }
 
