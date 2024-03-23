@@ -49,10 +49,10 @@ public class ParserTests_TopLvl_Lifting {
         expectedRecord.Enqueue("variable2: bool");
         expectedRecord.Enqueue("variable7: int");
         expectedRecord.Enqueue("variable8: bool");
-        expectedRecord.Enqueue("variable3: int[] SIZE:10");
-        expectedRecord.Enqueue("variable4: bool[] SIZE:10");
-        expectedRecord.Enqueue("variable5: int[][] ROW:10 COL:10");
-        expectedRecord.Enqueue("variable6: bool[][] ROW:10 COL:10");
+        expectedRecord.Enqueue("variable3: int[]");
+        expectedRecord.Enqueue("variable4: bool[]");
+        expectedRecord.Enqueue("variable5: int[][]");
+        expectedRecord.Enqueue("variable6: bool[][]");
 
         Queue<string> actualRecord = getActualTraversalRecord(programFilePath);
         
@@ -71,11 +71,11 @@ public class ParserTests_TopLvl_Lifting {
         expectedRecord.Enqueue("EXPR");
         expectedRecord.Enqueue("variable4: bool");
         expectedRecord.Enqueue("EXPR");
-        expectedRecord.Enqueue("variable5: int[] SIZE:10");
+        expectedRecord.Enqueue("variable5: int[]");
         expectedRecord.Enqueue("ArrayEXPRS");
-        expectedRecord.Enqueue("variable6: bool[] SIZE:4");
+        expectedRecord.Enqueue("variable6: bool[]");
         expectedRecord.Enqueue("ArrayEXPRS");
-        expectedRecord.Enqueue("variable7: int[][] ROW:3 COL:3");
+        expectedRecord.Enqueue("variable7: int[][]");
         expectedRecord.Enqueue("MultiDimEXPRS");
 
         Queue<string> actualRecord = getActualTraversalRecord(programFilePath);
@@ -188,10 +188,10 @@ public class ParserTests_TopLvl_Lifting {
         expectedRecord.Enqueue("variable4: bool");
         expectedRecord.Enqueue("EXPR");
 
-        expectedRecord.Enqueue("variable5: int[] SIZE:10");
+        expectedRecord.Enqueue("variable5: int[]");
         expectedRecord.Enqueue("ArrayEXPRS");
 
-        expectedRecord.Enqueue("variable6: int[][] ROW:3 COL:3");
+        expectedRecord.Enqueue("variable6: int[][]");
         expectedRecord.Enqueue("MultiDimEXPRS");
 
         Queue<string> actualRecord = getActualTraversalRecord(programFilePath);
