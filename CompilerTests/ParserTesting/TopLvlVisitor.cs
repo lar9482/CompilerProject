@@ -13,23 +13,16 @@ internal class TopLvlVisitor : ASTVisitor {
     }
 
     public void visit(ProgramAST program) { 
-        foreach (var varDecl in program.varDecls) {
-            varDecl.accept(this);
+        foreach (DeclAST decl in program.declarations) {
+            switch(decl) {
+                case VarDeclAST varDecl: visit(varDecl); break;
+                case MultiVarDeclAST multiVarDecl: visit(multiVarDecl); break;
+                case ArrayDeclAST arrayDecl: visit(arrayDecl); break;
+                case MultiDimArrayDeclAST multiDimArrayDecl: visit(multiDimArrayDecl); break;
+            }
         }
 
-        foreach(var multiVarDecl in program.multiVarDecls) {
-            multiVarDecl.accept(this);
-        }
-
-        foreach(var arrayDecl in program.arrayDecls) {
-            arrayDecl.accept(this);
-        }
-
-        foreach(var multiDimArrayDecl in program.multiDimArrayDecls) {
-            multiDimArrayDecl.accept(this);
-        }
-
-        foreach (var funcDecl in program.funcDecls) {
+        foreach (var funcDecl in program.functions) {
             funcDecl.accept(this);
         }
     }
@@ -96,17 +89,13 @@ internal class TopLvlVisitor : ASTVisitor {
     }
 
     public void visit(BlockAST block) { 
-        foreach (var varDecl in block.varDecls) {
-            varDecl.accept(this);
-        }
-        foreach(var multiVarDecl in block.multiVarDecls) {
-            multiVarDecl.accept(this);
-        }
-        foreach(var arrayDecl in block.arrays) {
-            arrayDecl.accept(this);
-        }
-        foreach(var multiDimArrayDecl in block.multiDimArrays) {
-            multiDimArrayDecl.accept(this);
+        foreach (DeclAST decl in block.declarations) {
+            switch(decl) {
+                case VarDeclAST varDecl: visit(varDecl); break;
+                case MultiVarDeclAST multiVarDecl: visit(multiVarDecl); break;
+                case ArrayDeclAST arrayDecl: visit(arrayDecl); break;
+                case MultiDimArrayDeclAST multiDimArrayDecl: visit(multiDimArrayDecl); break;
+            }
         }
 
         foreach(StmtAST Stmt in block.statements) {

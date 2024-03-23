@@ -58,21 +58,19 @@ public sealed class Parser {
 
     private Queue<Token> tokenQueue;
 
-    private List<FunctionAST> topLvl_FuncDecls;
-    private List<VarDeclAST> topLvl_VarDecls;
-    private List<MultiVarDeclAST> topLvl_MultiVarDecls;
-    private List<ArrayDeclAST> topLvl_ArrayDecls;
-    private List<MultiDimArrayDeclAST> topLvl_MultiDimArrayDecls;
+    private List<FunctionAST> topLvl_Functions;
+    private List<DeclAST> topLvl_Declarations;
+    // private List<VarDeclAST> topLvl_VarDecls;
+    // private List<MultiVarDeclAST> topLvl_MultiVarDecls;
+    // private List<ArrayDeclAST> topLvl_ArrayDecls;
+    // private List<MultiDimArrayDeclAST> topLvl_MultiDimArrayDecls;
 
+    
     public Parser(Queue<Token> tokenQueue) {
         this.tokenQueue = tokenQueue;
 
-        this.topLvl_FuncDecls = new List<FunctionAST>();
-
-        this.topLvl_VarDecls = new List<VarDeclAST>();
-        this.topLvl_MultiVarDecls = new List<MultiVarDeclAST>();
-        this.topLvl_ArrayDecls = new List<ArrayDeclAST>();
-        this.topLvl_MultiDimArrayDecls = new List<MultiDimArrayDeclAST>();
+        this.topLvl_Functions = new List<FunctionAST>();
+        this.topLvl_Declarations = new List<DeclAST>();
     }
 
     /*
@@ -85,7 +83,7 @@ public sealed class Parser {
             Token currToken = tokenQueue.Peek();
             switch(currToken.type) {
                 case TokenType.identifier:
-                    topLvl_FuncDecls.Add(parseFunctionDeclaration());
+                    topLvl_Functions.Add(parseFunctionDeclaration());
                     break;
                 case TokenType.global:
                     parseGlobalDeclaration();
@@ -103,11 +101,8 @@ public sealed class Parser {
         }
         
         ProgramAST program = new ProgramAST(
-            topLvl_VarDecls,
-            topLvl_MultiVarDecls,
-            topLvl_ArrayDecls,
-            topLvl_MultiDimArrayDecls,
-            topLvl_FuncDecls,
+            topLvl_Declarations,
+            topLvl_Functions,
             1,
             1
         );
@@ -124,10 +119,7 @@ public sealed class Parser {
         parseDeclaration(
             identifierAndType.Item1,
             identifierAndType.Item2,
-            topLvl_VarDecls,
-            topLvl_MultiVarDecls,
-            topLvl_ArrayDecls,
-            topLvl_MultiDimArrayDecls
+            topLvl_Declarations
         );
     }
 
@@ -139,29 +131,25 @@ public sealed class Parser {
     private void parseDeclaration(
         Token firstIdentifier,
         PrimitiveType firstType,
-        List<VarDeclAST> varDecls,
-        List<MultiVarDeclAST> multiVarDecls,
-        List<ArrayDeclAST> arrayDecls,
-        List<MultiDimArrayDeclAST> multiDimArrayDecls
+        List<DeclAST> declarations
     ) {
         switch(tokenQueue.Peek().type) {
             case TokenType.assign:
             case TokenType.semicolon:
                 VarDeclAST varDecl = parseVarDecl(firstIdentifier, firstType);
-                varDecls.Add(varDecl);
+                declarations.Add(varDecl);
                 break;
             case TokenType.comma:
                 MultiVarDeclAST multiVarDecl = parseMultiVarDecls(
                     firstIdentifier, 
                     firstType
                 );
-                multiVarDecls.Add(multiVarDecl);
+                declarations.Add(multiVarDecl);
                 break;
             case TokenType.startBracket:
                 parseArrayDeclaration(
                     firstIdentifier, firstType,
-                    arrayDecls, 
-                    multiDimArrayDecls
+                    declarations
                 );
                 break;
             default:
@@ -346,8 +334,7 @@ public sealed class Parser {
       */
     private void parseArrayDeclaration(
         Token identifierToken, PrimitiveType primitiveType,
-        List<ArrayDeclAST> arrayDecls,
-        List<MultiDimArrayDeclAST> multiDimArrayDecls
+        List<DeclAST> declarations
     ) {
         consume(TokenType.startBracket);
 
@@ -356,7 +343,7 @@ public sealed class Parser {
                 consume(TokenType.endBracket);
                 parse_SingleOrMulti_Array_Expr(
                     identifierToken, primitiveType,
-                    arrayDecls, multiDimArrayDecls
+                    declarations
                 );
                 break;
             default:
@@ -364,7 +351,7 @@ public sealed class Parser {
                 consume(TokenType.endBracket);
                 parse_SingleOrMulti_Array_Static(
                     identifierToken, primitiveType,
-                    arrayDecls, multiDimArrayDecls,
+                    declarations,
                     firstExpr
                 );
                 break;
@@ -376,8 +363,7 @@ public sealed class Parser {
      */
     private void parse_SingleOrMulti_Array_Expr(
         Token identifierToken, PrimitiveType primitiveType,
-        List<ArrayDeclAST> arrayDecls,
-        List<MultiDimArrayDeclAST> multiDimArrayDecls
+        List<DeclAST> declarations
     ) {
         switch(tokenQueue.Peek().type) {
             case TokenType.assign:
@@ -397,7 +383,7 @@ public sealed class Parser {
                     identifierToken.line,
                     identifierToken.column
                 );
-                arrayDecls.Add(array);
+                declarations.Add(array);
                 break;
             case TokenType.startBracket:
                 consume(TokenType.startBracket);
@@ -425,7 +411,7 @@ public sealed class Parser {
                     identifierToken.line,
                     identifierToken.column
                 );
-                multiDimArrayDecls.Add(multiDimArray);
+                declarations.Add(multiDimArray);
                 break;
             default:
                 throw new Exception(
@@ -461,8 +447,7 @@ public sealed class Parser {
      */
     private void parse_SingleOrMulti_Array_Static(
         Token identifierToken, PrimitiveType primitiveType,
-        List<ArrayDeclAST> arrayDecls,
-        List<MultiDimArrayDeclAST> multiDimArrayDecls,
+        List<DeclAST> declarations,
         ExprAST firstExpr
     ) {
         switch(tokenQueue.Peek().type) {
@@ -477,7 +462,7 @@ public sealed class Parser {
                     identifierToken.line,
                     identifierToken.column
                 );
-                arrayDecls.Add(array);
+                declarations.Add(array);
                 break;
             case TokenType.startBracket:
                 consume(TokenType.startBracket);
@@ -495,7 +480,7 @@ public sealed class Parser {
                     identifierToken.column
                 );
 
-                multiDimArrayDecls.Add(multiDimArray);
+                declarations.Add(multiDimArray);
                 break;
             default:
                 break;
@@ -706,25 +691,16 @@ public sealed class Parser {
     }
 
     private BlockAST parseStatements(int line, int column) {
-        List<VarDeclAST> varDecls = new List<VarDeclAST>();
-        List<MultiVarDeclAST> multiVarDecls = new List<MultiVarDeclAST>();
-        List<ArrayDeclAST> arrayDecls = new List<ArrayDeclAST>();
-        List<MultiDimArrayDeclAST> multiDimArrayDecls = new List<MultiDimArrayDeclAST>();
+        List<DeclAST> declarations = new List<DeclAST>();
         List<StmtAST> statements = new List<StmtAST>();
 
         parseStatement(
-            varDecls,
-            multiVarDecls,
-            arrayDecls,
-            multiDimArrayDecls,
+            declarations,
             statements
         );
 
         return new BlockAST(
-            varDecls,
-            multiVarDecls,
-            arrayDecls,
-            multiDimArrayDecls,
+            declarations,
             statements,
             line, column
         );
@@ -737,19 +713,13 @@ public sealed class Parser {
      * | <Return >
      */
     private void parseStatement(
-        List<VarDeclAST> varDecls,
-        List<MultiVarDeclAST> multiVarDecls,
-        List<ArrayDeclAST> arrayDecls,
-        List<MultiDimArrayDeclAST> multiDimArrayDecls,
+        List<DeclAST> declarations,
         List<StmtAST> statements
     ) {
         switch(tokenQueue.Peek().type) {
             case TokenType.identifier:
                 parseDeclarationOrAssignment(
-                    varDecls,
-                    multiVarDecls,
-                    arrayDecls,
-                    multiDimArrayDecls,
+                    declarations,
                     statements
                 );
                 break;
@@ -770,10 +740,7 @@ public sealed class Parser {
         }
 
         parseStatement(
-            varDecls,
-            multiVarDecls,
-            arrayDecls,
-            multiDimArrayDecls,
+            declarations,
             statements
         );
     }
@@ -783,10 +750,7 @@ public sealed class Parser {
      * | <identifier> <procedureCall>
      */
     private void parseDeclarationOrAssignment(
-        List<VarDeclAST> varDecls,
-        List<MultiVarDeclAST> multiVarDecls,
-        List<ArrayDeclAST> arrayDecls,
-        List<MultiDimArrayDeclAST> multiDimArrayDecls,
+        List<DeclAST> declarations,
         List<StmtAST> assignStmts
     ) {
         Token firstIdentifer = consume(TokenType.identifier);
@@ -796,10 +760,7 @@ public sealed class Parser {
                 parseDeclaration(
                     firstIdentifer,
                     firstType,
-                    varDecls,
-                    multiVarDecls,
-                    arrayDecls,
-                    multiDimArrayDecls
+                    declarations
                 );
                 break;
             case TokenType.assign:
