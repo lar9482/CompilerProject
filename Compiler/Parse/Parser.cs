@@ -61,8 +61,8 @@ public sealed class Parser {
     private List<FuncDeclAST> topLvl_FuncDecls;
     private List<VarDeclAST> topLvl_VarDecls;
     private List<MultiVarDeclAST> topLvl_MultiVarDecls;
-    private List<ArrayAST> topLvl_ArrayDecls;
-    private List<MultiDimArrayAST> topLvl_MultiDimArrayDecls;
+    private List<ArrayDeclAST> topLvl_ArrayDecls;
+    private List<MultiDimArrayDeclAST> topLvl_MultiDimArrayDecls;
 
     public Parser(Queue<Token> tokenQueue) {
         this.tokenQueue = tokenQueue;
@@ -71,8 +71,8 @@ public sealed class Parser {
 
         this.topLvl_VarDecls = new List<VarDeclAST>();
         this.topLvl_MultiVarDecls = new List<MultiVarDeclAST>();
-        this.topLvl_ArrayDecls = new List<ArrayAST>();
-        this.topLvl_MultiDimArrayDecls = new List<MultiDimArrayAST>();
+        this.topLvl_ArrayDecls = new List<ArrayDeclAST>();
+        this.topLvl_MultiDimArrayDecls = new List<MultiDimArrayDeclAST>();
     }
 
     /*
@@ -141,8 +141,8 @@ public sealed class Parser {
         PrimitiveType firstType,
         List<VarDeclAST> varDecls,
         List<MultiVarDeclAST> multiVarDecls,
-        List<ArrayAST> arrayDecls,
-        List<MultiDimArrayAST> multiDimArrayDecls
+        List<ArrayDeclAST> arrayDecls,
+        List<MultiDimArrayDeclAST> multiDimArrayDecls
     ) {
         switch(tokenQueue.Peek().type) {
             case TokenType.assign:
@@ -346,8 +346,8 @@ public sealed class Parser {
       */
     private void parseArrayDeclaration(
         Token identifierToken, PrimitiveType primitiveType,
-        List<ArrayAST> arrayDecls,
-        List<MultiDimArrayAST> multiDimArrayDecls
+        List<ArrayDeclAST> arrayDecls,
+        List<MultiDimArrayDeclAST> multiDimArrayDecls
     ) {
         consume(TokenType.startBracket);
 
@@ -376,8 +376,8 @@ public sealed class Parser {
      */
     private void parse_SingleOrMulti_Array_Expr(
         Token identifierToken, PrimitiveType primitiveType,
-        List<ArrayAST> arrayDecls,
-        List<MultiDimArrayAST> multiDimArrayDecls
+        List<ArrayDeclAST> arrayDecls,
+        List<MultiDimArrayDeclAST> multiDimArrayDecls
     ) {
         switch(tokenQueue.Peek().type) {
             case TokenType.assign:
@@ -385,7 +385,7 @@ public sealed class Parser {
                 ExprAST[] exprs = parseArrayInitial();
                 consume(TokenType.semicolon);
 
-                ArrayAST array = new ArrayAST(
+                ArrayDeclAST array = new ArrayDeclAST(
                     identifierToken.lexeme,
                     new IntLiteralAST(
                         exprs.Length,
@@ -408,7 +408,7 @@ public sealed class Parser {
                 verifyMultiDimArrayColumnSize(arrayOfExprs);
                 consume(TokenType.endCurly);
                 consume(TokenType.semicolon);
-                MultiDimArrayAST multiDimArray = new MultiDimArrayAST(
+                MultiDimArrayDeclAST multiDimArray = new MultiDimArrayDeclAST(
                     identifierToken.lexeme,
                     new IntLiteralAST(
                         arrayOfExprs.Count,
@@ -461,15 +461,15 @@ public sealed class Parser {
      */
     private void parse_SingleOrMulti_Array_Static(
         Token identifierToken, PrimitiveType primitiveType,
-        List<ArrayAST> arrayDecls,
-        List<MultiDimArrayAST> multiDimArrayDecls,
+        List<ArrayDeclAST> arrayDecls,
+        List<MultiDimArrayDeclAST> multiDimArrayDecls,
         ExprAST firstExpr
     ) {
         switch(tokenQueue.Peek().type) {
             case TokenType.semicolon:
                 consume(TokenType.semicolon);
 
-                ArrayAST array = new ArrayAST(
+                ArrayDeclAST array = new ArrayDeclAST(
                     identifierToken.lexeme,
                     firstExpr,
                     primitiveType,
@@ -485,7 +485,7 @@ public sealed class Parser {
                 consume(TokenType.endBracket);
                 consume(TokenType.semicolon);
 
-                MultiDimArrayAST multiDimArray = new MultiDimArrayAST(
+                MultiDimArrayDeclAST multiDimArray = new MultiDimArrayDeclAST(
                     identifierToken.lexeme,
                     firstExpr,
                     secondExpr,
@@ -708,8 +708,8 @@ public sealed class Parser {
     private BlockAST parseStatements(int line, int column) {
         List<VarDeclAST> varDecls = new List<VarDeclAST>();
         List<MultiVarDeclAST> multiVarDecls = new List<MultiVarDeclAST>();
-        List<ArrayAST> arrayDecls = new List<ArrayAST>();
-        List<MultiDimArrayAST> multiDimArrayDecls = new List<MultiDimArrayAST>();
+        List<ArrayDeclAST> arrayDecls = new List<ArrayDeclAST>();
+        List<MultiDimArrayDeclAST> multiDimArrayDecls = new List<MultiDimArrayDeclAST>();
         List<StmtAST> statements = new List<StmtAST>();
 
         parseStatement(
@@ -739,8 +739,8 @@ public sealed class Parser {
     private void parseStatement(
         List<VarDeclAST> varDecls,
         List<MultiVarDeclAST> multiVarDecls,
-        List<ArrayAST> arrayDecls,
-        List<MultiDimArrayAST> multiDimArrayDecls,
+        List<ArrayDeclAST> arrayDecls,
+        List<MultiDimArrayDeclAST> multiDimArrayDecls,
         List<StmtAST> statements
     ) {
         switch(tokenQueue.Peek().type) {
@@ -785,8 +785,8 @@ public sealed class Parser {
     private void parseDeclarationOrAssignment(
         List<VarDeclAST> varDecls,
         List<MultiVarDeclAST> multiVarDecls,
-        List<ArrayAST> arrayDecls,
-        List<MultiDimArrayAST> multiDimArrayDecls,
+        List<ArrayDeclAST> arrayDecls,
+        List<MultiDimArrayDeclAST> multiDimArrayDecls,
         List<StmtAST> assignStmts
     ) {
         Token firstIdentifer = consume(TokenType.identifier);

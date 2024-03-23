@@ -5,8 +5,8 @@ using CompilerProj.Context;
 public sealed class BlockAST : NodeAST {
     public List<VarDeclAST> varDecls;
     public List<MultiVarDeclAST> multiVarDecls;
-    public List<ArrayAST> arrays;
-    public List<MultiDimArrayAST> multiDimArrays;
+    public List<ArrayDeclAST> arrays;
+    public List<MultiDimArrayDeclAST> multiDimArrays;
 
     public List<StmtAST> statements;
 
@@ -15,8 +15,8 @@ public sealed class BlockAST : NodeAST {
     public BlockAST(
         List<VarDeclAST> varDecls,
         List<MultiVarDeclAST> multiVarDecls,
-        List<ArrayAST> arrays,
-        List<MultiDimArrayAST> multiDimArrays,
+        List<ArrayDeclAST> arrays,
+        List<MultiDimArrayDeclAST> multiDimArrays,
         List<StmtAST> statements, 
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {

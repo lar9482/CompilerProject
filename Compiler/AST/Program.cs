@@ -5,8 +5,8 @@ using CompilerProj.Context;
 public sealed class ProgramAST : NodeAST {
     public List<VarDeclAST> varDecls;
     public List<MultiVarDeclAST> multiVarDecls;
-    public List<ArrayAST> arrayDecls;
-    public List<MultiDimArrayAST> multiDimArrayDecls;
+    public List<ArrayDeclAST> arrayDecls;
+    public List<MultiDimArrayDeclAST> multiDimArrayDecls;
 
     public List<FuncDeclAST> funcDecls;
 
@@ -15,8 +15,8 @@ public sealed class ProgramAST : NodeAST {
     public ProgramAST(
         List<VarDeclAST> varDecls, 
         List<MultiVarDeclAST> multiVarDecls,
-        List<ArrayAST> arrayDecls,
-        List<MultiDimArrayAST> multiDimArrayDecls,
+        List<ArrayDeclAST> arrayDecls,
+        List<MultiDimArrayDeclAST> multiDimArrayDecls,
         List<FuncDeclAST> funcDecls,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {

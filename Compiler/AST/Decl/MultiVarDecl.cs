@@ -2,7 +2,7 @@ using CompilerProj.AST;
 using CompilerProj.Types;
 using CompilerProj.Visitors;
 
-public sealed class MultiVarDeclAST : NodeAST {
+public sealed class MultiVarDeclAST : DeclAST {
     public List<string> names;
     public Dictionary<string, ExprAST?> initialValues;
     public Dictionary<string, PrimitiveType> types;

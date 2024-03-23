@@ -2,7 +2,7 @@ using CompilerProj.AST;
 using CompilerProj.Types;
 using CompilerProj.Visitors;
 
-public sealed class MultiDimArrayAST : NodeAST {
+public sealed class MultiDimArrayDeclAST : DeclAST {
     public string name;
     public ExprAST rowSize;
     public ExprAST colSize;
@@ -10,7 +10,7 @@ public sealed class MultiDimArrayAST : NodeAST {
 
     public ExprAST[][]? initialValues;
 
-    public MultiDimArrayAST(
+    public MultiDimArrayDeclAST(
         string name,
         ExprAST rowSize,
         ExprAST colSize,
