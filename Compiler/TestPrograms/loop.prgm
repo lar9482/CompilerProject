@@ -1,3 +1,12 @@
+:global
+num1: int, num2: int, num3:int = 0, 0, 0;
+
+:global
+bool1: bool, bool2: bool, bool3: bool = true, true, true;
+
+:global
+array1: int[] = {0, 1, 2};
+
 sum(a: int):int {
     x: int = 1;
     y: int = 0;

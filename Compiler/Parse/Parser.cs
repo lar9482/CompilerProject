@@ -60,11 +60,6 @@ public sealed class Parser {
 
     private List<FunctionAST> topLvl_Functions;
     private List<DeclAST> topLvl_Declarations;
-    // private List<VarDeclAST> topLvl_VarDecls;
-    // private List<MultiVarDeclAST> topLvl_MultiVarDecls;
-    // private List<ArrayDeclAST> topLvl_ArrayDecls;
-    // private List<MultiDimArrayDeclAST> topLvl_MultiDimArrayDecls;
-
     
     public Parser(Queue<Token> tokenQueue) {
         this.tokenQueue = tokenQueue;

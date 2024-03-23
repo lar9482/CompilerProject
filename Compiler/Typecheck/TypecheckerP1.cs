@@ -1,20 +1,195 @@
+using System.Reflection.Metadata;
+using CompilerProj.Context;
 using CompilerProj.Visitors;
 
 /*
- * This pass will
+ * This pass will build the symbol tables, then annotate the AST with them.
  */
 public sealed class TypecheckerP1 : ASTVisitor {
 
-    public void visit(ProgramAST program) { }
-    public void visit(VarDeclAST varDecl) { }
-    public void visit(MultiVarDeclAST multiVarDecl) { }
-    public void visit(ArrayDeclAST array) { }
-    public void visit(MultiDimArrayDeclAST multiDimArray) { }
-    public void visit(FunctionAST function) { }
-    public void visit(ParameterAST parameter) { }
-    public void visit(BlockAST block) { }
-    public void visit(ConditionalAST conditional) { }
-    public void visit(WhileLoopAST whileLoop) { }
+    private Context context;
+    private List<string> errorMsgs;
+
+    public TypecheckerP1() { 
+        this.context = new Context();
+        this.errorMsgs = new List<string>();
+    }
+
+    public void visit(ProgramAST program) { 
+        context.push();
+
+        foreach(DeclAST decl in program.declarations) {
+            switch(decl) {
+                case VarDeclAST varDecl: varDecl.accept(this); break;
+                case MultiVarDeclAST multiVarDecl: multiVarDecl.accept(this); break;
+                case ArrayDeclAST arrayDecl: arrayDecl.accept(this); break;
+                case MultiDimArrayDeclAST multiDimArrayDecl: multiDimArrayDecl.accept(this); break;
+            }
+        }
+
+        foreach(FunctionAST function in program.functions) {
+            function.accept(this);
+        }
+
+        program.scope = context.pop();
+    }
+
+    public void visit(VarDeclAST varDecl) { 
+        if (context.lookup(varDecl.name) != null) {
+            errorMsgs.Add(
+                String.Format(
+                    "Line {0}:{1}, {2} exists already.", 
+                    varDecl.lineNumber, varDecl.columnNumber, varDecl.name
+                )
+            );
+            return;
+        }
+
+        SymbolVariable symbolVar = new SymbolVariable(
+            varDecl.name, varDecl.type
+        );
+
+        context.put(varDecl.name, symbolVar);
+    }
+
+    public void visit(MultiVarDeclAST multiVarDecl) { 
+        foreach(KeyValuePair<string, PrimitiveType> nameAndType in multiVarDecl.types) {
+            if (context.lookup(nameAndType.Key) != null) {
+                errorMsgs.Add(
+                    String.Format(
+                        "Line {0}:{1}, {2} exists already.", 
+                        multiVarDecl.lineNumber, multiVarDecl.columnNumber, nameAndType.Key
+                    )
+                );
+                continue;
+            }
+
+            SymbolVariable symbolVar = new SymbolVariable(
+                nameAndType.Key,
+                nameAndType.Value
+            );
+
+            context.put(nameAndType.Key, symbolVar);
+        }
+    }
+
+    public void visit(ArrayDeclAST array) { 
+        if (context.lookup(array.name) != null) {
+            errorMsgs.Add(
+                String.Format(
+                    "Line {0}:{1}, {2} exists already.", 
+                    array.lineNumber, array.columnNumber, array.name
+                )
+            );
+            return;
+        }
+
+        SymbolVariable symbolVar = new SymbolVariable(
+            array.name,
+            array.type
+        );
+
+        context.put(array.name, symbolVar);
+    }
+
+    public void visit(MultiDimArrayDeclAST multiDimArray) { 
+        if (context.lookup(multiDimArray.name) != null) {
+            errorMsgs.Add(
+                String.Format(
+                    "Line {0}:{1}, {2} exists already.", 
+                    multiDimArray.lineNumber, multiDimArray.columnNumber, multiDimArray.name
+                )
+            );
+            return;
+        }
+
+        SymbolVariable symbolVar = new SymbolVariable(
+            multiDimArray.name,
+            multiDimArray.type
+        );
+
+        context.put(multiDimArray.name, symbolVar);
+    }
+
+    public void visit(FunctionAST function) { 
+        List<SimpleType> parameterTypes = new List<SimpleType>();
+        foreach(ParameterAST param in function.parameters) {
+            parameterTypes.Add(param.type);
+        }
+        SymbolFunction symbolFunc = new SymbolFunction(
+            function.name,
+            parameterTypes.ToArray<SimpleType>(),
+            function.returnTypes.ToArray<SimpleType>()
+        );
+        context.put(function.name, symbolFunc);
+
+        context.push();
+
+        foreach(ParameterAST param in function.parameters) {
+            param.accept(this);
+        }
+        function.block.accept(this);
+
+        function.scope = context.pop();
+    }
+
+    public void visit(ParameterAST parameter) { 
+        if (context.lookup(parameter.name) != null) {
+            errorMsgs.Add(
+                String.Format(
+                    "Line {0}:{1}, {2} exists already.", 
+                    parameter.lineNumber, parameter.columnNumber, parameter.name
+                )
+            );
+            return;
+        }
+
+        SymbolVariable symbolVar = new SymbolVariable(
+            parameter.name,
+            parameter.type
+        );
+
+        context.put(parameter.name, symbolVar);
+    }
+
+    public void visit(BlockAST block) { 
+        context.push();
+
+        foreach(DeclAST decl in block.declarations) {
+            switch(decl) {
+                case VarDeclAST varDecl: varDecl.accept(this); break;
+                case MultiVarDeclAST multiVarDecl: multiVarDecl.accept(this); break;
+                case ArrayDeclAST arrayDecl: arrayDecl.accept(this); break;
+                case MultiDimArrayDeclAST multiDimArrayDecl: multiDimArrayDecl.accept(this); break;
+            }
+        }
+
+        foreach(StmtAST stmt in block.statements) {
+            switch(stmt) {
+                case ConditionalAST conditional: conditional.accept(this); break;
+                case WhileLoopAST whileLoop: whileLoop.accept(this); break;
+            }
+        }
+
+        block.scope = context.pop();
+    }
+    
+    public void visit(ConditionalAST conditional) { 
+        conditional.ifBlock.accept(this);
+        if (conditional.elseIfConditionalBlocks != null) {
+            foreach(KeyValuePair<ExprAST, BlockAST> elseIfConditionalBlock in conditional.elseIfConditionalBlocks) {
+                elseIfConditionalBlock.Value.accept(this);
+            }
+        }
+
+        if (conditional.elseBlock != null) {
+            conditional.elseBlock.accept(this);
+        }
+    }
+
+    public void visit(WhileLoopAST whileLoop) { 
+        whileLoop.body.accept(this);
+    }
 
 
     //Unused visit procedures
