@@ -30,3 +30,11 @@ public sealed class SymbolFunction : Symbol {
         this.returnTypes = returnTypes;
     }
 }
+
+public sealed class SymbolReturn : Symbol {
+    public SimpleType[] returnTypes;
+
+    public SymbolReturn(SimpleType[] returnTypes) : base("return") {
+        this.returnTypes = returnTypes;
+    }
+}
