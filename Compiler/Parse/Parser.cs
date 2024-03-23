@@ -342,7 +342,7 @@ public sealed class Parser {
     }
 
      /* ⟨arrayDeclaration⟩ ::= ‘[’ ‘]’ ⟨singleOrMulti_Array_Expr ⟩
-      * | ‘[’ ⟨number ⟩ ‘]’ ⟨singleOrMulti_Array_Static>
+      * | ‘[’ ⟨Expr ⟩ ‘]’ ⟨singleOrMulti_Array_Static>
       */
     private void parseArrayDeclaration(
         Token identifierToken, PrimitiveType primitiveType,
@@ -359,24 +359,15 @@ public sealed class Parser {
                     arrayDecls, multiDimArrayDecls
                 );
                 break;
-            case TokenType.number:
-                Token numberToken = consume(TokenType.number);
+            default:
+                ExprAST firstExpr = parseExpr();
                 consume(TokenType.endBracket);
                 parse_SingleOrMulti_Array_Static(
                     identifierToken, primitiveType,
                     arrayDecls, multiDimArrayDecls,
-                    Int32.Parse(numberToken.lexeme)
+                    firstExpr
                 );
                 break;
-            default:
-                throw new Exception(
-                    String.Format(
-                        "Line {0}:{1}, Expected a ] or a number, not {2}", 
-                        tokenQueue.Peek().line.ToString(), 
-                        tokenQueue.Peek().column.ToString(),
-                        tokenQueue.Peek().lexeme
-                    )
-                );
         }
     }
 
@@ -396,7 +387,11 @@ public sealed class Parser {
 
                 ArrayAST array = new ArrayAST(
                     identifierToken.lexeme,
-                    exprs.Length,
+                    new IntLiteralAST(
+                        exprs.Length,
+                        identifierToken.line,
+                        identifierToken.column
+                    ),
                     primitiveType,
                     exprs,
                     identifierToken.line,
@@ -415,8 +410,16 @@ public sealed class Parser {
                 consume(TokenType.semicolon);
                 MultiDimArrayAST multiDimArray = new MultiDimArrayAST(
                     identifierToken.lexeme,
-                    arrayOfExprs.Count,
-                    arrayOfExprs[0].Length,
+                    new IntLiteralAST(
+                        arrayOfExprs.Count,
+                        identifierToken.line,
+                        identifierToken.column
+                    ),
+                    new IntLiteralAST(
+                        arrayOfExprs[0].Length,
+                        identifierToken.line,
+                        identifierToken.column
+                    ),
                     primitiveType,
                     arrayOfExprs.ToArray(),
                     identifierToken.line,
@@ -454,13 +457,13 @@ public sealed class Parser {
     }
     /*
      * ⟨singleOrMulti Array Static⟩ ::= ‘;’
-     * | ‘[’ ⟨number ⟩ ‘]’ ‘;’
+     * | ‘[’ ⟨Expr ⟩ ‘]’ ‘;’
      */
     private void parse_SingleOrMulti_Array_Static(
         Token identifierToken, PrimitiveType primitiveType,
         List<ArrayAST> arrayDecls,
         List<MultiDimArrayAST> multiDimArrayDecls,
-        int firstNumber
+        ExprAST firstExpr
     ) {
         switch(tokenQueue.Peek().type) {
             case TokenType.semicolon:
@@ -468,7 +471,7 @@ public sealed class Parser {
 
                 ArrayAST array = new ArrayAST(
                     identifierToken.lexeme,
-                    firstNumber,
+                    firstExpr,
                     primitiveType,
                     null,
                     identifierToken.line,
@@ -478,14 +481,14 @@ public sealed class Parser {
                 break;
             case TokenType.startBracket:
                 consume(TokenType.startBracket);
-                Token secondNumberToken = consume(TokenType.number);
+                ExprAST secondExpr = parseExpr();
                 consume(TokenType.endBracket);
                 consume(TokenType.semicolon);
 
                 MultiDimArrayAST multiDimArray = new MultiDimArrayAST(
                     identifierToken.lexeme,
-                    firstNumber,
-                    Int32.Parse(secondNumberToken.lexeme),
+                    firstExpr,
+                    secondExpr,
                     primitiveType,
                     null,
                     identifierToken.line,
@@ -731,6 +734,7 @@ public sealed class Parser {
      * ⟨statements⟩ ::= ⟨DeclarationOrAssignment⟩
      * | ⟨Conditional ⟩
      * | ⟨WhileLoop⟩
+     * | <Return >
      */
     private void parseStatement(
         List<VarDeclAST> varDecls,

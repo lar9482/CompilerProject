@@ -57,8 +57,8 @@ internal class TopLvlVisitor : ASTVisitor {
 
     public void visit(ArrayAST array) {  
         traversalRecord.Enqueue(
-            String.Format("{0}: {1} SIZE:{2}", 
-            array.name, SimpleTypeToString(array.type), array.size
+            String.Format("{0}: {1}", 
+            array.name, SimpleTypeToString(array.type)
         ));
 
         if (array.initialValues != null) {
@@ -68,9 +68,8 @@ internal class TopLvlVisitor : ASTVisitor {
 
     public void visit(MultiDimArrayAST multiDimArray) { 
         traversalRecord.Enqueue(
-            String.Format("{0}: {1} ROW:{2} COL:{3}", 
-            multiDimArray.name, SimpleTypeToString(multiDimArray.type), 
-            multiDimArray.rowSize, multiDimArray.colSize
+            String.Format("{0}: {1}", 
+            multiDimArray.name, SimpleTypeToString(multiDimArray.type)
         ));
 
         if (multiDimArray.initialValues != null) {

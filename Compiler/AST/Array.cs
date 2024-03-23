@@ -4,13 +4,13 @@ using CompilerProj.Visitors;
 
 public sealed class ArrayAST : NodeAST {
     public string name;
-    public int size;
+    public ExprAST? size;
     public ArrayType<PrimitiveType> type;
     public ExprAST[]? initialValues;
 
     public ArrayAST(
         string name,
-        int size,
+        ExprAST size,
         PrimitiveType type,
         ExprAST[]? initialValues,
         int lineNumber, int columnNumber
