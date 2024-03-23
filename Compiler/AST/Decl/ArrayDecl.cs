@@ -2,13 +2,13 @@ using CompilerProj.AST;
 using CompilerProj.Types;
 using CompilerProj.Visitors;
 
-public sealed class ArrayAST : NodeAST {
+public sealed class ArrayDeclAST : DeclAST {
     public string name;
     public ExprAST size;
     public ArrayType<PrimitiveType> type;
     public ExprAST[]? initialValues;
 
-    public ArrayAST(
+    public ArrayDeclAST(
         string name,
         ExprAST size,
         PrimitiveType type,

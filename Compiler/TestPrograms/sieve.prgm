@@ -1,7 +1,7 @@
 main(args:int[][]) {
     n: int = 500; // # of runs.
     LIMIT: int = 90000;
-    flags: bool[90001];
+    flags: bool[LIMIT+1];
 
     c: int = 0;
     while (c < length(flags)) {

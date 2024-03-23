@@ -2,7 +2,7 @@ using CompilerProj.AST;
 using CompilerProj.Types;
 using CompilerProj.Visitors;
 
-public sealed class VarDeclAST : NodeAST {
+public sealed class VarDeclAST : DeclAST {
     public string name;
     public ExprAST? initialValue;
     public PrimitiveType type;
