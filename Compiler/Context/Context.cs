@@ -46,7 +46,11 @@ public sealed class Context {
             environment.Push(new SymbolTable(environment.Peek()));
     }
 
-    public void pop() {
-        environment.Pop();
+    public void push(SymbolTable table) {
+        environment.Push(table);
+    }
+
+    public SymbolTable pop() {
+        return environment.Pop();
     }
 }

@@ -18,13 +18,13 @@ public sealed class SymbolVariable : Symbol {
 }
 
 public sealed class SymbolFunction : Symbol {
-    public List<SimpleType> parameterTypes;
-    public List<SimpleType> returnTypes;
+    public SimpleType[] parameterTypes;
+    public SimpleType[] returnTypes;
 
     public SymbolFunction(
         string functionName,
-        List<SimpleType> parameterTypes, 
-        List<SimpleType> returnTypes
+        SimpleType[] parameterTypes,
+        SimpleType[] returnTypes
     ) : base(functionName) {
         this.parameterTypes = parameterTypes;
         this.returnTypes = returnTypes;
