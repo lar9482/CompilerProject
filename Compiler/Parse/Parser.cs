@@ -58,7 +58,7 @@ public sealed class Parser {
 
     private Queue<Token> tokenQueue;
 
-    private List<FuncDeclAST> topLvl_FuncDecls;
+    private List<FunctionAST> topLvl_FuncDecls;
     private List<VarDeclAST> topLvl_VarDecls;
     private List<MultiVarDeclAST> topLvl_MultiVarDecls;
     private List<ArrayDeclAST> topLvl_ArrayDecls;
@@ -67,7 +67,7 @@ public sealed class Parser {
     public Parser(Queue<Token> tokenQueue) {
         this.tokenQueue = tokenQueue;
 
-        this.topLvl_FuncDecls = new List<FuncDeclAST>();
+        this.topLvl_FuncDecls = new List<FunctionAST>();
 
         this.topLvl_VarDecls = new List<VarDeclAST>();
         this.topLvl_MultiVarDecls = new List<MultiVarDeclAST>();
@@ -534,7 +534,7 @@ public sealed class Parser {
     /*
      * ⟨functionDeclaration⟩ ::= ⟨identifier ⟩ ‘(’ ⟨paramsOptional ⟩ ‘)’ ⟨returnTypesOptional ⟩ ⟨Block ⟩
      */
-    private FuncDeclAST parseFunctionDeclaration() {
+    private FunctionAST parseFunctionDeclaration() {
         Token functionNameToken = consume(TokenType.identifier);
         consume(TokenType.startParen);
         List<ParameterAST> parameters = parseParams();
@@ -544,7 +544,7 @@ public sealed class Parser {
 
         BlockAST block = parseBlock();
 
-        return new FuncDeclAST(
+        return new FunctionAST(
             functionNameToken.lexeme,
             parameters,
             returnTypes,

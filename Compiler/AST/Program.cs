@@ -8,7 +8,7 @@ public sealed class ProgramAST : NodeAST {
     public List<ArrayDeclAST> arrayDecls;
     public List<MultiDimArrayDeclAST> multiDimArrayDecls;
 
-    public List<FuncDeclAST> funcDecls;
+    public List<FunctionAST> funcDecls;
 
     public SymbolTable? scope;
     
@@ -17,7 +17,7 @@ public sealed class ProgramAST : NodeAST {
         List<MultiVarDeclAST> multiVarDecls,
         List<ArrayDeclAST> arrayDecls,
         List<MultiDimArrayDeclAST> multiDimArrayDecls,
-        List<FuncDeclAST> funcDecls,
+        List<FunctionAST> funcDecls,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {
         

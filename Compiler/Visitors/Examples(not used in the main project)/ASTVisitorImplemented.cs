@@ -6,7 +6,7 @@ public sealed class ASTVisitorImplemented : ASTVisitor {
     public void visit(MultiVarDeclAST multiVarDecl) { }
     public void visit(ArrayDeclAST array) { }
     public void visit(MultiDimArrayDeclAST multiDimArray) { }
-    public void visit(FuncDeclAST function) { }
+    public void visit(FunctionAST function) { }
     public void visit(ParameterAST parameter) { }
     public void visit(BlockAST block) { }
     public void visit(AssignAST assign) { }
