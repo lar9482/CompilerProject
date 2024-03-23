@@ -4,16 +4,16 @@ using CompilerProj.Visitors;
 
 public sealed class MultiDimArrayAST : NodeAST {
     public string name;
-    public ExprAST? rowSize;
-    public ExprAST? colSize;
+    public ExprAST rowSize;
+    public ExprAST colSize;
     public MultiDimArrayType<PrimitiveType> type;
 
     public ExprAST[][]? initialValues;
 
     public MultiDimArrayAST(
         string name,
-        ExprAST? rowSize,
-        ExprAST? colSize,
+        ExprAST rowSize,
+        ExprAST colSize,
         PrimitiveType type,
         ExprAST[][]? initialValues,
         int lineNumber, int columnNumber
