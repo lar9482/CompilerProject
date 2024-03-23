@@ -107,7 +107,7 @@ internal class ExprVisitor : ASTVisitor {
     public void visit(MultiVarDeclAST multiVarDecl) { throw new NotImplementedException("This visit is not implemented here."); }
     public void visit(ArrayDeclAST array) { throw new NotImplementedException("This visit is not implemented here."); }
     public void visit(MultiDimArrayDeclAST multiDimArray) { throw new NotImplementedException("This visit is not implemented here."); }
-    public void visit(FuncDeclAST function) { throw new NotImplementedException("This visit is not implemented here."); }
+    public void visit(FunctionAST function) { throw new NotImplementedException("This visit is not implemented here."); }
     public void visit(ParameterAST parameter) { throw new NotImplementedException("This visit is not implemented here."); }
     public void visit(BlockAST block) { throw new NotImplementedException("This visit is not implemented here."); }
     public void visit(AssignAST assign) { throw new NotImplementedException("This visit is not implemented here."); }

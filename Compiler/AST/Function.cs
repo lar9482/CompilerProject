@@ -3,7 +3,7 @@ using CompilerProj.Types;
 using CompilerProj.Visitors;
 using CompilerProj.Context;
 
-public sealed class FuncDeclAST : NodeAST {
+public sealed class FunctionAST : NodeAST {
     public string name;
     public List<ParameterAST> parameters;
     public List<SimpleType> returnTypes;
@@ -12,7 +12,7 @@ public sealed class FuncDeclAST : NodeAST {
 
     public SymbolTable? scope;
     
-    public FuncDeclAST(
+    public FunctionAST(
         string name,
         List<ParameterAST> parameters,
         List<SimpleType> returnTypes,

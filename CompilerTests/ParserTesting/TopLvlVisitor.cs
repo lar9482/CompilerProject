@@ -77,7 +77,7 @@ internal class TopLvlVisitor : ASTVisitor {
         }
     }
 
-    public void visit(FuncDeclAST function) { 
+    public void visit(FunctionAST function) { 
         traversalRecord.Enqueue(function.name);
 
         foreach (var parameter in function.parameters) {
