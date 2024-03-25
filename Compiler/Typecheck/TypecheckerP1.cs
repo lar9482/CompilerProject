@@ -17,6 +17,7 @@ public sealed class TypecheckerP1 : ASTVisitor {
     }
 
     private void addIO() {
+        // Reads a string to standard output
         context.put("print", new SymbolFunction(
             "print",
             new SimpleType[] {
@@ -25,6 +26,7 @@ public sealed class TypecheckerP1 : ASTVisitor {
             new SimpleType[] {}
         ));
 
+        // Reads a string to standard output, followed by a newline and flush()aybe
         context.put("println", new SymbolFunction(
             "println",
             new SimpleType[] {
@@ -33,7 +35,8 @@ public sealed class TypecheckerP1 : ASTVisitor {
             new SimpleType[] {}
         ));
 
-        context.put("readln", new SymbolFunction(
+        //Read from standard input until a newline
+        context.put("readln", new SymbolFunction(   
             "readln",
             new SimpleType[] {},
             new SimpleType[] {
@@ -41,6 +44,8 @@ public sealed class TypecheckerP1 : ASTVisitor {
             }
         ));
 
+        //Read a single character from standard input
+        //Return -1 if the end of input has been reached.
         context.put("getchar", new SymbolFunction(
             "getchar",
             new SimpleType[] {},
@@ -49,6 +54,8 @@ public sealed class TypecheckerP1 : ASTVisitor {
             }
         ));
 
+
+        // Test for end of file on standard input
         context.put("eof", new SymbolFunction(
             "eof",
             new SimpleType[] {},
@@ -59,6 +66,9 @@ public sealed class TypecheckerP1 : ASTVisitor {
     }
 
     private void addConv() {
+
+        // If "str" contains a sequence of ASCII characters that correctly represent
+        // an integer constant n, return (n, true). Otherwise return (0, false).
         context.put("parseInt", new SymbolFunction(
             "parseInt",
             new SimpleType[] {
@@ -69,6 +79,8 @@ public sealed class TypecheckerP1 : ASTVisitor {
             }
         ));
 
+        // Return a sequence of ASCII characters representing the
+        // integer n.
         context.put("unparseInt", new SymbolFunction(
             "unparseInt",
             new SimpleType[] {
