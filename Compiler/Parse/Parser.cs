@@ -789,7 +789,8 @@ public sealed class Parser {
             case TokenType.startParen:
                 assignStmts.Add(parseProcedureCall(firstIdentifer));
                 break;
-            throw new Exception(
+            default:
+                throw new Exception(
                     String.Format(
                         "{0}:{1} ParseError: Expected : = , [ (, not {2}", 
                         tokenQueue.Peek().line.ToString(), 
