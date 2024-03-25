@@ -1,0 +1,7 @@
+spam(a: bool[]) {
+}
+
+eggs() {
+    montyPython: int[] = {25, 27};
+    spam(montyPython);
+}
