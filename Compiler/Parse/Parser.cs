@@ -86,7 +86,7 @@ public sealed class Parser {
                 default:
                     throw new Exception(
                         String.Format(
-                            "Line {0}:{1}, expected an identifier or :global, not {2}", 
+                            "{0}:{1} ParseError: expected an identifier or :global, not {2}", 
                             currToken.line.ToString(), 
                             currToken.column.ToString(),
                             currToken.lexeme
@@ -150,7 +150,7 @@ public sealed class Parser {
             default:
                 throw new Exception(
                     String.Format(
-                        "Line {0}:{1}, expected an identifer, not {2}", 
+                        "{0}:{1} ParseError: expected an identifer, not {2}", 
                         tokenQueue.Peek().line.ToString(), 
                         tokenQueue.Peek().column.ToString(),
                         tokenQueue.Peek().lexeme
@@ -192,7 +192,7 @@ public sealed class Parser {
             default:
                 throw new Exception(
                     String.Format(
-                        "Line {0}:{1}, expected int or bool, not {2}", 
+                        "{0}:{1} ParseError: expected int or bool, not {2}", 
                         tokenQueue.Peek().line.ToString(), 
                         tokenQueue.Peek().column.ToString(),
                         tokenQueue.Peek().lexeme
@@ -231,7 +231,7 @@ public sealed class Parser {
             default:
                 throw new Exception(
                     String.Format(
-                        "Line {0}:{1}, Expected a ; or =, not {2}", 
+                        "{0}:{1} ParseError: Expected a ; or =, not {2}", 
                         tokenQueue.Peek().line.ToString(), 
                         tokenQueue.Peek().column.ToString(),
                         tokenQueue.Peek().lexeme
@@ -319,6 +319,15 @@ public sealed class Parser {
             case TokenType.semicolon:
                 consume(TokenType.semicolon);
                 break;
+            default:
+                throw new Exception(
+                    String.Format(
+                        "{0}:{1} ParseError: Expected a ; or =, not {2}", 
+                        tokenQueue.Peek().line.ToString(), 
+                        tokenQueue.Peek().column.ToString(),
+                        tokenQueue.Peek().lexeme
+                    )
+                );
         }
 
         return initialValues;
@@ -411,7 +420,7 @@ public sealed class Parser {
             default:
                 throw new Exception(
                     String.Format(
-                        "Line {0}:{1}, Expected = or [, not {2}", 
+                        "{0}:{1} ParseError: Expected = or [, not {2}", 
                         tokenQueue.Peek().line.ToString(), 
                         tokenQueue.Peek().column.ToString(),
                         tokenQueue.Peek().lexeme
@@ -427,7 +436,7 @@ public sealed class Parser {
                 int lineNumber = arrayOfExprs[i][0].lineNumber;
                 int columnNumber = arrayOfExprs[i][0].lineNumber;
                 throw new Exception(
-                    String.Format("Line {0}:{1}, The length of the sub-array doesn't match with {3}", 
+                    String.Format("{0}:{1} ParseError: The length of the sub-array doesn't match with {3}", 
                         lineNumber.ToString(), 
                         columnNumber.ToString(),
                         expectedColumnSize
@@ -478,7 +487,14 @@ public sealed class Parser {
                 declarations.Add(multiDimArray);
                 break;
             default:
-                break;
+                throw new Exception(
+                    String.Format(
+                        "{0}:{1} ParseError: Expected a ; or [, not {2}", 
+                        tokenQueue.Peek().line.ToString(), 
+                        tokenQueue.Peek().column.ToString(),
+                        tokenQueue.Peek().lexeme
+                    )
+                );
         }
     }
 
@@ -731,7 +747,14 @@ public sealed class Parser {
                 statements.Add(returnStmt);
                 break;
             default:
-                return;
+                throw new Exception(
+                    String.Format(
+                        "{0}:{1} ParseError: Expected <identifier> <if> <while> <return>, not {2}", 
+                        tokenQueue.Peek().line.ToString(), 
+                        tokenQueue.Peek().column.ToString(),
+                        tokenQueue.Peek().lexeme
+                    )
+                );
         }
 
         parseStatement(
@@ -766,6 +789,14 @@ public sealed class Parser {
             case TokenType.startParen:
                 assignStmts.Add(parseProcedureCall(firstIdentifer));
                 break;
+            throw new Exception(
+                    String.Format(
+                        "{0}:{1} ParseError: Expected : = , [ (, not {2}", 
+                        tokenQueue.Peek().line.ToString(), 
+                        tokenQueue.Peek().column.ToString(),
+                        tokenQueue.Peek().lexeme
+                    )
+                );
         } 
     }
 
@@ -793,7 +824,7 @@ public sealed class Parser {
             default:
                 throw new Exception(
                     String.Format(
-                        "Line {0}:{1}, Expected = , [ but not {2}", 
+                        "{0}:{1} ParseError: Expected = , [ but not {2}", 
                         tokenQueue.Peek().line.ToString(), 
                         tokenQueue.Peek().column.ToString(),
                         tokenQueue.Peek().lexeme
@@ -857,7 +888,7 @@ public sealed class Parser {
         } else {
             throw new Exception(
                 String.Format(
-                    "Line {0}:{1}: Expected a list of expressions, or just one procedure call",
+                    "{0}:{1} ParseError: Expected a list of expressions, or just one procedure call",
                     firstIdentifier.line,
                     firstIdentifier.column
                 )
@@ -1031,7 +1062,7 @@ public sealed class Parser {
         while (tokenQueue.Peek().type == TokenType.reserved_else) {
             if (seenElseBlock) {
                 throw new Exception(String.Format(
-                    "Line {0}:{1}, no 'else if' or 'else' conditionals can exist after the 1st 'else' conditional",
+                    "{0}:{1} ParseError: no 'else if' or 'else' conditionals can exist after the 1st 'else' conditional",
                     tokenQueue.Peek().line.ToString(),
                     tokenQueue.Peek().column.ToString()
                 ));
@@ -1053,7 +1084,7 @@ public sealed class Parser {
                 default:
                     throw new Exception(
                         String.Format(
-                            "Line {0}:{1}, Expected 'if' or '{' ,but not {2}", 
+                            "{0}:{1} ParseError: Expected 'if' or '{' ,but not {2}", 
                             tokenQueue.Peek().line.ToString(), 
                             tokenQueue.Peek().column.ToString(),
                             tokenQueue.Peek().lexeme
@@ -1144,7 +1175,7 @@ public sealed class Parser {
         if (expectedToken.type == currTokenType) {
             return tokenQueue.Dequeue();
         } else {
-            throw new Exception(String.Format("Line {0}:{1}, The lexeme {2} does not match with the expected token {3}", 
+            throw new Exception(String.Format("{0}:{1} ParseError: The lexeme {2} does not match with the expected token {3}", 
                 expectedToken.line.ToString(), expectedToken.column.ToString(), currTokenType.ToString(), expectedToken.type.ToString()
             ));
         }
