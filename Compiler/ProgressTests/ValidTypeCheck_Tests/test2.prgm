@@ -8,6 +8,7 @@ foo(): bool, int {
 
     return pred, expr;
 }
+
 bar() {
     b:bool, i: int = foo();
 }

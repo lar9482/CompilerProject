@@ -1,0 +1,8 @@
+main(args: int[][]) {
+    i: int = 0;
+    n: int = 100;
+    while (i < n) {
+        println(unparseInt(i));
+        i = i+1;
+    }
+}
