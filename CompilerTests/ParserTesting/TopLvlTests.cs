@@ -55,7 +55,6 @@ public class ParserTests_TopLvl_Lifting {
         expectedRecord.Enqueue("variable6: bool[][]");
 
         Queue<string> actualRecord = getActualTraversalRecord(programFilePath);
-        
         Assert.IsTrue(matchingTraversalRecord(expectedRecord, actualRecord));
     }
 

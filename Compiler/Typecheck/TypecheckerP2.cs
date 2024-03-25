@@ -1,13 +1,40 @@
+using CompilerProj.Context;
 using CompilerProj.Visitors;
 
 /*
  * This pass does the actual full typechecking, via recursive visits and ASt annotation.
  */
 public sealed class TypecheckerP2 : ASTVisitor {
+    private Context context;
+    private List<string> errorMsgs;
+
+    public TypecheckerP2() {
+        this.context = new Context();
+        this.errorMsgs = new List<string>();
+    }
+
     // Top level nodes
-    public void visit(ProgramAST program) { }
+    public void visit(ProgramAST program) { 
+        if (program.scope == null) {
+            errorMsgs.Add("Semantic Error: Top level scope was not initialized");
+            return;
+        }
+
+        context.push(program.scope);
+
+        foreach(DeclAST decl in program.declarations) {
+            decl.accept(this);
+        }
+
+        foreach(FunctionAST function in program.functions) {
+            function.accept(this);
+        }
+        program.scope = context.pop();
+    }
+
     public void visit(VarDeclAST varDecl) { }
     public void visit(MultiVarDeclAST multiVarDecl) { }
+    public void visit(MultiVarDeclCallAST multiVarDeclCall) { }
     public void visit(ArrayDeclAST array) { }
     public void visit(MultiDimArrayDeclAST multiDimArray) { }
     public void visit(FunctionAST function) { }

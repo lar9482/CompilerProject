@@ -2,8 +2,7 @@ using CompilerProj.Context;
 using CompilerProj.Visitors;
 
 /*
- * This pass will build the symbol tables, then annotate the AST with them.
- * Error messages will be reported if symbols are already defined.
+ * This pass will build symbol tables and annotate the AST with top level declarations
  */
 public sealed class TypecheckerP1 : ASTVisitor {
 
@@ -152,6 +151,27 @@ public sealed class TypecheckerP1 : ASTVisitor {
         }
     }
 
+    public void visit(MultiVarDeclCallAST multiVarDeclCall) {
+        foreach(KeyValuePair<string, PrimitiveType> nameAndType in multiVarDeclCall.types) {
+            if (context.lookup(nameAndType.Key) != null) {
+                errorMsgs.Add(
+                    String.Format(
+                        "Line {0}:{1}, {2} exists already.", 
+                        multiVarDeclCall.lineNumber, multiVarDeclCall.columnNumber, nameAndType.Key
+                    )
+                );
+                continue;
+            }
+
+            SymbolVariable symbolVar = new SymbolVariable(
+                nameAndType.Key,
+                nameAndType.Value
+            );
+
+            context.put(nameAndType.Key, symbolVar);
+        }
+    }
+
     public void visit(ArrayDeclAST array) { 
         if (context.lookup(array.name) != null) {
             errorMsgs.Add(
@@ -201,82 +221,13 @@ public sealed class TypecheckerP1 : ASTVisitor {
             function.returnTypes.ToArray<SimpleType>()
         );
         context.put(function.name, symbolFunc);
-
-        context.push();
-
-        foreach(ParameterAST param in function.parameters) {
-            param.accept(this);
-        }
-        function.block.accept(this);
-
-        SymbolReturn symbolRet = new SymbolReturn(
-            function.returnTypes.ToArray<SimpleType>()
-        );
-        context.put("return", symbolRet);
-        
-        function.scope = context.pop();
-    }
-
-    public void visit(ParameterAST parameter) { 
-        if (context.lookup(parameter.name) != null) {
-            errorMsgs.Add(
-                String.Format(
-                    "Line {0}:{1}, {2} exists already.", 
-                    parameter.lineNumber, parameter.columnNumber, parameter.name
-                )
-            );
-            return;
-        }
-
-        SymbolVariable symbolVar = new SymbolVariable(
-            parameter.name,
-            parameter.type
-        );
-
-        context.put(parameter.name, symbolVar);
-    }
-
-    public void visit(BlockAST block) { 
-        context.push();
-
-        foreach(DeclAST decl in block.declarations) {
-            switch(decl) {
-                case VarDeclAST varDecl: varDecl.accept(this); break;
-                case MultiVarDeclAST multiVarDecl: multiVarDecl.accept(this); break;
-                case ArrayDeclAST arrayDecl: arrayDecl.accept(this); break;
-                case MultiDimArrayDeclAST multiDimArrayDecl: multiDimArrayDecl.accept(this); break;
-            }
-        }
-
-        foreach(StmtAST stmt in block.statements) {
-            switch(stmt) {
-                case ConditionalAST conditional: conditional.accept(this); break;
-                case WhileLoopAST whileLoop: whileLoop.accept(this); break;
-            }
-        }
-
-        block.scope = context.pop();
     }
     
-    public void visit(ConditionalAST conditional) { 
-        conditional.ifBlock.accept(this);
-        if (conditional.elseIfConditionalBlocks != null) {
-            foreach(KeyValuePair<ExprAST, BlockAST> elseIfConditionalBlock in conditional.elseIfConditionalBlocks) {
-                elseIfConditionalBlock.Value.accept(this);
-            }
-        }
-
-        if (conditional.elseBlock != null) {
-            conditional.elseBlock.accept(this);
-        }
-    }
-
-    public void visit(WhileLoopAST whileLoop) { 
-        whileLoop.body.accept(this);
-    }
-
-
     //Unused visit procedures
+    public void visit(ParameterAST parameter) { }
+    public void visit(BlockAST block) { }
+    public void visit(ConditionalAST conditional) { }
+    public void visit(WhileLoopAST whileLoop) { }
     public void visit(AssignAST assign) { throw new NotImplementedException("This visit is not used"); }
     public void visit(MultiAssignAST multiAssign) { throw new NotImplementedException("This visit is not used"); }
     public void visit(MultiAssignCallAST multiAssignCall) { throw new NotImplementedException("This visit is not used"); }

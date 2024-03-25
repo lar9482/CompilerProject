@@ -4,6 +4,7 @@ public sealed class ASTVisitorImplemented : ASTVisitor {
     public void visit(ProgramAST program) { }
     public void visit(VarDeclAST varDecl) { }
     public void visit(MultiVarDeclAST multiVarDecl) { }
+    public void visit(MultiVarDeclCallAST multiVarDeclCallAST) { }
     public void visit(ArrayDeclAST array) { }
     public void visit(MultiDimArrayDeclAST multiDimArray) { }
     public void visit(FunctionAST function) { }
