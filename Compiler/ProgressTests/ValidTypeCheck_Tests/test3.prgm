@@ -1,0 +1,8 @@
+valid(): int[] {
+    return "Valid Program.";
+}
+
+main(arg: int[][]) {
+    string: int[] = valid();
+    println(string);
+}

@@ -1,0 +1,5 @@
+main(args: int[][]) {
+    print("Hello, World!");
+    var1: int = 'x' + 47;
+    var2: int = c3po;
+}
