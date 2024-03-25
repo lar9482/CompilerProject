@@ -1,4 +1,4 @@
 ﻿using CompilerProj;
 
-string filePath = "./TestPrograms/loop.prgm";
+string filePath = "./ProgressTests/ValidTypeCheck_Tests/test2.prgm";
 Compiler.compileFile(filePath);

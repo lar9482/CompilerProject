@@ -34,9 +34,11 @@ public class Compiler {
         Parser parser = new Parser(tokenQueue);
         ProgramAST programAST = parser.parseProgram();
 
-        TypecheckerP1 symbolTableBuilder = new TypecheckerP1();
-        symbolTableBuilder.visit(programAST);
+        TypecheckerP1 topLvlDeclBuilder = new TypecheckerP1();
+        topLvlDeclBuilder.visit(programAST);
         
+        TypecheckerP2 typechecker = new TypecheckerP2();
+        typechecker.visit(programAST);
         Console.WriteLine();
     }
 }

@@ -121,6 +121,7 @@ public sealed class Parser {
     /*
      * ⟨declaration⟩ ::= ⟨varDecl ⟩
      *   | ⟨multiVarDecl ⟩
+     *   | ⟨multiVarDeclCall ⟩
      *   | ⟨arrayDeclaration⟩
      */
     private void parseDeclaration(
@@ -135,11 +136,11 @@ public sealed class Parser {
                 declarations.Add(varDecl);
                 break;
             case TokenType.comma:
-                MultiVarDeclAST multiVarDecl = parseMultiVarDecls(
+                DeclAST multiDecl = parseMultiVarDecls_Or_MultiVarDeclCall(
                     firstIdentifier, 
                     firstType
                 );
-                declarations.Add(multiVarDecl);
+                declarations.Add(multiDecl);
                 break;
             case TokenType.startBracket:
                 parseArrayDeclaration(
@@ -241,9 +242,9 @@ public sealed class Parser {
     }
 
     /*
-     * ⟨multiVarDecl ⟩ ::= ‘,’ ⟨identifierDeclList ⟩ ⟨optional multiple value⟩
+     * ⟨multiVarDecl Or multiVarDeclCall⟩ ::= ‘,’ ⟨identifierDeclList ⟩ ⟨optional multiple value⟩
      */
-    private MultiVarDeclAST parseMultiVarDecls(Token firstIdentifierToken, PrimitiveType firstType) {
+    private DeclAST parseMultiVarDecls_Or_MultiVarDeclCall(Token firstIdentifierToken, PrimitiveType firstType) {
         consume(TokenType.comma);
 
         Dictionary<string, PrimitiveType> identifierTypeMap = new Dictionary<string, PrimitiveType>();
@@ -253,9 +254,19 @@ public sealed class Parser {
         identifierTypeMap = identifierTypeMap.Concat(nextIdentifierTypeMap)
                                 .ToDictionary(x => x.Key, x => x.Value);
 
-        List<ExprAST> initialValues = parseOptionalMultipleValues();
-        List<string> identifiers = new List<string>(identifierTypeMap.Keys);
+        List<ExprAST> initialValues = parseOptionalMultipleValues_Or_FunctionCall();
 
+        if (initialValues.Count == 1 && initialValues[0].GetType() == typeof(FunctionCallAST)) {
+            return new MultiVarDeclCallAST(
+                new List<string>(identifierTypeMap.Keys),
+                identifierTypeMap,
+                (FunctionCallAST) initialValues[0],
+                firstIdentifierToken.line,
+                firstIdentifierToken.column
+            );
+        }
+
+        List<string> identifiers = new List<string>(identifierTypeMap.Keys);
         Dictionary<string, ExprAST?> identifier_initialValuesMap = new Dictionary<string, ExprAST?>();
         for (int i = 0; i < identifiers.Count; i++) {
             if ((i+1) > initialValues.Count) {
@@ -298,23 +309,27 @@ public sealed class Parser {
     }
 
     /**
-     *  ⟨optional multiple values⟩ ::= ‘=’ ⟨Expr ⟩ ‘,’ ⟨exprList⟩ ‘;’
+     *  ⟨optional multiple values or function call⟩ ::= ‘=’ ⟨Expr ⟩ <multipleValues>
+     *   | ‘=’ <FunctionCallAST> ‘;’
      *   | ‘;’
      */
-    private List<ExprAST> parseOptionalMultipleValues() {
+    private List<ExprAST> parseOptionalMultipleValues_Or_FunctionCall() {
         List<ExprAST> initialValues = new List<ExprAST>();
 
         switch(tokenQueue.Peek().type) {
             case TokenType.assign:
                 consume(TokenType.assign);
-                initialValues.Add(parseExpr());
+                ExprAST firstExpr = parseExpr();
 
-                consume(TokenType.comma);
-                
-                List<ExprAST> nextExprs = parseExprList();
-                initialValues = initialValues.Concat<ExprAST>(nextExprs).ToList<ExprAST>();
+                if (firstExpr.GetType() == typeof(FunctionCallAST) 
+                && tokenQueue.Peek().type==TokenType.semicolon) {
 
-                consume(TokenType.semicolon);
+                    initialValues.Add(firstExpr);
+                    consume(TokenType.semicolon);
+
+                } else if (tokenQueue.Peek().type==TokenType.comma) {
+                    initialValues = parseMultipleValues(firstExpr);
+                }
                 break;
             case TokenType.semicolon:
                 consume(TokenType.semicolon);
@@ -329,6 +344,23 @@ public sealed class Parser {
                     )
                 );
         }
+
+        return initialValues;
+    }
+
+    /*
+     * <multipleValues> ::= ‘,’ ⟨exprList⟩ ‘;’
+     */
+    private List<ExprAST> parseMultipleValues(ExprAST firstExpr) {
+        List<ExprAST> initialValues = new List<ExprAST>();
+
+        initialValues.Add(firstExpr);
+        consume(TokenType.comma);
+                
+        List<ExprAST> nextExprs = parseExprList();
+        initialValues = initialValues.Concat<ExprAST>(nextExprs).ToList<ExprAST>();
+
+        consume(TokenType.semicolon);
 
         return initialValues;
     }
@@ -746,6 +778,8 @@ public sealed class Parser {
                 ReturnAST returnStmt = parseReturn();
                 statements.Add(returnStmt);
                 break;
+            case TokenType.endCurly:
+                return;
             default:
                 throw new Exception(
                     String.Format(

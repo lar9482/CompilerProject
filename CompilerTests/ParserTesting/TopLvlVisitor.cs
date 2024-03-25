@@ -40,14 +40,22 @@ internal class TopLvlVisitor : ASTVisitor {
                 String.Format("{0}: {1}", pair.Key, SimpleTypeToString(pair.Value))
             );
 
-            ExprAST? initialValue;
-            multiVarDecl.initialValues.TryGetValue(pair.Key, out initialValue);
+            ExprAST? initialValue = multiVarDecl.initialValues.GetValueOrDefault(pair.Key);
             if (initialValue != null) {
                 traversalRecord.Enqueue("EXPR");
             }
         }
     }
 
+    public void visit(MultiVarDeclCallAST multiVarDeclCall) {
+        foreach (KeyValuePair<string, PrimitiveType> pair in multiVarDeclCall.types) {
+            traversalRecord.Enqueue(
+                String.Format("{0}: {1}", pair.Key, SimpleTypeToString(pair.Value))
+            );
+        }
+        multiVarDeclCall.functionCall.accept(this);
+    }
+    
     public void visit(ArrayDeclAST array) {  
         traversalRecord.Enqueue(
             String.Format("{0}: {1}", 
