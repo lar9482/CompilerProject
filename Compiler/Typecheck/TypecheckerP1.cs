@@ -16,6 +16,70 @@ public sealed class TypecheckerP1 : ASTVisitor {
         this.errorMsgs = new List<string>();
     }
 
+    private void addIO() {
+        context.put("print", new SymbolFunction(
+            "print",
+            new SimpleType[] {
+                new ArrayType<PrimitiveType>(new IntType())
+            },
+            new SimpleType[] {}
+        ));
+
+        context.put("println", new SymbolFunction(
+            "println",
+            new SimpleType[] {
+                new ArrayType<PrimitiveType>(new IntType())
+            },
+            new SimpleType[] {}
+        ));
+
+        context.put("readln", new SymbolFunction(
+            "readln",
+            new SimpleType[] {},
+            new SimpleType[] {
+                new ArrayType<PrimitiveType>(new IntType())
+            }
+        ));
+
+        context.put("getchar", new SymbolFunction(
+            "getchar",
+            new SimpleType[] {},
+            new SimpleType[] {
+                new IntType()
+            }
+        ));
+
+        context.put("eof", new SymbolFunction(
+            "eof",
+            new SimpleType[] {},
+            new SimpleType[] {
+                new BoolType()
+            }
+        ));
+    }
+
+    private void addConv() {
+        context.put("parseInt", new SymbolFunction(
+            "parseInt",
+            new SimpleType[] {
+                new ArrayType<PrimitiveType>(new IntType())
+            },
+            new SimpleType[] {
+                new IntType(), new BoolType()
+            }
+        ));
+
+        context.put("unparseInt", new SymbolFunction(
+            "unparseInt",
+            new SimpleType[] {
+                new IntType()
+            },
+            new SimpleType[] {
+                new ArrayType<PrimitiveType>(new IntType())
+            }
+        ));
+    }
+
     public void visit(ProgramAST program) { 
         context.push();
 
@@ -32,6 +96,9 @@ public sealed class TypecheckerP1 : ASTVisitor {
             function.accept(this);
         }
 
+        // Future system call support.
+        addIO();
+        addConv();
         program.scope = context.pop();
     }
 
