@@ -262,15 +262,8 @@ public sealed class TypecheckerP2 : ASTVisitor {
             arrayAccess.arrayName, arrayAccess.lineNumber, arrayAccess.columnNumber
         );
 
-        if (arrayAccess.accessValue.type == null) {
-            throw new Exception(
-                String.Format("{0}:{1} SemanticError: The access type could not be resolved",
-                    arrayAccess.accessValue.lineNumber, arrayAccess.accessValue.columnNumber
-                )
-            );
-        }
-
-        if (arrayAccess.accessValue.type.TypeTag != "int") {
+        SimpleType accessValueType = arrayAccess.accessValue.type;
+        if (accessValueType.TypeTag != "int") {
             errorMsgs.Add(
                 String.Format(
                     "{0}:{1} SemanticError: Access type to {2} must be an Int",
@@ -297,7 +290,10 @@ public sealed class TypecheckerP2 : ASTVisitor {
             multiDimArrayAccess.arrayName, multiDimArrayAccess.lineNumber, multiDimArrayAccess.columnNumber
         );
 
-        if (multiDimArrayAccess.firstIndex.type.TypeTag != "int") {
+        SimpleType firstIndexType = multiDimArrayAccess.firstIndex.type;
+        SimpleType secondIndexType = multiDimArrayAccess.secondIndex.type;
+
+        if (firstIndexType.TypeTag != "int") {
             errorMsgs.Add(
                 String.Format(
                     "{0}:{1} SemanticError: Row access type to {2} must be an int.",
@@ -307,7 +303,7 @@ public sealed class TypecheckerP2 : ASTVisitor {
                 )
             );
         }
-        if (multiDimArrayAccess.secondIndex.type.TypeTag != "int") {
+        if (secondIndexType.TypeTag != "int") {
             errorMsgs.Add(
                 String.Format(
                     "{0}:{1} SemanticError: Column access type to {2} must be an int.",
