@@ -5,7 +5,7 @@ using CompilerProj.Visitors;
 public sealed class ArrayDeclAST : DeclAST {
     public string name;
     public ExprAST size;
-    public ArrayType<PrimitiveType> type;
+    public ArrayType<PrimitiveType> declType;
     public ExprAST[]? initialValues;
 
     public ArrayDeclAST(
@@ -18,7 +18,7 @@ public sealed class ArrayDeclAST : DeclAST {
 
         this.name = name;
         this.size = size;
-        this.type = new ArrayType<PrimitiveType>(type);
+        this.declType = new ArrayType<PrimitiveType>(type);
         this.initialValues = initialValues;
     }
 

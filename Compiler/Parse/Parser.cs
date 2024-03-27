@@ -111,10 +111,11 @@ public sealed class Parser {
     private void parseGlobalDeclaration() {
         consume(TokenType.global);
         Tuple<Token, PrimitiveType> identifierAndType = parseIdentifierDeclaration();
-        parseDeclaration(
-            identifierAndType.Item1,
-            identifierAndType.Item2,
-            topLvl_Declarations
+        topLvl_Declarations.Add(
+            parseDeclaration(
+                identifierAndType.Item1,
+                identifierAndType.Item2
+            )
         );
     }
 
@@ -124,30 +125,25 @@ public sealed class Parser {
      *   | ⟨multiVarDeclCall ⟩
      *   | ⟨arrayDeclaration⟩
      */
-    private void parseDeclaration(
+    private DeclAST parseDeclaration(
         Token firstIdentifier,
-        PrimitiveType firstType,
-        List<DeclAST> declarations
+        PrimitiveType firstType
     ) {
         switch(tokenQueue.Peek().type) {
             case TokenType.assign:
             case TokenType.semicolon:
                 VarDeclAST varDecl = parseVarDecl(firstIdentifier, firstType);
-                declarations.Add(varDecl);
-                break;
+                return varDecl;
             case TokenType.comma:
                 DeclAST multiDecl = parseMultiVarDecls_Or_MultiVarDeclCall(
                     firstIdentifier, 
                     firstType
                 );
-                declarations.Add(multiDecl);
-                break;
+                return multiDecl;
             case TokenType.startBracket:
-                parseArrayDeclaration(
-                    firstIdentifier, firstType,
-                    declarations
+                return parseArrayDeclaration(
+                    firstIdentifier, firstType
                 );
-                break;
             default:
                 throw new Exception(
                     String.Format(
@@ -368,38 +364,31 @@ public sealed class Parser {
      /* ⟨arrayDeclaration⟩ ::= ‘[’ ‘]’ ⟨singleOrMulti_Array_Expr ⟩
       * | ‘[’ ⟨Expr ⟩ ‘]’ ⟨singleOrMulti_Array_Static>
       */
-    private void parseArrayDeclaration(
-        Token identifierToken, PrimitiveType primitiveType,
-        List<DeclAST> declarations
+    private DeclAST parseArrayDeclaration(
+        Token identifierToken, PrimitiveType primitiveType
     ) {
         consume(TokenType.startBracket);
 
         switch(tokenQueue.Peek().type) {
             case TokenType.endBracket:
                 consume(TokenType.endBracket);
-                parse_SingleOrMulti_Array_Expr(
-                    identifierToken, primitiveType,
-                    declarations
+                return parse_SingleOrMulti_Array_Expr(
+                    identifierToken, primitiveType
                 );
-                break;
             default:
                 ExprAST firstExpr = parseExpr();
                 consume(TokenType.endBracket);
-                parse_SingleOrMulti_Array_Static(
-                    identifierToken, primitiveType,
-                    declarations,
-                    firstExpr
+                return parse_SingleOrMulti_Array_Static(
+                    identifierToken, primitiveType, firstExpr
                 );
-                break;
         }
     }
 
     /*  ⟨singleOrMulti Array Expr ⟩ ::= ‘=’ ⟨arrayInitial ⟩ ‘;’
      *  | ‘[’ ‘]’ ‘=’ ‘{’ ⟨multiDimArrayInitial ⟩ ‘}’ ‘;’
      */
-    private void parse_SingleOrMulti_Array_Expr(
-        Token identifierToken, PrimitiveType primitiveType,
-        List<DeclAST> declarations
+    private DeclAST parse_SingleOrMulti_Array_Expr(
+        Token identifierToken, PrimitiveType primitiveType
     ) {
         switch(tokenQueue.Peek().type) {
             case TokenType.assign:
@@ -407,7 +396,7 @@ public sealed class Parser {
                 ExprAST[] exprs = parseArrayInitial();
                 consume(TokenType.semicolon);
 
-                ArrayDeclAST array = new ArrayDeclAST(
+                ArrayDeclAST arrayDecl = new ArrayDeclAST(
                     identifierToken.lexeme,
                     new IntLiteralAST(
                         exprs.Length,
@@ -419,8 +408,7 @@ public sealed class Parser {
                     identifierToken.line,
                     identifierToken.column
                 );
-                declarations.Add(array);
-                break;
+                return arrayDecl;
             case TokenType.startBracket:
                 consume(TokenType.startBracket);
                 consume(TokenType.endBracket);
@@ -430,7 +418,8 @@ public sealed class Parser {
                 verifyMultiDimArrayColumnSize(arrayOfExprs);
                 consume(TokenType.endCurly);
                 consume(TokenType.semicolon);
-                MultiDimArrayDeclAST multiDimArray = new MultiDimArrayDeclAST(
+
+                MultiDimArrayDeclAST multiDimArrayDecl = new MultiDimArrayDeclAST(
                     identifierToken.lexeme,
                     new IntLiteralAST(
                         arrayOfExprs.Count,
@@ -447,8 +436,7 @@ public sealed class Parser {
                     identifierToken.line,
                     identifierToken.column
                 );
-                declarations.Add(multiDimArray);
-                break;
+                return multiDimArrayDecl;
             default:
                 throw new Exception(
                     String.Format(
@@ -481,16 +469,14 @@ public sealed class Parser {
      * ⟨singleOrMulti Array Static⟩ ::= ‘;’
      * | ‘[’ ⟨Expr ⟩ ‘]’ ‘;’
      */
-    private void parse_SingleOrMulti_Array_Static(
-        Token identifierToken, PrimitiveType primitiveType,
-        List<DeclAST> declarations,
-        ExprAST firstExpr
+    private DeclAST parse_SingleOrMulti_Array_Static(
+        Token identifierToken, PrimitiveType primitiveType, ExprAST firstExpr
     ) {
         switch(tokenQueue.Peek().type) {
             case TokenType.semicolon:
                 consume(TokenType.semicolon);
 
-                ArrayDeclAST array = new ArrayDeclAST(
+                ArrayDeclAST arrayDecl = new ArrayDeclAST(
                     identifierToken.lexeme,
                     firstExpr,
                     primitiveType,
@@ -498,15 +484,14 @@ public sealed class Parser {
                     identifierToken.line,
                     identifierToken.column
                 );
-                declarations.Add(array);
-                break;
+                return arrayDecl;
             case TokenType.startBracket:
                 consume(TokenType.startBracket);
                 ExprAST secondExpr = parseExpr();
                 consume(TokenType.endBracket);
                 consume(TokenType.semicolon);
 
-                MultiDimArrayDeclAST multiDimArray = new MultiDimArrayDeclAST(
+                MultiDimArrayDeclAST multiDimArrayDecl = new MultiDimArrayDeclAST(
                     identifierToken.lexeme,
                     firstExpr,
                     secondExpr,
@@ -516,8 +501,7 @@ public sealed class Parser {
                     identifierToken.column
                 );
 
-                declarations.Add(multiDimArray);
-                break;
+                return multiDimArrayDecl;
             default:
                 throw new Exception(
                     String.Format(
@@ -734,16 +718,13 @@ public sealed class Parser {
     }
 
     private BlockAST parseStatements(int line, int column) {
-        List<DeclAST> declarations = new List<DeclAST>();
         List<StmtAST> statements = new List<StmtAST>();
 
         parseStatement(
-            declarations,
             statements
         );
 
         return new BlockAST(
-            declarations,
             statements,
             line, column
         );
@@ -756,13 +737,11 @@ public sealed class Parser {
      * | <Return >
      */
     private void parseStatement(
-        List<DeclAST> declarations,
         List<StmtAST> statements
     ) {
         switch(tokenQueue.Peek().type) {
             case TokenType.identifier:
                 parseDeclarationOrAssignment(
-                    declarations,
                     statements
                 );
                 break;
@@ -792,7 +771,6 @@ public sealed class Parser {
         }
 
         parseStatement(
-            declarations,
             statements
         );
     }
@@ -802,26 +780,26 @@ public sealed class Parser {
      * | <identifier> <procedureCall>
      */
     private void parseDeclarationOrAssignment(
-        List<DeclAST> declarations,
-        List<StmtAST> assignStmts
+        List<StmtAST> blockStmts
     ) {
         Token firstIdentifer = consume(TokenType.identifier);
         switch(tokenQueue.Peek().type) {
             case TokenType.colon:
                 PrimitiveType firstType = parseIdentifierType();
-                parseDeclaration(
-                    firstIdentifer,
-                    firstType,
-                    declarations
+                blockStmts.Add(
+                    parseDeclaration(
+                        firstIdentifer,
+                        firstType
+                    )
                 );
                 break;
             case TokenType.assign:
             case TokenType.comma:
             case TokenType.startBracket:
-                assignStmts.Add(parseAssignment(firstIdentifer));
+                blockStmts.Add(parseAssignment(firstIdentifer));
                 break;
             case TokenType.startParen:
-                assignStmts.Add(parseProcedureCall(firstIdentifer));
+                blockStmts.Add(parseProcedureCall(firstIdentifer));
                 break;
             default:
                 throw new Exception(

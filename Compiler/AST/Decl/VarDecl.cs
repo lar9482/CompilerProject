@@ -5,19 +5,19 @@ using CompilerProj.Visitors;
 public sealed class VarDeclAST : DeclAST {
     public string name;
     public ExprAST? initialValue;
-    public PrimitiveType type;
+    public PrimitiveType declType;
 
     public VarDeclAST(
         string name, 
         ExprAST? initialValue, 
-        PrimitiveType type,
+        PrimitiveType declType,
         int lineNumber, int columnNumber
         
     ) : base(lineNumber, columnNumber) {
 
         this.name = name;
         this.initialValue = initialValue;
-        this.type = type;
+        this.declType = declType;
     }
 
     public override void accept(ASTVisitor visitor) {

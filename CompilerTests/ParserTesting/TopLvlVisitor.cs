@@ -28,14 +28,14 @@ internal class TopLvlVisitor : ASTVisitor {
     }
 
     public void visit(VarDeclAST varDecl) { 
-        traversalRecord.Enqueue(String.Format("{0}: {1}", varDecl.name, SimpleTypeToString(varDecl.type)));
+        traversalRecord.Enqueue(String.Format("{0}: {1}", varDecl.name, SimpleTypeToString(varDecl.declType)));
         if (varDecl.initialValue != null) {
             traversalRecord.Enqueue("EXPR");
         }
     }
 
     public void visit(MultiVarDeclAST multiVarDecl) { 
-        foreach (KeyValuePair<string, PrimitiveType> pair in multiVarDecl.types) {
+        foreach (KeyValuePair<string, PrimitiveType> pair in multiVarDecl.declTypes) {
             traversalRecord.Enqueue(
                 String.Format("{0}: {1}", pair.Key, SimpleTypeToString(pair.Value))
             );
@@ -48,7 +48,7 @@ internal class TopLvlVisitor : ASTVisitor {
     }
 
     public void visit(MultiVarDeclCallAST multiVarDeclCall) {
-        foreach (KeyValuePair<string, PrimitiveType> pair in multiVarDeclCall.types) {
+        foreach (KeyValuePair<string, PrimitiveType> pair in multiVarDeclCall.declTypes) {
             traversalRecord.Enqueue(
                 String.Format("{0}: {1}", pair.Key, SimpleTypeToString(pair.Value))
             );
@@ -59,7 +59,7 @@ internal class TopLvlVisitor : ASTVisitor {
     public void visit(ArrayDeclAST array) {  
         traversalRecord.Enqueue(
             String.Format("{0}: {1}", 
-            array.name, SimpleTypeToString(array.type)
+            array.name, SimpleTypeToString(array.declType)
         ));
 
         if (array.initialValues != null) {
@@ -70,7 +70,7 @@ internal class TopLvlVisitor : ASTVisitor {
     public void visit(MultiDimArrayDeclAST multiDimArray) { 
         traversalRecord.Enqueue(
             String.Format("{0}: {1}", 
-            multiDimArray.name, SimpleTypeToString(multiDimArray.type)
+            multiDimArray.name, SimpleTypeToString(multiDimArray.declType)
         ));
 
         if (multiDimArray.initialValues != null) {
@@ -97,17 +97,13 @@ internal class TopLvlVisitor : ASTVisitor {
     }
 
     public void visit(BlockAST block) { 
-        foreach (DeclAST decl in block.declarations) {
-            switch(decl) {
+
+        foreach(StmtAST Stmt in block.statements) {
+            switch(Stmt) {
                 case VarDeclAST varDecl: visit(varDecl); break;
                 case MultiVarDeclAST multiVarDecl: visit(multiVarDecl); break;
                 case ArrayDeclAST arrayDecl: visit(arrayDecl); break;
                 case MultiDimArrayDeclAST multiDimArrayDecl: visit(multiDimArrayDecl); break;
-            }
-        }
-
-        foreach(StmtAST Stmt in block.statements) {
-            switch(Stmt) {
                 case AssignAST assign: assign.accept(this); break;
                 case MultiAssignAST multiAssign: multiAssign.accept(this); break;
                 case MultiAssignCallAST multiAssignCall: multiAssignCall.accept(this); break;
