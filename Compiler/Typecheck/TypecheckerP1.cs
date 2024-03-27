@@ -124,14 +124,14 @@ public sealed class TypecheckerP1 : ASTVisitor {
         }
 
         SymbolVariable symbolVar = new SymbolVariable(
-            varDecl.name, varDecl.type
+            varDecl.name, varDecl.declType
         );
 
         context.put(varDecl.name, symbolVar);
     }
 
     public void visit(MultiVarDeclAST multiVarDecl) { 
-        foreach(KeyValuePair<string, PrimitiveType> nameAndType in multiVarDecl.types) {
+        foreach(KeyValuePair<string, PrimitiveType> nameAndType in multiVarDecl.declTypes) {
             if (context.lookup(nameAndType.Key) != null) {
                 errorMsgs.Add(
                     String.Format(
@@ -152,7 +152,7 @@ public sealed class TypecheckerP1 : ASTVisitor {
     }
 
     public void visit(MultiVarDeclCallAST multiVarDeclCall) {
-        foreach(KeyValuePair<string, PrimitiveType> nameAndType in multiVarDeclCall.types) {
+        foreach(KeyValuePair<string, PrimitiveType> nameAndType in multiVarDeclCall.declTypes) {
             if (context.lookup(nameAndType.Key) != null) {
                 errorMsgs.Add(
                     String.Format(
@@ -185,7 +185,7 @@ public sealed class TypecheckerP1 : ASTVisitor {
 
         SymbolVariable symbolVar = new SymbolVariable(
             array.name,
-            array.type
+            array.declType
         );
 
         context.put(array.name, symbolVar);
@@ -204,7 +204,7 @@ public sealed class TypecheckerP1 : ASTVisitor {
 
         SymbolVariable symbolVar = new SymbolVariable(
             multiDimArray.name,
-            multiDimArray.type
+            multiDimArray.declType
         );
 
         context.put(multiDimArray.name, symbolVar);
