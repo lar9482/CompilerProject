@@ -18,14 +18,14 @@ public sealed class ASTVisitorImplemented : ASTVisitor {
     public void visit(ConditionalAST conditional) { }
     public void visit(WhileLoopAST whileLoop) { }
     public void visit(ReturnAST returnStmt) { }
-    public void visit(FunctionCallAST functionCall) { }
+    public void visit(ProcedureCallAST procedureCall) { }
     
     public void visit(BinaryExprAST binaryExpr) { }
     public void visit(UnaryExprAST unaryExpr) { }
     public void visit(VarAccessAST varAccess) { }
     public void visit(ArrayAccessAST arrayAccess) { }
     public void visit(MultiDimArrayAccessAST multiDimArrayAccess) { }
-    public void visit(ProcedureCallAST procedureCall) { }
+    public void visit(FunctionCallAST functionCall) { }
     public void visit(IntLiteralAST intLiteral) { }
     public void visit(BoolLiteralAST boolLiteral) { }
     public void visit(CharLiteralAST charLiteral) { }

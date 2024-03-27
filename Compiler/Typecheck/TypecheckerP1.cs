@@ -2,16 +2,10 @@ using CompilerProj.Context;
 using CompilerProj.Visitors;
 
 /*
- * This pass will build symbol tables and annotate the AST with top level declarations
+ * This pass will record the symbols of the top level declarations
  */
-public sealed class TypecheckerP1 : ASTVisitor {
-
-    private Context context;
-    private List<string> errorMsgs;
-
+public sealed class TypecheckerP1 : TypeChecker {
     public TypecheckerP1() { 
-        this.context = new Context();
-        this.errorMsgs = new List<string>();
     }
 
     private void addIO() {
@@ -90,7 +84,7 @@ public sealed class TypecheckerP1 : ASTVisitor {
         ));
     }
 
-    public void visit(ProgramAST program) { 
+    public override void visit(ProgramAST program) { 
         context.push();
 
         foreach(DeclAST decl in program.declarations) {
@@ -112,11 +106,11 @@ public sealed class TypecheckerP1 : ASTVisitor {
         program.scope = context.pop();
     }
 
-    public void visit(VarDeclAST varDecl) { 
+    public override void visit(VarDeclAST varDecl) { 
         if (context.lookup(varDecl.name) != null) {
             errorMsgs.Add(
                 String.Format(
-                    "Line {0}:{1}, {2} exists already.", 
+                    "{0}:{1} SemanticError: {2} exists already.", 
                     varDecl.lineNumber, varDecl.columnNumber, varDecl.name
                 )
             );
@@ -130,12 +124,12 @@ public sealed class TypecheckerP1 : ASTVisitor {
         context.put(varDecl.name, symbolVar);
     }
 
-    public void visit(MultiVarDeclAST multiVarDecl) { 
+    public override void visit(MultiVarDeclAST multiVarDecl) { 
         foreach(KeyValuePair<string, PrimitiveType> nameAndType in multiVarDecl.declTypes) {
             if (context.lookup(nameAndType.Key) != null) {
                 errorMsgs.Add(
                     String.Format(
-                        "Line {0}:{1}, {2} exists already.", 
+                        "{0}:{1} SemanticError:{2} exists already.", 
                         multiVarDecl.lineNumber, multiVarDecl.columnNumber, nameAndType.Key
                     )
                 );
@@ -151,12 +145,12 @@ public sealed class TypecheckerP1 : ASTVisitor {
         }
     }
 
-    public void visit(MultiVarDeclCallAST multiVarDeclCall) {
+    public override void visit(MultiVarDeclCallAST multiVarDeclCall) {
         foreach(KeyValuePair<string, PrimitiveType> nameAndType in multiVarDeclCall.declTypes) {
             if (context.lookup(nameAndType.Key) != null) {
                 errorMsgs.Add(
                     String.Format(
-                        "Line {0}:{1}, {2} exists already.", 
+                        "{0}:{1} SemanticError: {2} exists already.", 
                         multiVarDeclCall.lineNumber, multiVarDeclCall.columnNumber, nameAndType.Key
                     )
                 );
@@ -172,11 +166,11 @@ public sealed class TypecheckerP1 : ASTVisitor {
         }
     }
 
-    public void visit(ArrayDeclAST array) { 
+    public override void visit(ArrayDeclAST array) { 
         if (context.lookup(array.name) != null) {
             errorMsgs.Add(
                 String.Format(
-                    "Line {0}:{1}, {2} exists already.", 
+                    "{0}:{1} SemanticError: {2} exists already.", 
                     array.lineNumber, array.columnNumber, array.name
                 )
             );
@@ -191,11 +185,11 @@ public sealed class TypecheckerP1 : ASTVisitor {
         context.put(array.name, symbolVar);
     }
 
-    public void visit(MultiDimArrayDeclAST multiDimArray) { 
+    public override void visit(MultiDimArrayDeclAST multiDimArray) { 
         if (context.lookup(multiDimArray.name) != null) {
             errorMsgs.Add(
                 String.Format(
-                    "Line {0}:{1}, {2} exists already.", 
+                    "{0}:{1} SemanticError: {2} exists already.", 
                     multiDimArray.lineNumber, multiDimArray.columnNumber, multiDimArray.name
                 )
             );
@@ -210,11 +204,24 @@ public sealed class TypecheckerP1 : ASTVisitor {
         context.put(multiDimArray.name, symbolVar);
     }
 
-    public void visit(FunctionAST function) { 
+    public override void visit(FunctionAST function) { 
+        if (context.lookup(function.name) != null) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: {2} exists already.",
+                    function.lineNumber,
+                    function.columnNumber,
+                    function.name
+                )
+            );
+            return;
+        }
+
         List<SimpleType> parameterTypes = new List<SimpleType>();
         foreach(ParameterAST param in function.parameters) {
             parameterTypes.Add(param.type);
         }
+
         SymbolFunction symbolFunc = new SymbolFunction(
             function.name,
             parameterTypes.ToArray<SimpleType>(),
@@ -224,25 +231,15 @@ public sealed class TypecheckerP1 : ASTVisitor {
     }
     
     //Unused visit procedures
-    public void visit(ParameterAST parameter) { }
-    public void visit(BlockAST block) { }
-    public void visit(ConditionalAST conditional) { }
-    public void visit(WhileLoopAST whileLoop) { }
-    public void visit(AssignAST assign) { throw new NotImplementedException("This visit is not used"); }
-    public void visit(MultiAssignAST multiAssign) { throw new NotImplementedException("This visit is not used"); }
-    public void visit(MultiAssignCallAST multiAssignCall) { throw new NotImplementedException("This visit is not used"); }
-    public void visit(ArrayAssignAST arrayAssign) { throw new NotImplementedException("This visit is not used"); }
-    public void visit(MultiDimArrayAssignAST multiDimArrayAssign) { throw new NotImplementedException("This visit is not used"); }
-    public void visit(ReturnAST returnStmt) { throw new NotImplementedException("This visit is not used"); }
-    public void visit(FunctionCallAST functionCall) { throw new NotImplementedException("This visit is not used"); }
-    public void visit(BinaryExprAST binaryExpr) { throw new NotImplementedException("This visit is not used"); }
-    public void visit(UnaryExprAST unaryExpr) { throw new NotImplementedException("This visit is not used"); }
-    public void visit(VarAccessAST varAccess) { throw new NotImplementedException("This visit is not used"); }
-    public void visit(ArrayAccessAST arrayAccess) { throw new NotImplementedException("This visit is not used"); }
-    public void visit(MultiDimArrayAccessAST multiDimArrayAccess) { throw new NotImplementedException("This visit is not used"); }
-    public void visit(ProcedureCallAST procedureCall) { throw new NotImplementedException("This visit is not used"); }
-    public void visit(IntLiteralAST intLiteral) { throw new NotImplementedException("This visit is not used"); }
-    public void visit(BoolLiteralAST boolLiteral) { throw new NotImplementedException("This visit is not used"); }
-    public void visit(CharLiteralAST charLiteral) { throw new NotImplementedException("This visit is not used"); }
-    public void visit(StrLiteralAST strLiteral) { throw new NotImplementedException("This visit is not used"); }
+    public override void visit(ParameterAST parameter) { throw new NotImplementedException("This visit is not used"); }
+    public override void visit(BlockAST block) { throw new NotImplementedException("This visit is not used"); }
+    public override void visit(ConditionalAST conditional) { throw new NotImplementedException("This visit is not used"); }
+    public override void visit(WhileLoopAST whileLoop) { throw new NotImplementedException("This visit is not used"); }
+    public override void visit(AssignAST assign) { throw new NotImplementedException("This visit is not used"); }
+    public override void visit(MultiAssignAST multiAssign) { throw new NotImplementedException("This visit is not used"); }
+    public override void visit(MultiAssignCallAST multiAssignCall) { throw new NotImplementedException("This visit is not used"); }
+    public override void visit(ArrayAssignAST arrayAssign) { throw new NotImplementedException("This visit is not used"); }
+    public override void visit(MultiDimArrayAssignAST multiDimArrayAssign) { throw new NotImplementedException("This visit is not used"); }
+    public override void visit(ReturnAST returnStmt) { throw new NotImplementedException("This visit is not used"); }
+    public override void visit(ProcedureCallAST procedureCall) { throw new NotImplementedException("This visit is not used"); }
 }
