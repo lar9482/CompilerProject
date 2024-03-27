@@ -6,6 +6,10 @@ public abstract class SimpleType : LangType {
 public abstract class PrimitiveType : SimpleType {
 }
 
+public sealed class UninitializedType : SimpleType {
+    public override string TypeTag => "uninitalized";
+}
+
 public sealed class IntType : PrimitiveType {
     public override string TypeTag => "int";
 }

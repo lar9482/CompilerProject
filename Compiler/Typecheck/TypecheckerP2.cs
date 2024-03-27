@@ -1,6 +1,7 @@
 using CompilerProj.Context;
 using CompilerProj.Visitors;
 using CompilerProj.Types;
+using System.Diagnostics;
 
 /*
  * This pass does the actual full typechecking, via recursive visits and ASt annotation.
@@ -37,9 +38,21 @@ public sealed class TypecheckerP2 : ASTVisitor {
         SymbolVariable symbol = (SymbolVariable) lookUpSymbolFromContext(
             varDecl.name, varDecl.lineNumber, varDecl.columnNumber
         );
+        varDecl.type = new UnitType();
 
         if (varDecl.initialValue == null) {
             return;
+        }
+        varDecl.initialValue.accept(this);
+
+        if (!sameTypes(symbol.type, varDecl.initialValue.type)) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The initial value doesn't match with the declaration type",
+                    varDecl.lineNumber, 
+                    varDecl.columnNumber
+                )
+            );
         }
     }
 
@@ -67,19 +80,6 @@ public sealed class TypecheckerP2 : ASTVisitor {
     public void visit(BinaryExprAST binaryExpr) { 
         binaryExpr.leftOperand.accept(this);
         binaryExpr.rightOperand.accept(this);
-
-        if (binaryExpr.leftOperand.type == null) {
-            throw new Exception(String.Format(
-                "{0}:{1} SemanticError: Unable to resolve left operand type",
-                binaryExpr.lineNumber, binaryExpr.columnNumber
-            ));
-        }
-        if (binaryExpr.rightOperand.type == null) {
-            throw new Exception(String.Format(
-                "{0}:{1} SemanticError: Unable to resolve right operand type",
-                binaryExpr.lineNumber, binaryExpr.columnNumber
-            ));
-        }
 
         SimpleType leftType = binaryExpr.leftOperand.type;
         SimpleType rightType = binaryExpr.rightOperand.type;
@@ -262,19 +262,24 @@ public sealed class TypecheckerP2 : ASTVisitor {
             arrayAccess.arrayName, arrayAccess.lineNumber, arrayAccess.columnNumber
         );
 
-        if (arrayAccess.accessValue.type != null) {
-            if (arrayAccess.accessValue.type.TypeTag != "int") {
-                errorMsgs.Add(
-                    String.Format(
-                        "{0}:{1} SemanticError: Access type to {2} must be an Int",
-                        arrayAccess.accessValue.lineNumber, 
-                        arrayAccess.accessValue.columnNumber, 
-                        arrayAccess.arrayName
-                    )
-                );
-            }
+        if (arrayAccess.accessValue.type == null) {
+            throw new Exception(
+                String.Format("{0}:{1} SemanticError: The access type could not be resolved",
+                    arrayAccess.accessValue.lineNumber, arrayAccess.accessValue.columnNumber
+                )
+            );
         }
 
+        if (arrayAccess.accessValue.type.TypeTag != "int") {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: Access type to {2} must be an Int",
+                    arrayAccess.accessValue.lineNumber, 
+                    arrayAccess.accessValue.columnNumber, 
+                    arrayAccess.arrayName
+                )
+            );
+        }
         switch(symbol.type) {
             case ArrayType<PrimitiveType> array when array.baseType.TypeTag=="int": 
                 arrayAccess.type = new IntType();
@@ -292,31 +297,25 @@ public sealed class TypecheckerP2 : ASTVisitor {
             multiDimArrayAccess.arrayName, multiDimArrayAccess.lineNumber, multiDimArrayAccess.columnNumber
         );
 
-        if (multiDimArrayAccess.firstIndex.type != null) {
-            if (multiDimArrayAccess.firstIndex.type.TypeTag != "int") {
-                errorMsgs.Add(
-                    String.Format(
-                        "{0}:{1} SemanticError: Row access type to {2} must be an int.",
-                        multiDimArrayAccess.firstIndex.lineNumber, 
-                        multiDimArrayAccess.firstIndex.columnNumber, 
-                        multiDimArrayAccess.arrayName
-                    )
-                );
-                return;
-            }
+        if (multiDimArrayAccess.firstIndex.type.TypeTag != "int") {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: Row access type to {2} must be an int.",
+                    multiDimArrayAccess.firstIndex.lineNumber, 
+                    multiDimArrayAccess.firstIndex.columnNumber, 
+                    multiDimArrayAccess.arrayName   
+                )
+            );
         }
-        if (multiDimArrayAccess.secondIndex.type != null) {
-            if (multiDimArrayAccess.secondIndex.type.TypeTag != "int") {
-                errorMsgs.Add(
-                    String.Format(
-                        "{0}:{1} SemanticError: Column access type to {2} must be an int.",
-                        multiDimArrayAccess.secondIndex.lineNumber,
-                        multiDimArrayAccess.secondIndex.columnNumber, 
-                        multiDimArrayAccess.arrayName
-                    )
-                );
-                return;
-            }
+        if (multiDimArrayAccess.secondIndex.type.TypeTag != "int") {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: Column access type to {2} must be an int.",
+                    multiDimArrayAccess.secondIndex.lineNumber,
+                    multiDimArrayAccess.secondIndex.columnNumber, 
+                    multiDimArrayAccess.arrayName
+                )
+            );
         }
 
         switch(symbol.type) {
@@ -339,18 +338,16 @@ public sealed class TypecheckerP2 : ASTVisitor {
 
             ExprAST param = functionCall.args[i];
             param.accept(this);
-
-            if (param.type != null) {
-                SimpleType actualParamType = param.type;
-                if (!sameTypes(expectedParamType, actualParamType)) {
-                    errorMsgs.Add(
-                        String.Format(
-                            "{0}:{1} SemanticError: Param type is expected to be {2}, but it is {3}",
-                            param.lineNumber, param.columnNumber, 
-                            expectedParamType.TypeTag, actualParamType.TypeTag
-                        )
-                    );
-                }
+            
+            SimpleType actualParamType = param.type;
+            if (!sameTypes(expectedParamType, actualParamType)) {
+                errorMsgs.Add(
+                    String.Format(
+                        "{0}:{1} SemanticError: Param type is expected to be {2}, but it is {3}",
+                        param.lineNumber, param.columnNumber, 
+                        expectedParamType.TypeTag, actualParamType.TypeTag
+                    )
+                );
             }
         }
 
