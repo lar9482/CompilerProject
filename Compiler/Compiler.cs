@@ -37,8 +37,8 @@ public class Compiler {
         TypecheckerP1 topLvlDeclBuilder = new TypecheckerP1();
         topLvlDeclBuilder.visit(programAST);
         
-        TypecheckerP2 typechecker = new TypecheckerP2();
-        typechecker.visit(programAST);
+        TypecheckerP2 topLvlDeclChecker = new TypecheckerP2();
+        topLvlDeclChecker.visit(programAST);
         Console.WriteLine();
     }
 }

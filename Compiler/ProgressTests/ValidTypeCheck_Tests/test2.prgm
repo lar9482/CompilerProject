@@ -1,23 +1,27 @@
 
+:global 
+variable10: bool, variable11: int = foo(100);
+
 :global variable1: int = 0;
 :global variable2: bool = true;
 
 :global
-variable7: int, variable8: bool = (0 + 1 + 2 + 3 + 4 + 5), (true || false);
+variable3: int, variable4: bool = (0 + 1 + 2 + 3 + 4 + 5), (true || false);
 
-:global variable3: int[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+:global variable5: int[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
 
 :global 
-variable4: int[][] = {
+variable6: bool[] = {true, false, (true || false), (true && false)};
+
+:global 
+variable7: int[][] = {
     {1, 2, 3},
     {4, 5, 6},
     {7, 8, 9}
 };
 
-:global 
-variable5: bool[] = {true, false, (true || false), (true && false)};
-
-foo(): bool, int {
+foo(x: int): bool, int {
     expr: int = 1 - 2 * 3 * -4;
     fivePred: bool = true && true || false;
 
