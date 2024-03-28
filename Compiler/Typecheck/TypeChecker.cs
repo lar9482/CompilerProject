@@ -13,6 +13,25 @@ public abstract class TypeChecker : ASTVisitor {
         this.errorMsgs = new List<string>();
     }
 
+    public abstract void visit(ProgramAST program);
+    public abstract void visit(VarDeclAST varDecl);
+    public abstract void visit(MultiVarDeclAST multiVarDecl);
+    public abstract void visit(MultiVarDeclCallAST multiVarDeclCallAST);
+    public abstract void visit(ArrayDeclAST array);
+    public abstract void visit(MultiDimArrayDeclAST multiDimArray);
+    public abstract void visit(FunctionAST function) ;
+    public abstract void visit(ParameterAST parameter) ;
+    public abstract void visit(BlockAST block);
+    public abstract void visit(ConditionalAST conditional) ;
+    public abstract void visit(WhileLoopAST whileLoop) ;
+    public abstract void visit(AssignAST assign);
+    public abstract void visit(MultiAssignAST multiAssign);
+    public abstract void visit(MultiAssignCallAST multiAssignCall);
+    public abstract void visit(ArrayAssignAST arrayAssign);
+    public abstract void visit(MultiDimArrayAssignAST multiDimArrayAssign);
+    public abstract void visit(ReturnAST returnStmt);
+    public abstract void visit(ProcedureCallAST procedureCall);
+
     public void visit(BinaryExprAST binaryExpr) { 
         binaryExpr.leftOperand.accept(this);
         binaryExpr.rightOperand.accept(this);
@@ -344,22 +363,326 @@ public abstract class TypeChecker : ASTVisitor {
         }
     }
 
-    public abstract void visit(ProgramAST program);
-    public abstract void visit(VarDeclAST varDecl);
-    public abstract void visit(MultiVarDeclAST multiVarDecl);
-    public abstract void visit(MultiVarDeclCallAST multiVarDeclCallAST);
-    public abstract void visit(ArrayDeclAST array);
-    public abstract void visit(MultiDimArrayDeclAST multiDimArray);
-    public abstract void visit(FunctionAST function) ;
-    public abstract void visit(ParameterAST parameter) ;
-    public abstract void visit(BlockAST block);
-    public abstract void visit(ConditionalAST conditional) ;
-    public abstract void visit(WhileLoopAST whileLoop) ;
-    public abstract void visit(AssignAST assign);
-    public abstract void visit(MultiAssignAST multiAssign);
-    public abstract void visit(MultiAssignCallAST multiAssignCall);
-    public abstract void visit(ArrayAssignAST arrayAssign);
-    public abstract void visit(MultiDimArrayAssignAST multiDimArrayAssign);
-    public abstract void visit(ReturnAST returnStmt);
-    public abstract void visit(ProcedureCallAST procedureCall);
+    protected void initializeVarDecl(VarDeclAST varDecl) {
+        if (context.lookup(varDecl.name) != null) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: {2} exists already.", 
+                    varDecl.lineNumber, varDecl.columnNumber, varDecl.name
+                )
+            );
+            return;
+        }
+
+        SymbolVariable symbolVar = new SymbolVariable(
+            varDecl.name, varDecl.declType
+        );
+
+        context.put(varDecl.name, symbolVar);
+    }
+
+    protected void checkVarDecl(VarDeclAST varDecl) {
+        SymbolVariable varSymbol = (SymbolVariable) lookUpSymbolFromContext(
+            varDecl.name, varDecl.lineNumber, varDecl.columnNumber
+        );
+
+        if (varDecl.initialValue == null) {
+            return;
+        }
+        varDecl.initialValue.accept(this);
+        SimpleType initialValueType = varDecl.initialValue.type;
+        SimpleType varDeclType = varSymbol.type;
+
+        if (!sameTypes(initialValueType, varDeclType)) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The initial value type, {2}, doesn't match with the variable declaration.",
+                    varDecl.initialValue.lineNumber,
+                    varDecl.initialValue.columnNumber,
+                    simpleTypeToString(initialValueType)
+                )
+            );
+        }
+    }
+
+    protected void initializeMultiVarDecl(MultiVarDeclAST multiVarDecl) {
+        foreach(KeyValuePair<string, PrimitiveType> nameAndType in multiVarDecl.declTypes) {
+            if (context.lookup(nameAndType.Key) != null) {
+                errorMsgs.Add(
+                    String.Format(
+                        "{0}:{1} SemanticError:{2} exists already.", 
+                        multiVarDecl.lineNumber, multiVarDecl.columnNumber, nameAndType.Key
+                    )
+                );
+                continue;
+            }
+
+            SymbolVariable symbolVar = new SymbolVariable(
+                nameAndType.Key,
+                nameAndType.Value
+            );
+
+            context.put(nameAndType.Key, symbolVar);
+        }
+    }
+
+    protected void checkMultiVarDecl(MultiVarDeclAST multiVarDecl) {
+        foreach(string varName in multiVarDecl.names) {
+            SymbolVariable varSymbol = (SymbolVariable) lookUpSymbolFromContext(
+                varName, multiVarDecl.lineNumber, multiVarDecl.columnNumber
+            );
+
+            ExprAST? initialValue = multiVarDecl.initialValues[varName];
+            if (initialValue == null) {
+                continue;
+            }
+
+            initialValue.accept(this);
+            SimpleType initialValueType = initialValue.type;
+
+            if (!sameTypes(initialValueType, varSymbol.type)) {
+                errorMsgs.Add(
+                    String.Format(
+                        "{0}:{1} SemanticError: The initial value type, {2}, doesn't match with the variable declaration.",
+                        initialValue.lineNumber,
+                        initialValue.columnNumber,
+                        simpleTypeToString(initialValueType)
+                    )
+                );
+            }
+        }
+    }
+
+    protected void initializeMultiVarDeclCall(MultiVarDeclCallAST multiVarDeclCall) {
+        foreach(KeyValuePair<string, PrimitiveType> nameAndType in multiVarDeclCall.declTypes) {
+            if (context.lookup(nameAndType.Key) != null) {
+                errorMsgs.Add(
+                    String.Format(
+                        "{0}:{1} SemanticError: {2} exists already.", 
+                        multiVarDeclCall.lineNumber, multiVarDeclCall.columnNumber, nameAndType.Key
+                    )
+                );
+                continue;
+            }
+
+            SymbolVariable symbolVar = new SymbolVariable(
+                nameAndType.Key,
+                nameAndType.Value
+            );
+
+            context.put(nameAndType.Key, symbolVar);
+        }
+    }
+
+    protected void checkMultiVarDeclCall(MultiVarDeclCallAST multiVarDeclCall) {
+        SymbolFunction symbolFunction = (SymbolFunction) lookUpSymbolFromContext(
+            multiVarDeclCall.functionCall.functionName,
+            multiVarDeclCall.lineNumber, multiVarDeclCall.columnNumber
+        );
+
+        //Checking variable declarations against the function return types.
+        for (int i = 0; i < multiVarDeclCall.names.Count; i++) {
+            string varName = multiVarDeclCall.names[i];
+            SymbolVariable symbolVar = (SymbolVariable) lookUpSymbolFromContext(
+                varName, multiVarDeclCall.lineNumber, multiVarDeclCall.columnNumber
+            );
+
+            SimpleType variableType = symbolVar.type;
+            SimpleType returnFuncType = symbolFunction.returnTypes[i];
+            if (!sameTypes(variableType , returnFuncType)) {
+                errorMsgs.Add(
+                    String.Format(
+                        "{0}:{1} SemanticError: {2}'s type doesn't match with the return type {3}",
+                        multiVarDeclCall.lineNumber,
+                        multiVarDeclCall.columnNumber,
+                        varName, simpleTypeToString(returnFuncType)
+                    )
+                );
+            }
+        }
+
+        //Checking parameter types
+        FunctionCallAST functionCall = multiVarDeclCall.functionCall;
+        for (int i = 0; i < functionCall.args.Count; i++) {
+            ExprAST param = functionCall.args[i];
+            param.accept(this);
+
+            SimpleType paramType = param.type;
+            SimpleType expectedParamType = symbolFunction.parameterTypes[i];
+            
+            if (!sameTypes(paramType, expectedParamType)) {
+                errorMsgs.Add(
+                    String.Format(
+                        "{0}:{1} SemanticError: Param's type {2} doesn't match with the expected type {3}",
+                        param.lineNumber, param.columnNumber,
+                        simpleTypeToString(paramType), simpleTypeToString(expectedParamType)
+                    )
+                );
+            }
+        }
+    }
+
+    protected void initializeArrayDecl(ArrayDeclAST array) {
+        if (context.lookup(array.name) != null) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: {2} exists already.", 
+                    array.lineNumber, array.columnNumber, array.name
+                )
+            );
+            return;
+        }
+
+        SymbolVariable symbolVar = new SymbolVariable(
+            array.name,
+            array.declType
+        );
+
+        context.put(array.name, symbolVar);
+    }
+
+    protected void checkArrayDecl(ArrayDeclAST array) {
+
+        //Checking the size is an integer
+        array.size.accept(this);
+        SimpleType arraySizeType = array.size.type;
+
+        if (arraySizeType.TypeTag != "int") {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The size expression must be an int",
+                    array.size.lineNumber, array.size.columnNumber
+                )
+            );
+        }
+
+        //Checking all the initial values are integers or bools.
+        if (array.initialValues == null) {
+            return;
+        }
+
+        SymbolVariable symbolVar = (SymbolVariable) lookUpSymbolFromContext(
+            array.name, array.lineNumber, array.columnNumber
+        );
+
+        SimpleType expectedInitValType;
+        switch(symbolVar.type) {
+            case ArrayType<PrimitiveType> arrayDecl when arrayDecl.baseType.TypeTag=="int": 
+                expectedInitValType = new IntType();
+                break;
+            case ArrayType<PrimitiveType> arrayDecl when arrayDecl.baseType.TypeTag=="bool":
+                expectedInitValType = new BoolType();
+                break;
+            default:
+                throw new Exception(
+                    String.Format(
+                        "{0}:{1} SemanticError: The array type could not be resolved incorrectly"
+                    )
+                );
+        }
+
+        foreach(ExprAST initialValue in array.initialValues) {
+            initialValue.accept(this);
+            SimpleType actualInitValType = initialValue.type;
+
+            if (!sameTypes(expectedInitValType, actualInitValType)) {
+                errorMsgs.Add(
+                    String.Format(
+                        "{0}:{1} SemanticError: The initial value must be of type {2}",
+                        initialValue.lineNumber, initialValue.columnNumber,
+                        simpleTypeToString(expectedInitValType)
+                    )
+                );
+            }
+        }
+    }
+
+    protected void initializeMultiDimArrayDecl(MultiDimArrayDeclAST multiDimArray) {
+        if (context.lookup(multiDimArray.name) != null) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: {2} exists already.", 
+                    multiDimArray.lineNumber, multiDimArray.columnNumber, multiDimArray.name
+                )
+            );
+            return;
+        }
+
+        SymbolVariable symbolVar = new SymbolVariable(
+            multiDimArray.name,
+            multiDimArray.declType
+        );
+
+        context.put(multiDimArray.name, symbolVar);
+    }
+
+    protected void checkMultiDimArrayDecl(MultiDimArrayDeclAST multiDimArray) {
+
+        //Checking that the row and column expression sizes are integers.
+        multiDimArray.rowSize.accept(this);
+        multiDimArray.colSize.accept(this);
+
+        SimpleType rowSizeType = multiDimArray.rowSize.type;
+        SimpleType colSizeType = multiDimArray.colSize.type;
+
+        if (rowSizeType.TypeTag != "int") {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The row size expression must be an int",
+                    multiDimArray.rowSize.lineNumber, multiDimArray.rowSize.columnNumber
+                )
+            );
+        }
+        if (colSizeType.TypeTag != "int") {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The column size expression must be an int",
+                    multiDimArray.colSize.lineNumber, multiDimArray.colSize.columnNumber
+                )
+            );
+        }
+
+        //Checking that the initial values are either integers are bools.
+        if (multiDimArray.initialValues == null) {
+            return;
+        }
+
+        SymbolVariable symbolVar = (SymbolVariable) lookUpSymbolFromContext(
+            multiDimArray.name, multiDimArray.lineNumber, multiDimArray.columnNumber
+        );
+
+        SimpleType expectedInitValType;
+        switch(symbolVar.type) {
+            case MultiDimArrayType<PrimitiveType> arrayDecl when arrayDecl.baseType.TypeTag=="int": 
+                expectedInitValType = new IntType();
+                break;
+            case MultiDimArrayType<PrimitiveType> arrayDecl when arrayDecl.baseType.TypeTag=="bool":
+                expectedInitValType = new BoolType();
+                break;
+            default:
+                throw new Exception(
+                    String.Format(
+                        "{0}:{1} SemanticError: The array type could not be resolved incorrectly"
+                    )
+                );
+        }
+
+        for (int i = 0; i < multiDimArray.initialValues.Length; i++) {
+            for (int j = 0; j < multiDimArray.initialValues[i].Length; j++) {
+                ExprAST initialValue = multiDimArray.initialValues[i][j];
+                initialValue.accept(this);
+
+                SimpleType actualInitValType = initialValue.type;
+                if (!sameTypes(expectedInitValType, actualInitValType)) {
+                    errorMsgs.Add(
+                        String.Format(
+                            "{0}:{1} SemanticError: The initial value must be of type {2}",
+                            initialValue.lineNumber, initialValue.columnNumber,
+                            simpleTypeToString(actualInitValType)
+                        )
+                    );
+                }
+            }
+        }
+    }
 }
