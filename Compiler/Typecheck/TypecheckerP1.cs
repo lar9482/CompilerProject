@@ -88,12 +88,7 @@ public sealed class TypecheckerP1 : TypeChecker {
         context.push();
 
         foreach(DeclAST decl in program.declarations) {
-            switch(decl) {
-                case VarDeclAST varDecl: varDecl.accept(this); break;
-                case MultiVarDeclAST multiVarDecl: multiVarDecl.accept(this); break;
-                case ArrayDeclAST arrayDecl: arrayDecl.accept(this); break;
-                case MultiDimArrayDeclAST multiDimArrayDecl: multiDimArrayDecl.accept(this); break;
-            }
+            decl.accept(this);
         }
 
         foreach(FunctionAST function in program.functions) {
