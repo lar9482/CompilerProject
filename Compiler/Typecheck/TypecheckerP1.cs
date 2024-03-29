@@ -46,29 +46,7 @@ public sealed class TypecheckerP1 : TypeChecker {
     }
 
     public override void visit(FunctionAST function) { 
-        if (context.lookup(function.name) != null) {
-            errorMsgs.Add(
-                String.Format(
-                    "{0}:{1} SemanticError: {2} exists already.",
-                    function.lineNumber,
-                    function.columnNumber,
-                    function.name
-                )
-            );
-            return;
-        }
-
-        List<SimpleType> parameterTypes = new List<SimpleType>();
-        foreach(ParameterAST param in function.parameters) {
-            parameterTypes.Add(param.type);
-        }
-
-        SymbolFunction symbolFunc = new SymbolFunction(
-            function.name,
-            parameterTypes.ToArray<SimpleType>(),
-            function.returnTypes.ToArray<SimpleType>()
-        );
-        context.put(function.name, symbolFunc);
+        initializeFunction(function);
     }
     
     private void addIO() {
@@ -146,17 +124,4 @@ public sealed class TypecheckerP1 : TypeChecker {
             }
         ));
     }
-
-    //Unused visit procedures
-    public override void visit(ParameterAST parameter) { throw new NotImplementedException("This visit is not used"); }
-    public override void visit(BlockAST block) { throw new NotImplementedException("This visit is not used"); }
-    public override void visit(ConditionalAST conditional) { throw new NotImplementedException("This visit is not used"); }
-    public override void visit(WhileLoopAST whileLoop) { throw new NotImplementedException("This visit is not used"); }
-    public override void visit(AssignAST assign) { throw new NotImplementedException("This visit is not used"); }
-    public override void visit(MultiAssignAST multiAssign) { throw new NotImplementedException("This visit is not used"); }
-    public override void visit(MultiAssignCallAST multiAssignCall) { throw new NotImplementedException("This visit is not used"); }
-    public override void visit(ArrayAssignAST arrayAssign) { throw new NotImplementedException("This visit is not used"); }
-    public override void visit(MultiDimArrayAssignAST multiDimArrayAssign) { throw new NotImplementedException("This visit is not used"); }
-    public override void visit(ReturnAST returnStmt) { throw new NotImplementedException("This visit is not used"); }
-    public override void visit(ProcedureCallAST procedureCall) { throw new NotImplementedException("This visit is not used"); }
 }

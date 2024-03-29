@@ -57,15 +57,4 @@ public sealed class TypecheckerP2 : TypeChecker {
     }
 
     public override void visit(FunctionAST function) { throw new NotImplementedException("This visit is not used."); }
-    public override void visit(ParameterAST parameter) { throw new NotImplementedException("This visit is not used."); }
-    public override void visit(BlockAST block) { throw new NotImplementedException("This visit is not used."); }
-    public override void visit(ConditionalAST conditional) { throw new NotImplementedException("This visit is not used."); }
-    public override void visit(WhileLoopAST whileLoop) { throw new NotImplementedException("This visit is not used."); }
-    public override void visit(AssignAST assign) { throw new NotImplementedException("This visit is not used"); }
-    public override void visit(MultiAssignAST multiAssign) { throw new NotImplementedException("This visit is not used"); }
-    public override void visit(MultiAssignCallAST multiAssignCall) { throw new NotImplementedException("This visit is not used"); }
-    public override void visit(ArrayAssignAST arrayAssign) { throw new NotImplementedException("This visit is not used"); }
-    public override void visit(MultiDimArrayAssignAST multiDimArrayAssign) { throw new NotImplementedException("This visit is not used"); }
-    public override void visit(ReturnAST returnStmt) { throw new NotImplementedException("This visit is not used"); }
-    public override void visit(ProcedureCallAST procedureCall) { throw new NotImplementedException("This visit is not used"); }
 }
