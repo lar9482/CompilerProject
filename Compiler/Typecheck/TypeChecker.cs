@@ -492,6 +492,7 @@ public abstract class TypeChecker : ASTVisitor {
         BlockAST ifBlock,
         Dictionary<ExprAST, BlockAST> elseIfConditionalBlocks
     ) {
+        ifCondition.accept(this);
         if (ifCondition.type.TypeTag != "bool") {
             errorMsgs.Add(
                 String.Format(
@@ -590,7 +591,53 @@ public abstract class TypeChecker : ASTVisitor {
     public void visit(ArrayAssignAST arrayAssign) { }
     public void visit(MultiDimArrayAssignAST multiDimArrayAssign) { }
     public void visit(ReturnAST returnStmt) { }
-    public void visit(ProcedureCallAST procedureCall) { }
+
+    public void visit(ProcedureCallAST procedureCall) { 
+        SymbolFunction symbolFunction = (SymbolFunction) lookUpSymbolFromContext(
+            procedureCall.procedureName, procedureCall.lineNumber, procedureCall.columnNumber
+        );
+
+        if (symbolFunction.returnTypes.Length != 0) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: {2} is a function that returns a type, not a procedure",
+                    procedureCall.lineNumber, procedureCall.columnNumber,
+                    procedureCall.procedureName
+                )
+            );
+        }
+
+        if (symbolFunction.parameterTypes.Length != procedureCall.args.Count) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The number of parameters for {2} must match the number of arguments.",
+                    procedureCall.lineNumber, procedureCall.columnNumber,
+                    procedureCall.procedureName
+                )
+            );
+            procedureCall.type = new UnitType();
+            return;
+        } 
+
+        for(int i = 0; i < symbolFunction.parameterTypes.Length; i++) {
+            procedureCall.args[i].accept(this);
+
+            SimpleType expectedType = symbolFunction.parameterTypes[i];
+            SimpleType actualType = procedureCall.args[i].type;
+
+            if (simpleTypeToString(expectedType) != simpleTypeToString(actualType)) {
+                errorMsgs.Add(
+                    String.Format(
+                        "{0}:{1} SemanticError: The type of the argument, {2}, doesn't match the parameter, {3}.",
+                        procedureCall.args[i].lineNumber, procedureCall.args[i].columnNumber,
+                        simpleTypeToString(actualType), simpleTypeToString(expectedType)
+                    )
+                );
+            }
+        }
+
+        procedureCall.type = new UnitType();
+    }
 
     public void visit(BinaryExprAST binaryExpr) { 
         binaryExpr.leftOperand.accept(this);
