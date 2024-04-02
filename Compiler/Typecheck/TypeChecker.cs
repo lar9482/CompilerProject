@@ -570,7 +570,7 @@ public abstract class TypeChecker : ASTVisitor {
         SimpleType expectedType = assign.variable.type;
         SimpleType actualType = assign.value.type;
 
-        if (expectedType.TypeTag != actualType.TypeTag) {
+        if (!sameTypes(expectedType, actualType)) {
             errorMsgs.Add(
                 String.Format(
                     "{0}:{1} SemanticError: The assignment expression type, {2}, doesn't match with the {3}'s type {4}",
@@ -625,7 +625,7 @@ public abstract class TypeChecker : ASTVisitor {
             SimpleType expectedType = symbolFunction.parameterTypes[i];
             SimpleType actualType = procedureCall.args[i].type;
 
-            if (simpleTypeToString(expectedType) != simpleTypeToString(actualType)) {
+            if (!sameTypes(expectedType, actualType)) {
                 errorMsgs.Add(
                     String.Format(
                         "{0}:{1} SemanticError: The type of the argument, {2}, doesn't match the parameter, {3}.",
