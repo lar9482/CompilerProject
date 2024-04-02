@@ -55,5 +55,13 @@ public sealed class TypecheckerP3 : TypeChecker {
         checkMultiDimArrayDecl(multiDimArray);
     }
 
-    public override void visit(FunctionAST function) { }
+    public override void visit(FunctionAST function) { 
+        context.push();
+        foreach (ParameterAST param in function.parameters) {
+            param.accept(this);
+        }
+
+        function.block.accept(this);
+        function.scope = context.pop();
+    }
 }

@@ -6,7 +6,7 @@ public abstract class SimpleType : LangType {
 public abstract class PrimitiveType : SimpleType {
 }
 
-public sealed class UninitializedType : SimpleType {
+public sealed class UninitializedSimpleType : SimpleType {
     public override string TypeTag => "uninitalized";
 }
 
