@@ -61,6 +61,11 @@ public sealed class TypecheckerP3 : TypeChecker {
             param.accept(this);
         }
 
+        SymbolReturn symbolReturn = new SymbolReturn(
+            function.returnTypes.ToArray()
+        );
+        context.put("return", symbolReturn);
+
         function.block.accept(this);
         function.scope = context.pop();
     }
