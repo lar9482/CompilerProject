@@ -563,7 +563,28 @@ public abstract class TypeChecker : ASTVisitor {
         whileLoop.type = new UnitType();
     }
 
-    public void visit(AssignAST assign) { }
+    public void visit(AssignAST assign) { 
+        assign.variable.accept(this);
+        assign.value.accept(this);
+        SimpleType expectedType = assign.variable.type;
+        SimpleType actualType = assign.value.type;
+
+        if (expectedType.TypeTag != actualType.TypeTag) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The assignment expression type, {2}, doesn't match with the {3}'s type {4}",
+                    assign.lineNumber,
+                    assign.columnNumber,
+                    simpleTypeToString(actualType),
+                    assign.variable.variableName,
+                    simpleTypeToString(expectedType)
+                )
+            );
+        }
+
+        assign.type = new UnitType();
+    }
+
     public void visit(MultiAssignAST multiAssign) { }
     public void visit(MultiAssignCallAST multiAssignCall) { }
     public void visit(ArrayAssignAST arrayAssign) { }
