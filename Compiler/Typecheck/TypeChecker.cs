@@ -588,8 +588,52 @@ public abstract class TypeChecker : ASTVisitor {
 
     public void visit(MultiAssignAST multiAssign) { }
     public void visit(MultiAssignCallAST multiAssignCall) { }
-    public void visit(ArrayAssignAST arrayAssign) { }
-    public void visit(MultiDimArrayAssignAST multiDimArrayAssign) { }
+    
+    public void visit(ArrayAssignAST arrayAssign) { 
+        arrayAssign.arrayAccess.accept(this);
+        arrayAssign.value.accept(this);
+
+        SimpleType expectedType = arrayAssign.arrayAccess.type;
+        SimpleType actualType = arrayAssign.value.type;
+
+        if (!sameTypes(expectedType, actualType)) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The assignment expression type, {2}, doesn't match with the {3}'s type {4}",
+                    arrayAssign.lineNumber,
+                    arrayAssign.columnNumber,
+                    simpleTypeToString(actualType),
+                    arrayAssign.arrayAccess.arrayName,
+                    simpleTypeToString(expectedType)
+                )
+            );
+        }
+
+        arrayAssign.type = new UnitType();
+    }
+
+    public void visit(MultiDimArrayAssignAST multiDimArrayAssign) { 
+        multiDimArrayAssign.arrayAccess.accept(this);
+        multiDimArrayAssign.value.accept(this);
+
+        SimpleType expectedType = multiDimArrayAssign.arrayAccess.type;
+        SimpleType actualType = multiDimArrayAssign.value.type;
+
+        if (!sameTypes(expectedType, actualType)) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The assignment expression type, {2}, doesn't match with the {3}'s type {4}",
+                    multiDimArrayAssign.lineNumber,
+                    multiDimArrayAssign.columnNumber,
+                    simpleTypeToString(actualType),
+                    multiDimArrayAssign.arrayAccess.arrayName,
+                    simpleTypeToString(expectedType)
+                )
+            );
+        }
+
+        multiDimArrayAssign.type = new UnitType();
+    }
 
     public void visit(ReturnAST returnStmt) { 
         SymbolReturn symbolReturn = (SymbolReturn) lookUpSymbolFromContext(
