@@ -546,7 +546,23 @@ public abstract class TypeChecker : ASTVisitor {
         );
     }
 
-    public void visit(WhileLoopAST whileLoop)  { }
+    public void visit(WhileLoopAST whileLoop) { 
+        whileLoop.condition.accept(this);
+        SimpleType conditionType = whileLoop.condition.type;
+        if (conditionType.TypeTag != "bool") {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The while loop condition must be a bool",
+                    whileLoop.condition.lineNumber,
+                    whileLoop.condition.columnNumber
+                )
+            );
+        }
+
+        whileLoop.body.accept(this);
+        whileLoop.type = new UnitType();
+    }
+
     public void visit(AssignAST assign) { }
     public void visit(MultiAssignAST multiAssign) { }
     public void visit(MultiAssignCallAST multiAssignCall) { }
