@@ -39,4 +39,13 @@ foo(x: int): bool, int {
 
 bar() {
     b:bool, i: int = foo();
+    array1: int[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    array2: int[][] = {
+        {0, 1, 2},
+        {3, 4, 5},
+        {6, 7, 8}
+    };
+
+    array1[5 - 3] = 0;
+    array2[5 - 3][5 - 2] = 0;
 }
