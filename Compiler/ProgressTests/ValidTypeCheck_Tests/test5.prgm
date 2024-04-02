@@ -3,12 +3,12 @@ main(args: int[][]) {
     x: int;
 
     if (i <= 100 && i > 0) {
-        x = 1;
+        // x = 1;
     } else if (i == 0) {
-        x = 0;
+        // x = 0;
     } else if (i >= -100 && i < 0) {
-        x = -1;
+        // x = -1;
     }
 
-    println(unparseInt(x));
+    // println(unparseInt(x));
 }

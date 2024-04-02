@@ -1,4 +1,5 @@
 using CompilerProj.Context;
+using CompilerProj.Types;
 using CompilerProj.Visitors;
 
 /*
@@ -370,9 +371,181 @@ public abstract class TypeChecker : ASTVisitor {
         context.put(function.name, symbolFunc);
     }
 
-    public void visit(ParameterAST parameter)  { }
-    public void visit(BlockAST block) { }
-    public void visit(ConditionalAST conditional)  { }
+    public void visit(ParameterAST parameter) { 
+        if (context.lookup(parameter.name) != null) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: {2} exists already.",
+                    parameter.lineNumber,
+                    parameter.columnNumber,
+                    parameter.name
+                )
+            );
+            return;
+        }
+
+        SymbolVariable paramSymbol = new SymbolVariable(
+            parameter.name,
+            parameter.type
+        );
+        context.put(parameter.name, paramSymbol);
+    }
+
+    public void visit(BlockAST block) { 
+        if (block.statements.Count == 0) {
+            block.type = new UnitType();
+            return;
+        }
+
+        context.push();
+
+        for(int i = 0; i < block.statements.Count; i++) {
+            StmtAST stmt = block.statements[i];
+            stmt.accept(this);
+
+            if (i < (block.statements.Count-1) && stmt.type.TypeTag == "terminate") {
+                errorMsgs.Add(
+                    String.Format(
+                        "{0}:{1} SemanticError: The next statement can't be executed, because of the current statement terminates",
+                        stmt.lineNumber, stmt.columnNumber
+                    )
+                );
+            }
+        }
+
+        block.scope = context.pop();    
+        block.type = block.statements.Last<StmtAST>().type;
+    }
+
+    public void visit(ConditionalAST conditional) { 
+        StmtType conditionalType;
+        if (conditional.elseIfConditionalBlocks == null) {
+            if (conditional.elseBlock == null) {
+                conditionalType = checkIfStmt(
+                    conditional.ifCondition, conditional.ifBlock
+                );
+            } else {
+                conditionalType = checkIfElseStmt(
+                    conditional.ifCondition, conditional.ifBlock, conditional.elseBlock
+                );
+            }
+        } else {
+            if (conditional.elseBlock == null) {
+                conditionalType = checkIf_ElseIf_Stmt(
+                    conditional.ifCondition,
+                    conditional.ifBlock,
+                    conditional.elseIfConditionalBlocks
+                );
+            } else {
+                conditionalType = checkIf_ElseIf_ElseStmt(
+                    conditional.ifCondition,
+                    conditional.ifBlock,
+                    conditional.elseIfConditionalBlocks,
+                    conditional.elseBlock
+                );
+            }
+        }
+
+        conditional.type = conditionalType;
+    }
+
+    private StmtType checkIfStmt(ExprAST ifCondition, BlockAST ifBlock) {
+        ifCondition.accept(this);
+
+        if (ifCondition.type.TypeTag != "bool") {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: Condition for the if statement must be a bool",
+                    ifCondition.lineNumber, ifCondition.columnNumber
+                )
+            );
+        }
+        
+        ifBlock.accept(this);
+        return new UnitType();
+    }
+
+    private StmtType checkIfElseStmt(ExprAST ifCondition, BlockAST ifBlock, BlockAST elseBlock) {
+        ifCondition.accept(this);
+
+        if (ifCondition.type.TypeTag != "bool") {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: Condition for the if statement must be a bool",
+                    ifCondition.lineNumber, ifCondition.columnNumber
+                )
+            );
+        }
+
+        ifBlock.accept(this);
+        elseBlock.accept(this);
+
+        return (ifBlock.type.TypeTag == "terminate" && elseBlock.type.TypeTag == "terminate") ? (
+            new TerminateType()
+        ) : (
+            new UnitType()
+        );
+    }
+
+    private StmtType checkIf_ElseIf_Stmt(
+        ExprAST ifCondition,
+        BlockAST ifBlock,
+        Dictionary<ExprAST, BlockAST> elseIfConditionalBlocks
+    ) {
+        if (ifCondition.type.TypeTag != "bool") {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: Condition for the if statement must be a bool",
+                    ifCondition.lineNumber, ifCondition.columnNumber
+                )
+            );
+        }
+        ifBlock.accept(this);
+        bool unitTypeStmtExists = ifBlock.type.TypeTag == "unit";
+
+        foreach(KeyValuePair<ExprAST, BlockAST> elseIfConditionalBlock in elseIfConditionalBlocks) {
+            ExprAST elseIfCondition = elseIfConditionalBlock.Key;
+            BlockAST elseIfBlock = elseIfConditionalBlock.Value;
+
+            elseIfCondition.accept(this);
+            if (elseIfCondition.type.TypeTag != "bool") {
+                errorMsgs.Add(
+                    String.Format(
+                        "{0}:{1} SemanticError: Condition for the else if statement must be a bool",
+                        elseIfCondition.lineNumber, elseIfCondition.columnNumber
+                    )
+                );
+            }
+            elseIfBlock.accept(this);
+
+            if (!unitTypeStmtExists && elseIfBlock.type.TypeTag == "unit") {
+                unitTypeStmtExists = true;
+            }
+        }
+
+        return (unitTypeStmtExists) ? (
+            new UnitType()
+        ) : (
+            new TerminateType()
+        );
+    }
+
+    private StmtType checkIf_ElseIf_ElseStmt(
+        ExprAST ifCondition,
+        BlockAST ifBlock,
+        Dictionary<ExprAST, BlockAST> elseIfConditionalBlocks, 
+        BlockAST elseBlock
+    ) {
+        StmtType ifElseIfType = checkIf_ElseIf_Stmt(ifCondition, ifBlock, elseIfConditionalBlocks);
+        elseBlock.accept(this);
+
+        return (ifElseIfType.TypeTag == "unit" || elseBlock.type.TypeTag == "unit") ? (
+            new UnitType()
+        ) : (
+            new TerminateType()
+        );
+    }
+
     public void visit(WhileLoopAST whileLoop)  { }
     public void visit(AssignAST assign) { }
     public void visit(MultiAssignAST multiAssign) { }
