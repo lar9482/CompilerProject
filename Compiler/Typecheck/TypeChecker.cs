@@ -590,7 +590,58 @@ public abstract class TypeChecker : ASTVisitor {
     public void visit(MultiAssignCallAST multiAssignCall) { }
     public void visit(ArrayAssignAST arrayAssign) { }
     public void visit(MultiDimArrayAssignAST multiDimArrayAssign) { }
-    public void visit(ReturnAST returnStmt) { }
+
+    public void visit(ReturnAST returnStmt) { 
+        SymbolReturn symbolReturn = (SymbolReturn) lookUpSymbolFromContext(
+            "return", returnStmt.lineNumber, returnStmt.columnNumber
+        );
+        
+        if (returnStmt.returnValues == null) {
+            if (symbolReturn.returnTypes.Length > 0) {
+                errorMsgs.Add(
+                    String.Format(
+                        "{0}:{1} SemanticError: Return expressions expected",
+                        returnStmt.lineNumber, returnStmt.columnNumber
+                    )
+                );
+            }
+            returnStmt.type = new TerminateType();
+            return;
+        }
+
+        if (symbolReturn.returnTypes.Length != returnStmt.returnValues.Count) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The number of expressions being returned " +
+                    "does not match the number of expected expressions",
+                    returnStmt.lineNumber, returnStmt.columnNumber
+                )
+            );
+            returnStmt.type = new TerminateType();
+            return;
+        }
+
+        for(int i = 0; i < symbolReturn.returnTypes.Length; i++) {
+            returnStmt.returnValues[i].accept(this);
+
+            SimpleType expectedType = symbolReturn.returnTypes[i];
+            SimpleType actualType = returnStmt.returnValues[i].type;
+
+            if (!sameTypes(expectedType, actualType)) {
+                errorMsgs.Add(
+                    String.Format(
+                        "{0}:{1} SemanticError: The expression type, {2}, " +
+                        "does not match the expected parameter type, {3}",
+                        returnStmt.lineNumber, returnStmt.columnNumber,
+                        simpleTypeToString(actualType),
+                        simpleTypeToString(expectedType)
+                    )
+                );
+            }
+        }
+
+        returnStmt.type = new TerminateType();
+    }
 
     public void visit(ProcedureCallAST procedureCall) { 
         SymbolFunction symbolFunction = (SymbolFunction) lookUpSymbolFromContext(

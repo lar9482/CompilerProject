@@ -1,14 +1,14 @@
 
 :global 
-variable10: bool, variable11: int = foo(true);
+variable10: bool, variable11: int = foo(10);
 
 :global variable1: int = 0;
 :global variable2: bool = true;
 
 :global
-variable3: int, variable4: bool = (true || false), (0 + 1 + 2 + 3 + 4 + 5);
+variable3: int, variable4: bool = (0 + 1 + 2 + 3 + 4 + 5), (true || false);
 
-:global variable5: int[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, true};
+:global variable5: int[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
 
 :global 
@@ -24,6 +24,7 @@ variable7: int[][] = {
 foo(x: int): bool, int {
     expr: int = 1 - 2 * 3 * -4;
     fivePred: bool = true && true || false;
+    pred: bool = true;
 
     if (expr <= 47) { 
 
