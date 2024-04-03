@@ -1,0 +1,11 @@
+valid(): int[] {
+    validArray: int[] = {0, 1, 2, 3, 4, 5};
+    return validArray;
+}
+
+main(arg: int[][]) {
+    validArray: int[6];
+
+    validArray = valid();
+    println(validArray);
+}
