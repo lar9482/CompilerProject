@@ -4,6 +4,10 @@ using CompilerProj.Visitors;
 
 /*
  * Wrapper for typechecking passes.
+ * Most of the logic for typechecking is contained here.
+ *
+ * However, the order for typechecking declarations, functions, and the program
+ * is different per pass.
  */
 public abstract class TypeChecker : ASTVisitor {
     protected Context context;

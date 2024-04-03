@@ -3,6 +3,12 @@ using CompilerProj.Visitors;
 
 /*
  * This pass will record the symbols of the top level declarations.
+ * This includes:
+ *      Single variable declarations
+ *      Multi variable declarations, with multiple expressions or a function call
+ *      Array declarations.
+ *      Multi-dimensional array declarations
+ *      Functions
  */
 public sealed class TypecheckerP1 : TypeChecker {
     public TypecheckerP1() { 

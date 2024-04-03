@@ -4,6 +4,9 @@ using CompilerProj.Visitors;
 
 /*
  * This pass will typecheck top level declarations.
+ * 
+ * Basically, the symbols that were constructed in the previous pass will
+ * be used to typecheck optional initial expressions for the declarations.
  */
 public sealed class TypecheckerP2 : TypeChecker {
 
