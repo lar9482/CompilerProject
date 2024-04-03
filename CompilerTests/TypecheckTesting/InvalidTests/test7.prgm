@@ -1,0 +1,7 @@
+spam() { 
+    
+}
+
+eggs() { 
+    x:int = eggs(); 
+}

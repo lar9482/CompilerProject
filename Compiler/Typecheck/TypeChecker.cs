@@ -145,6 +145,15 @@ public abstract class TypeChecker : ASTVisitor {
         );
 
         //Checking variable declarations against the function return types.
+        if (multiVarDeclCall.names.Count != symbolFunction.returnTypes.Length) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The number of variable declarations is not equal to the number of return types for {2}",
+                    multiVarDeclCall.lineNumber, multiVarDeclCall.columnNumber, multiVarDeclCall.functionCall.functionName
+                )
+            );
+            return;
+        }
         for (int i = 0; i < multiVarDeclCall.names.Count; i++) {
             string varName = multiVarDeclCall.names[i];
             SymbolVariable symbolVar = (SymbolVariable) lookUpSymbolFromContext(
@@ -164,9 +173,19 @@ public abstract class TypeChecker : ASTVisitor {
                 );
             }
         }
-
+        
         //Checking parameter types
         FunctionCallAST functionCall = multiVarDeclCall.functionCall;
+        if (functionCall.args.Count != symbolFunction.parameterTypes.Length) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The number of arguments is not equal to the number of parameters for {2}",
+                    multiVarDeclCall.lineNumber, multiVarDeclCall.columnNumber, functionCall.functionName
+                )
+            );
+            return;
+        }
+
         for (int i = 0; i < functionCall.args.Count; i++) {
             ExprAST param = functionCall.args[i];
             param.accept(this);
@@ -632,6 +651,16 @@ public abstract class TypeChecker : ASTVisitor {
         );
 
         // Checking the variables against the return types of the function.
+        if (multiAssignCall.variableNames.Count != symbolFunction.returnTypes.Length) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The number of assignments is not equal to the number of return types for {2}",
+                    multiAssignCall.lineNumber, multiAssignCall.columnNumber, multiAssignCall.call.functionName
+                )
+            );
+            multiAssignCall.type = new UnitType();
+            return;
+        }
         for (int i = 0; i < multiAssignCall.variableNames.Count; i++) {
             VarAccessAST variableAccess = multiAssignCall.variableNames[i];
             variableAccess.accept(this);
@@ -653,6 +682,16 @@ public abstract class TypeChecker : ASTVisitor {
 
         //Checking parameter types
         FunctionCallAST functionCall = multiAssignCall.call;
+        if (functionCall.args.Count != symbolFunction.parameterTypes.Length) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The number of arguments is not equal to the number of parameters for {2}",
+                    multiAssignCall.lineNumber, multiAssignCall.columnNumber, functionCall.functionName
+                )
+            );
+            multiAssignCall.type = new UnitType();
+            return;
+        }
         for (int i = 0; i < functionCall.args.Count; i++) {
             ExprAST param = functionCall.args[i];
             param.accept(this);
@@ -837,7 +876,7 @@ public abstract class TypeChecker : ASTVisitor {
         } else {
             errorMsgs.Add(
                 String.Format(
-                    "{0}:{1} SemanticError: The left operand type, {3}, mismatches with the right operand type, {4}",
+                    "{0}:{1} SemanticError: The left operand type, {2}, mismatches with the right operand type, {3}",
                     binaryExpr.lineNumber, 
                     binaryExpr.columnNumber, 
                     leftType.TypeTag,
@@ -1089,7 +1128,18 @@ public abstract class TypeChecker : ASTVisitor {
             }
         }
 
-        if (symbol.returnTypes.Length != 1) {
+        if (symbol.returnTypes.Length == 0) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The function {2} doesn't return anything. so can't be used as a function call",
+                    functionCall.lineNumber, functionCall.columnNumber, 
+                    functionCall.functionName
+                )
+            );
+            return;
+        }
+
+        if (symbol.returnTypes.Length > 1) {
             errorMsgs.Add(
                 String.Format(
                     "{0}:{1} SemanticError: The function call {2} is only allowed a single return type",
@@ -1097,6 +1147,7 @@ public abstract class TypeChecker : ASTVisitor {
                     functionCall.functionName
                 )
             );
+            return;
         }
 
         functionCall.type = symbol.returnTypes[0];
@@ -1145,6 +1196,8 @@ public abstract class TypeChecker : ASTVisitor {
                 return "int[][]";
             case MultiDimArrayType<PrimitiveType> multiArray when multiArray.baseType.TypeTag=="bool": 
                 return "bool[][]";
+            case UninitializedSimpleType uninitialized:
+                return "uninitalizedType";
             default: 
                 throw new Exception(String.Format("Can't recognize the type"));
         }

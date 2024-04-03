@@ -1,0 +1,3 @@
+spam(x: int): bool {
+    return eggs();
+}
