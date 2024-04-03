@@ -1,0 +1,4 @@
+foo(x: int): bool {
+    b: bool = x + 27;
+    return b;
+}

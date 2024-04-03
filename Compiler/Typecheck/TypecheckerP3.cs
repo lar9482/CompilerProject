@@ -60,6 +60,7 @@ public sealed class TypecheckerP3 : TypeChecker {
 
     public override void visit(FunctionAST function) { 
         context.push();
+
         foreach (ParameterAST param in function.parameters) {
             param.accept(this);
         }
@@ -68,8 +69,26 @@ public sealed class TypecheckerP3 : TypeChecker {
             function.returnTypes.ToArray()
         );
         context.put("return", symbolReturn);
-
         function.block.accept(this);
+
+        StmtType blockType = function.block.type;
+        if (blockType.TypeTag == "unit" && symbolReturn.returnTypes.Length > 0) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: A terminate type was expected. Not all paths in {2} will return something.",
+                    function.lineNumber, function.columnNumber, function.name
+                )
+            );
+        }
+
+        if (blockType.TypeTag == "terminate" && symbolReturn.returnTypes.Length == 0) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: A unit type was expected. There exists a path in {2} that returns something, when that's not allowed.",
+                    function.lineNumber, function.columnNumber, function.name
+                )
+            );
+        }
         function.scope = context.pop();
     }
 }

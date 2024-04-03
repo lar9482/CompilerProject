@@ -1,0 +1,8 @@
+spam(): int, int, int { 
+    return 0, 1, 2; 
+}
+
+eggs() { 
+    x:int, y:int = spam(); 
+    x, y = spam();
+}
