@@ -38,7 +38,11 @@ foo(x: int): bool, int {
 }
 
 bar() {
-    b:bool, i: int = foo();
+    b:bool, i: int;
+
+    b, i = true, 0;
+    b, i = foo();
+    
     array1: int[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
     array2: int[][] = {
         {0, 1, 2},
