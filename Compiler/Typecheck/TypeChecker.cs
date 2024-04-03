@@ -586,8 +586,81 @@ public abstract class TypeChecker : ASTVisitor {
         assign.type = new UnitType();
     }
 
-    public void visit(MultiAssignAST multiAssign) { }
-    public void visit(MultiAssignCallAST multiAssignCall) { }
+    public void visit(MultiAssignAST multiAssign) { 
+        foreach(KeyValuePair<VarAccessAST, ExprAST> varAccessExpr in multiAssign.assignments) {
+            VarAccessAST varAccess = varAccessExpr.Key;
+            ExprAST expr = varAccessExpr.Value;
+
+            varAccess.accept(this);
+            expr.accept(this);
+
+            SimpleType expectedType = varAccess.type;
+            SimpleType actualType = expr.type;
+
+            if (!sameTypes(expectedType, actualType)) {
+                errorMsgs.Add(
+                    String.Format(
+                        "{0}:{1} SemanticError: The assignment expression type, {2}, doesn't match with the {3}'s type {4}",
+                        expr.lineNumber,
+                        expr.columnNumber,
+                        simpleTypeToString(actualType),
+                        varAccess.variableName,
+                        simpleTypeToString(expectedType)
+                    )
+                );
+            }
+        }
+
+        multiAssign.type = new UnitType();
+    }
+
+    public void visit(MultiAssignCallAST multiAssignCall) { 
+        SymbolFunction symbolFunction = (SymbolFunction) lookUpSymbolFromContext(
+            multiAssignCall.call.functionName, multiAssignCall.lineNumber, multiAssignCall.columnNumber
+        );
+
+        // Checking the variables against the return types of the function.
+        for (int i = 0; i < multiAssignCall.variableNames.Count; i++) {
+            VarAccessAST variableAccess = multiAssignCall.variableNames[i];
+            variableAccess.accept(this);
+
+            SimpleType expectedType = symbolFunction.returnTypes[i];
+            SimpleType actualType = variableAccess.type;
+
+            if (!sameTypes(expectedType, actualType)) {
+                errorMsgs.Add(
+                    String.Format(
+                        "{0}:{1} SemanticError: {2}'s type, {3}, doesn't with with the {3} return type of {4}",
+                        variableAccess.lineNumber, variableAccess.columnNumber,
+                        variableAccess.variableName, simpleTypeToString(actualType),
+                        (i+1).ToString(), symbolFunction.identifier
+                    )
+                );
+            }
+        }
+
+        //Checking parameter types
+        FunctionCallAST functionCall = multiAssignCall.call;
+        for (int i = 0; i < functionCall.args.Count; i++) {
+            ExprAST param = functionCall.args[i];
+            param.accept(this);
+
+            SimpleType paramType = param.type;
+            SimpleType expectedParamType = symbolFunction.parameterTypes[i];
+            
+            if (!sameTypes(paramType, expectedParamType)) {
+                errorMsgs.Add(
+                    String.Format(
+                        "{0}:{1} SemanticError: Param's type {2} doesn't match with the expected type {3}",
+                        param.lineNumber, param.columnNumber,
+                        simpleTypeToString(paramType), simpleTypeToString(expectedParamType)
+                    )
+                );
+            }
+        }
+
+        multiAssignCall.type = new UnitType();
+    }
     
     public void visit(ArrayAssignAST arrayAssign) { 
         arrayAssign.arrayAccess.accept(this);
