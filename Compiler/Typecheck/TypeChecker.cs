@@ -436,11 +436,18 @@ public abstract class TypeChecker : ASTVisitor {
             }
         } else {
             if (conditional.elseBlock == null) {
-                conditionalType = checkIf_ElseIf_Stmt(
+                // Interesting edge case.
+                
+                // Honestly, an if-elseif statement doesn't itself create a terminate type,
+                // but it creates the conditions for a terminate type to exist if it's paired with an 
+                // else statement.
+                checkIf_ElseIf_Stmt(
                     conditional.ifCondition,
                     conditional.ifBlock,
                     conditional.elseIfConditionalBlocks
                 );
+                conditionalType = new UnitType();
+
             } else {
                 conditionalType = checkIf_ElseIf_ElseStmt(
                     conditional.ifCondition,
