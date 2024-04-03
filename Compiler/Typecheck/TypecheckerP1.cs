@@ -27,7 +27,7 @@ public sealed class TypecheckerP1 : TypeChecker {
 
         // Future system call support.
         addIO();
-        addConv();
+        addSysCallSupport();
         program.scope = context.pop();
     }
 
@@ -104,7 +104,7 @@ public sealed class TypecheckerP1 : TypeChecker {
         ));
     }
 
-    private void addConv() {
+    private void addSysCallSupport() {
 
         // If "str" contains a sequence of ASCII characters that correctly represent
         // an integer constant n, return (n, true). Otherwise return (0, false).
@@ -128,6 +128,37 @@ public sealed class TypecheckerP1 : TypeChecker {
             new SimpleType[] {
                 new ArrayType<PrimitiveType>(new IntType())
             }
+        ));
+
+        //Given a single dimensional int array, the length is returned.
+        context.put("lengthInt", new SymbolFunction(
+            "lengthInt",
+            new SimpleType[] {
+                new ArrayType<PrimitiveType>(new IntType())
+            },
+            new SimpleType[] {
+                new IntType()
+            }
+        ));
+
+        //Given a single dimensional bool array, the length is returned.
+        context.put("lengthBool", new SymbolFunction(
+            "lengthBool",
+            new SimpleType[] {
+                new ArrayType<PrimitiveType>(new BoolType())
+            },
+            new SimpleType[] {
+                new IntType()
+            }
+        ));
+
+        //Ensure that the passed in boolean is true.
+        context.put("assert", new SymbolFunction(
+            "assert",
+            new SimpleType[] {
+                new BoolType()
+            },
+            new SimpleType[] { }
         ));
     }
 }

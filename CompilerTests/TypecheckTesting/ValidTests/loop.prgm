@@ -1,0 +1,28 @@
+:global
+num1: int, num2: int, num3:int = 0, 0, 0;
+
+:global
+bool1: bool, bool2: bool, bool3: bool = true, true, true;
+
+:global
+array1: int[] = {0, 1, 2};
+
+sum(a: int):int {
+    x: int = 1;
+    y: int = 0;
+    while (x <= a) {
+      y = y + x;
+      x = x + 1;
+    }
+    
+    return y;
+}
+
+main(args: int[][]) {
+    x:int = sum(500000000);
+    y:int = 500000001 * 250000000;
+
+    println(unparseInt(x));
+    println(unparseInt(y));
+}
+

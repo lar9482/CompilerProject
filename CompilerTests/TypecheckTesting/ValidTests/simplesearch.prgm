@@ -1,0 +1,17 @@
+findIndex(a:int[]): int {
+    n:int = lengthInt(a);
+    i:int = 0;
+    while (i < n) {
+        if (a[i] == i+1) {
+            return i;
+        }
+        i = i + 1;
+    }
+    return -1;
+}
+
+main(args:int[][]) {
+    array: int[] = {5, 4, 3, 2, 4, 6, 7, 8, 9, 10};
+    indexMatch: int = findIndex(array);
+    println(unparseInt(indexMatch));
+}
