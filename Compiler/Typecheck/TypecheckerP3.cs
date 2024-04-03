@@ -4,7 +4,10 @@ using CompilerProj.Types;
 using System.Diagnostics;
 
 /*
- * This pass will typecheck the function bodies
+ * This pass will typecheck the function bodies.
+ * 
+ * This includes every statement/declaration in the function body,
+ * along with expressions associated with these statements.
  */
 public sealed class TypecheckerP3 : TypeChecker {
     public TypecheckerP3() {
