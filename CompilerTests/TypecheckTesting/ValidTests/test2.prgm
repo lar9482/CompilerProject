@@ -1,0 +1,57 @@
+
+:global 
+variable10: bool, variable11: int = foo(10);
+
+:global variable1: int = 0;
+:global variable2: bool = true;
+
+:global
+variable3: int, variable4: bool = (0 + 1 + 2 + 3 + 4 + 5), (true || false);
+
+:global variable5: int[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+
+:global 
+variable6: bool[] = {true, false, (true || false), (true && false)};
+
+:global 
+variable7: int[][] = {
+    {1, 2, 3},
+    {4, 5, 6},
+    {7, 8, 9}
+};
+
+foo(x: int): bool, int {
+    expr: int = 1 - 2 * 3 * -4;
+    fivePred: bool = true && true || false;
+    pred: bool = true;
+
+    if (expr <= 47) { 
+        pred = !pred;
+    }
+    else { 
+        pred = !pred; 
+    }
+    if (pred) { 
+        expr = 59; 
+    }
+
+    return pred, expr;
+}
+
+bar() {
+    b:bool, i: int;
+
+    b, i = true, 0;
+    b, i = foo();
+    
+    array1: int[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    array2: int[][] = {
+        {0, 1, 2},
+        {3, 4, 5},
+        {6, 7, 8}
+    };
+
+    array1[5 - 3] = 0;
+    array2[5 - 3][5 - 2] = 0;
+}

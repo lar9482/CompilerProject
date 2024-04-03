@@ -1,5 +1,3 @@
-
-using System.Security.Cryptography;
 using CompilerProj;
 
 namespace CompilerTests;
@@ -14,7 +12,7 @@ public class ParserTests_TopLvl_Lifting {
     }
 
     private Queue<string> getActualTraversalRecord(string programFilePath) {
-        ProgramAST program = Compiler.dumpParse(programFilePath);
+        ProgramAST program = Compiler.parse(programFilePath);
         TopLvlVisitor visitor = new TopLvlVisitor();
         visitor.visit(program);
 

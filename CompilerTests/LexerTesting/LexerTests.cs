@@ -37,7 +37,7 @@ public class LexerTests {
         expectedTokenTypes.Enqueue(TokenType.identifier);
         expectedTokenTypes.Enqueue(TokenType.identifier);
 
-        Queue<Token> actualTokens = Compiler.dumpLex(programFilePath);
+        Queue<Token> actualTokens = Compiler.lex(programFilePath);
         
         Assert.DoesNotThrow(() => {
             compareExpectedAndActualTokens(expectedTokenTypes, actualTokens);
@@ -54,7 +54,7 @@ public class LexerTests {
         expectedTokenTypes.Enqueue(TokenType.minus);
         expectedTokenTypes.Enqueue(TokenType.number);
 
-        Queue<Token> actualTokens = Compiler.dumpLex(programFilePath);
+        Queue<Token> actualTokens = Compiler.lex(programFilePath);
         
         Assert.DoesNotThrow(() => {
             compareExpectedAndActualTokens(expectedTokenTypes, actualTokens);
@@ -85,7 +85,7 @@ public class LexerTests {
         expectedTokenTypes.Enqueue(TokenType.not);
         expectedTokenTypes.Enqueue(TokenType.colon);
 
-        Queue<Token> actualTokens = Compiler.dumpLex(programFilePath);
+        Queue<Token> actualTokens = Compiler.lex(programFilePath);
         
         Assert.DoesNotThrow(() => {
             compareExpectedAndActualTokens(expectedTokenTypes, actualTokens);
@@ -104,7 +104,7 @@ public class LexerTests {
         expectedTokenTypes.Enqueue(TokenType.and);
         expectedTokenTypes.Enqueue(TokenType.or);
 
-        Queue<Token> actualTokens = Compiler.dumpLex(programFilePath);
+        Queue<Token> actualTokens = Compiler.lex(programFilePath);
         
         Assert.DoesNotThrow(() => {
             compareExpectedAndActualTokens(expectedTokenTypes, actualTokens);
@@ -142,7 +142,7 @@ public class LexerTests {
         expectedTokenTypes.Enqueue(TokenType.and);
         expectedTokenTypes.Enqueue(TokenType.or);
         
-        Queue<Token> actualTokens = Compiler.dumpLex(programFilePath);
+        Queue<Token> actualTokens = Compiler.lex(programFilePath);
         
         Assert.DoesNotThrow(() => {
             compareExpectedAndActualTokens(expectedTokenTypes, actualTokens);
@@ -159,7 +159,7 @@ public class LexerTests {
         expectedTokenTypes.Enqueue(TokenType.String);
         expectedTokenTypes.Enqueue(TokenType.String);
         
-        Queue<Token> actualTokens = Compiler.dumpLex(programFilePath);
+        Queue<Token> actualTokens = Compiler.lex(programFilePath);
         
         Assert.DoesNotThrow(() => {
             compareExpectedAndActualTokens(expectedTokenTypes, actualTokens);

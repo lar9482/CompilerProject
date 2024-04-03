@@ -11,7 +11,8 @@ using CompilerProj.Visitors;
  */
 public abstract class TypeChecker : ASTVisitor {
     protected Context context;
-    protected List<string> errorMsgs;
+    
+    public List<string> errorMsgs;
 
     public TypeChecker() {
         this.context = new Context();
