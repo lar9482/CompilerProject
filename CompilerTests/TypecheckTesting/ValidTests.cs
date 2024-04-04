@@ -108,7 +108,7 @@ public class ValidTypecheckTests {
 
     [Test]
     public void test_simplesearch() {
-        string filePath = "../../../TypecheckTesting/ValidTests/binsearch.prgm";
+        string filePath = "../../../TypecheckTesting/ValidTests/simplesearch.prgm";
         ensureNoTypecheckErrors(filePath);
     }
 }
