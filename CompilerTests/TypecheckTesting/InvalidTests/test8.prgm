@@ -1,0 +1,8 @@
+
+spam() {
+    eggs: int = 0;
+
+    if (eggs == 0) {
+        return 0;
+    }
+}

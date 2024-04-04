@@ -75,7 +75,7 @@ public sealed class TypecheckerP3 : TypeChecker {
         if (blockType.TypeTag == "unit" && symbolReturn.returnTypes.Length > 0) {
             errorMsgs.Add(
                 String.Format(
-                    "{0}:{1} SemanticError: A terminate type was expected. Not all paths in {2} will return something.",
+                    "{0}:{1} SemanticError: Not all code paths in {2} will return something.",
                     function.lineNumber, function.columnNumber, function.name
                 )
             );
@@ -84,7 +84,7 @@ public sealed class TypecheckerP3 : TypeChecker {
         if (blockType.TypeTag == "terminate" && symbolReturn.returnTypes.Length == 0) {
             errorMsgs.Add(
                 String.Format(
-                    "{0}:{1} SemanticError: A unit type was expected. There exists a path in {2} that returns something, when that's not allowed.",
+                    "{0}:{1} SemanticError: There exists a code path in {2} that returns something, when that's not allowed.",
                     function.lineNumber, function.columnNumber, function.name
                 )
             );

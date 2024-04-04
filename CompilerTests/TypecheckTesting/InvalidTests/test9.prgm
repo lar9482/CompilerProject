@@ -1,0 +1,24 @@
+
+brian(): int {
+    mrBeast: int = 0;
+
+    return;
+}
+
+life(): bool {
+    
+}
+
+spam() {
+    eggs: int = 0;
+    
+    while (eggs) {
+        montyPython: bool = eggs;
+    }
+
+    if (eggs == true) {
+        return 0;
+    } else {
+        return true;
+    }
+}

@@ -64,4 +64,16 @@ public class InvalidTypecheckTests {
         string filePath = "../../../TypecheckTesting/InvalidTests/test7.prgm";
         ensureSomeTypecheckErrors(filePath);
     }
+
+    [Test]
+    public void invalidTest8() {
+        string filePath = "../../../TypecheckTesting/InvalidTests/test8.prgm";
+        ensureSomeTypecheckErrors(filePath);
+    }
+
+    [Test]
+    public void invalidTest9() {
+        string filePath = "../../../TypecheckTesting/InvalidTests/test9.prgm";
+        ensureSomeTypecheckErrors(filePath);
+    }
 }

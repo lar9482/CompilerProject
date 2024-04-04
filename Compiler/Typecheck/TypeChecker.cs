@@ -780,9 +780,10 @@ public abstract class TypeChecker : ASTVisitor {
         if (symbolReturn.returnTypes.Length != returnStmt.returnValues.Count) {
             errorMsgs.Add(
                 String.Format(
-                    "{0}:{1} SemanticError: The number of expressions being returned " +
-                    "does not match the number of expected expressions",
-                    returnStmt.lineNumber, returnStmt.columnNumber
+                    "{0}:{1} SemanticError: The number of expressions, {2}, being returned " +
+                    "does not match the number of expected expressions, {3}",
+                    returnStmt.lineNumber, returnStmt.columnNumber,
+                    returnStmt.returnValues.Count, symbolReturn.returnTypes.Length
                 )
             );
             returnStmt.type = new TerminateType();
