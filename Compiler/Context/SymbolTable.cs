@@ -24,6 +24,15 @@ public sealed class SymbolTable {
         if (table.TryGetValue(identifier, out symbol)) {
             if (symbol is T specifiedSymbol) {
                 return specifiedSymbol;
+            } else {
+                throw new Exception(
+                    String.Format(
+                        "Symbol type of {0} was expected to be {1}, but it is actually {2}",
+                        identifier,
+                        typeof(T).ToString(),
+                        symbol.GetType().ToString()
+                    )
+                );
             }
         }
 
