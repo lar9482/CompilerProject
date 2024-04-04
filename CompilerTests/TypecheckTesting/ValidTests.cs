@@ -59,6 +59,12 @@ public class ValidTypecheckTests {
     }
 
     [Test]
+    public void validTest8() {
+        string filePath = "../../../TypecheckTesting/ValidTests/test8.prgm";
+        ensureNoTypecheckErrors(filePath);
+    }
+
+    [Test]
     public void test_3np1() {
         string filePath = "../../../TypecheckTesting/ValidTests/3np1.prgm";
         ensureNoTypecheckErrors(filePath);

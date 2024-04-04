@@ -1,0 +1,61 @@
+:global
+globalArray1: int[] = {0, 1, 2};
+
+:global
+globalArray2: int[10 * 10];
+
+:global
+globalArray3: bool[] = {true, false, true};
+
+:global
+globalArray4: bool[10 * 10];
+
+procedureCall() {
+    println("Hello World");
+}
+
+foo(x: int, y: int): int, bool {
+    a: int = 0 + 1 + 2;
+    b: int, c: int = 0, 0;
+
+    b = 0;
+
+    if (a == 3) {
+        println(unparseInt(a));
+    } else if (b == 0 && c == 0) {
+        println(unparseInt(b));
+        println(unparseInt(c));
+    }
+
+    return (10 + 2) * 1 * (6 / 2), true && false;
+}
+
+bar(x: bool, y: bool): int, int {
+    while (x != true) {
+
+    }
+    return 0, 0;
+}
+
+spam(): int {
+    array1: int[][] = {
+        {0, 1, 2},
+        {3, 4, 5}
+    };
+
+    array2: int[] = {0, 1, 2};
+
+    array1[0][1] = 0;
+    array2[0] = 0;
+
+    return 0;
+}
+
+main(args: int[][]) {
+    
+    a: int, b: bool = foo(args[0][0], 0);
+    a, b = foo(args[0][0], 0);
+    a, b = 0, true;
+
+    procedureCall();
+}
