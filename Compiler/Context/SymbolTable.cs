@@ -19,11 +19,15 @@ public sealed class SymbolTable {
         table.Add(identifier, symbol);
     }
 
-    public Symbol? lookup(string identifier) {
+    public T? lookup<T>(string identifier) where T : Symbol{
         Symbol? symbol;
-        table.TryGetValue(identifier, out symbol);
-        
-        return symbol;
+        if (table.TryGetValue(identifier, out symbol)) {
+            if (symbol is T specifiedSymbol) {
+                return specifiedSymbol;
+            }
+        }
+
+        return null;
     }
 
     public void removeIdentifier(string identifier) {

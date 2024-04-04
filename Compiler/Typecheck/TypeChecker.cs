@@ -28,7 +28,7 @@ public abstract class TypeChecker : ASTVisitor {
     public abstract void visit(MultiDimArrayDeclAST multiDimArray);
 
     protected void initializeVarDecl(VarDeclAST varDecl) {
-        if (context.lookup(varDecl.name) != null) {
+        if (context.lookup<SymbolVariable>(varDecl.name) != null) {
             errorMsgs.Add(
                 String.Format(
                     "{0}:{1} SemanticError: {2} exists already.", 
@@ -46,7 +46,7 @@ public abstract class TypeChecker : ASTVisitor {
     }
 
     protected void checkVarDecl(VarDeclAST varDecl) {
-        SymbolVariable varSymbol = (SymbolVariable) lookUpSymbolFromContext(
+        SymbolVariable varSymbol = lookUpSymbolFromContext<SymbolVariable>(
             varDecl.name, varDecl.lineNumber, varDecl.columnNumber
         );
 
@@ -71,7 +71,7 @@ public abstract class TypeChecker : ASTVisitor {
 
     protected void initializeMultiVarDecl(MultiVarDeclAST multiVarDecl) {
         foreach(KeyValuePair<string, PrimitiveType> nameAndType in multiVarDecl.declTypes) {
-            if (context.lookup(nameAndType.Key) != null) {
+            if (context.lookup<SymbolVariable>(nameAndType.Key) != null) {
                 errorMsgs.Add(
                     String.Format(
                         "{0}:{1} SemanticError:{2} exists already.", 
@@ -92,7 +92,7 @@ public abstract class TypeChecker : ASTVisitor {
 
     protected void checkMultiVarDecl(MultiVarDeclAST multiVarDecl) {
         foreach(string varName in multiVarDecl.names) {
-            SymbolVariable varSymbol = (SymbolVariable) lookUpSymbolFromContext(
+            SymbolVariable varSymbol = lookUpSymbolFromContext<SymbolVariable>(
                 varName, multiVarDecl.lineNumber, multiVarDecl.columnNumber
             );
 
@@ -119,7 +119,7 @@ public abstract class TypeChecker : ASTVisitor {
 
     protected void initializeMultiVarDeclCall(MultiVarDeclCallAST multiVarDeclCall) {
         foreach(KeyValuePair<string, PrimitiveType> nameAndType in multiVarDeclCall.declTypes) {
-            if (context.lookup(nameAndType.Key) != null) {
+            if (context.lookup<SymbolVariable>(nameAndType.Key) != null) {
                 errorMsgs.Add(
                     String.Format(
                         "{0}:{1} SemanticError: {2} exists already.", 
@@ -139,7 +139,7 @@ public abstract class TypeChecker : ASTVisitor {
     }
 
     protected void checkMultiVarDeclCall(MultiVarDeclCallAST multiVarDeclCall) {
-        SymbolFunction symbolFunction = (SymbolFunction) lookUpSymbolFromContext(
+        SymbolFunction symbolFunction = lookUpSymbolFromContext<SymbolFunction>(
             multiVarDeclCall.functionCall.functionName,
             multiVarDeclCall.lineNumber, multiVarDeclCall.columnNumber
         );
@@ -156,7 +156,7 @@ public abstract class TypeChecker : ASTVisitor {
         }
         for (int i = 0; i < multiVarDeclCall.names.Count; i++) {
             string varName = multiVarDeclCall.names[i];
-            SymbolVariable symbolVar = (SymbolVariable) lookUpSymbolFromContext(
+            SymbolVariable symbolVar = lookUpSymbolFromContext<SymbolVariable>(
                 varName, multiVarDeclCall.lineNumber, multiVarDeclCall.columnNumber
             );
 
@@ -206,7 +206,7 @@ public abstract class TypeChecker : ASTVisitor {
     }
 
     protected void initializeArrayDecl(ArrayDeclAST array) {
-        if (context.lookup(array.name) != null) {
+        if (context.lookup<SymbolVariable>(array.name) != null) {
             errorMsgs.Add(
                 String.Format(
                     "{0}:{1} SemanticError: {2} exists already.", 
@@ -244,7 +244,7 @@ public abstract class TypeChecker : ASTVisitor {
             return;
         }
 
-        SymbolVariable symbolVar = (SymbolVariable) lookUpSymbolFromContext(
+        SymbolVariable symbolVar = lookUpSymbolFromContext<SymbolVariable>(
             array.name, array.lineNumber, array.columnNumber
         );
 
@@ -281,7 +281,7 @@ public abstract class TypeChecker : ASTVisitor {
     }
 
     protected void initializeMultiDimArrayDecl(MultiDimArrayDeclAST multiDimArray) {
-        if (context.lookup(multiDimArray.name) != null) {
+        if (context.lookup<SymbolVariable>(multiDimArray.name) != null) {
             errorMsgs.Add(
                 String.Format(
                     "{0}:{1} SemanticError: {2} exists already.", 
@@ -330,7 +330,7 @@ public abstract class TypeChecker : ASTVisitor {
             return;
         }
 
-        SymbolVariable symbolVar = (SymbolVariable) lookUpSymbolFromContext(
+        SymbolVariable symbolVar = lookUpSymbolFromContext<SymbolVariable>(
             multiDimArray.name, multiDimArray.lineNumber, multiDimArray.columnNumber
         );
 
@@ -370,7 +370,7 @@ public abstract class TypeChecker : ASTVisitor {
     }
 
     protected void initializeFunction(FunctionAST function) {
-        if (context.lookup(function.name) != null) {
+        if (context.lookup<SymbolFunction>(function.name) != null) {
             errorMsgs.Add(
                 String.Format(
                     "{0}:{1} SemanticError: {2} exists already.",
@@ -396,7 +396,7 @@ public abstract class TypeChecker : ASTVisitor {
     }
 
     public void visit(ParameterAST parameter) { 
-        if (context.lookup(parameter.name) != null) {
+        if (context.lookup<SymbolVariable>(parameter.name) != null) {
             errorMsgs.Add(
                 String.Format(
                     "{0}:{1} SemanticError: {2} exists already.",
@@ -646,7 +646,7 @@ public abstract class TypeChecker : ASTVisitor {
     }
 
     public void visit(MultiAssignCallAST multiAssignCall) { 
-        SymbolFunction symbolFunction = (SymbolFunction) lookUpSymbolFromContext(
+        SymbolFunction symbolFunction = lookUpSymbolFromContext<SymbolFunction>(
             multiAssignCall.call.functionName, multiAssignCall.lineNumber, multiAssignCall.columnNumber
         );
 
@@ -760,7 +760,7 @@ public abstract class TypeChecker : ASTVisitor {
     }
 
     public void visit(ReturnAST returnStmt) { 
-        SymbolReturn symbolReturn = (SymbolReturn) lookUpSymbolFromContext(
+        SymbolReturn symbolReturn = lookUpSymbolFromContext<SymbolReturn>(
             "return", returnStmt.lineNumber, returnStmt.columnNumber
         );
         
@@ -813,7 +813,7 @@ public abstract class TypeChecker : ASTVisitor {
     }
 
     public void visit(ProcedureCallAST procedureCall) { 
-        SymbolFunction symbolFunction = (SymbolFunction) lookUpSymbolFromContext(
+        SymbolFunction symbolFunction = lookUpSymbolFromContext<SymbolFunction>(
             procedureCall.procedureName, procedureCall.lineNumber, procedureCall.columnNumber
         );
 
@@ -1029,7 +1029,7 @@ public abstract class TypeChecker : ASTVisitor {
     }
 
     public void visit(VarAccessAST varAccess) { 
-        SymbolVariable symbol = (SymbolVariable) lookUpSymbolFromContext(
+        SymbolVariable symbol = lookUpSymbolFromContext<SymbolVariable>(
             varAccess.variableName, varAccess.lineNumber, varAccess.columnNumber
         );
 
@@ -1040,7 +1040,7 @@ public abstract class TypeChecker : ASTVisitor {
     public void visit(ArrayAccessAST arrayAccess) { 
         arrayAccess.accessValue.accept(this);
 
-        SymbolVariable symbol = (SymbolVariable) lookUpSymbolFromContext(
+        SymbolVariable symbol = lookUpSymbolFromContext<SymbolVariable>(
             arrayAccess.arrayName, arrayAccess.lineNumber, arrayAccess.columnNumber
         );
 
@@ -1068,7 +1068,7 @@ public abstract class TypeChecker : ASTVisitor {
     public void visit(MultiDimArrayAccessAST multiDimArrayAccess) { 
         multiDimArrayAccess.firstIndex.accept(this);
         multiDimArrayAccess.secondIndex.accept(this);
-        SymbolVariable symbol = (SymbolVariable) lookUpSymbolFromContext(
+        SymbolVariable symbol = lookUpSymbolFromContext<SymbolVariable>(
             multiDimArrayAccess.arrayName, multiDimArrayAccess.lineNumber, multiDimArrayAccess.columnNumber
         );
 
@@ -1107,7 +1107,7 @@ public abstract class TypeChecker : ASTVisitor {
     }
 
     public void visit(FunctionCallAST functionCall) { 
-        SymbolFunction symbol = (SymbolFunction) lookUpSymbolFromContext(
+        SymbolFunction symbol = lookUpSymbolFromContext<SymbolFunction>(
             functionCall.functionName, functionCall.lineNumber, functionCall.columnNumber
         );
 
@@ -1167,8 +1167,8 @@ public abstract class TypeChecker : ASTVisitor {
         strLiteral.type = new ArrayType<PrimitiveType>(new IntType());
     }
 
-    protected Symbol lookUpSymbolFromContext(string identifier, int lineNum, int colNum) {
-        Symbol? symbol = context.lookup(identifier);
+    protected T lookUpSymbolFromContext<T>(string identifier, int lineNum, int colNum) where T : Symbol {
+        T? symbol = context.lookup<T>(identifier);
         if (symbol == null) {
             throw new Exception(
                 String.Format(

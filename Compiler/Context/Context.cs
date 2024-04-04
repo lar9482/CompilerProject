@@ -20,11 +20,11 @@ public sealed class Context {
         this.environment = new Stack<SymbolTable>();
     }
 
-    public Symbol? lookup(string identifier) {
+    public T? lookup<T>(string identifier) where T : Symbol {
         SymbolTable? currTable = environment.Peek();
-        Symbol? symbol = null;
+        T? symbol = null;
         while (currTable != null) {
-            symbol = currTable.lookup(identifier);
+            symbol = currTable.lookup<T>(identifier);
             if (symbol != null) {
                 return symbol;
             }
