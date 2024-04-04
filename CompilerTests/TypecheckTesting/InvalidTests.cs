@@ -11,7 +11,6 @@ public class InvalidTypecheckTests {
         try {
             Compiler.typecheck(filePath);
         } catch (Exception e) {
-            Console.WriteLine();
             string errorMsg = e.Message;
             bool isSemanticError = errorMsg.Contains("SemanticError");
 

@@ -959,12 +959,19 @@ public sealed class Parser {
     }
 
     /*
-     * <ProcedureCall > ::= <identifier> ‘(’ ⟨ExprList⟩ ‘)’ `;'
+     * <ProcedureCall > ::= <identifier> ‘(’ ⟨ExprList⟩? ‘)’ `;'
      */
     private ProcedureCallAST parseProcedureCall(Token identifier) {
         consume(TokenType.startParen);
 
-        List<ExprAST> parameters = parseExprList();
+        List<ExprAST> parameters;
+
+        //Case when there are no expressions passed in.
+        if (tokenQueue.Peek().type == TokenType.endParen) {
+            parameters = new List<ExprAST>();
+        } else {
+            parameters = parseExprList();
+        }
 
         consume(TokenType.endParen);
         consume(TokenType.semicolon);
@@ -1182,7 +1189,6 @@ public sealed class Parser {
         return exprParser.parseByShuntingYard();
     }
     
-
     private Token consume(TokenType currTokenType) {
         Token expectedToken = tokenQueue.Peek();
         if (expectedToken.type == currTokenType) {
