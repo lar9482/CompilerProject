@@ -6,18 +6,19 @@ public class DummyClass {
 
 public class ASTVisitorGenericImplemented : ASTVisitorGeneric {
 
-    private T checkType<T, U>(U type) {
-        if (type is T specifiedType) {
+    private ExpectedType matchingType<ExpectedType, ActualType>(ActualType type) {
+        if (type is ExpectedType specifiedType) {
             return specifiedType;
         } else {
             throw new Exception();
         }
     }
+    
     // Top level nodes
     public T visit<T>(ProgramAST program) { 
         DummyClass test = new DummyClass();
 
-        return checkType<T, DummyClass>(test);
+        return matchingType<T, DummyClass>(test);
     }
     public T visit<T>(VarDeclAST varDecl) { throw new NotImplementedException(); }
     public T visit<T>(MultiVarDeclAST multiVarDecl) { throw new NotImplementedException(); }
