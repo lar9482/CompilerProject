@@ -1,0 +1,3 @@
+[submodule "Simulator"]
+	path = Simulator
+	url = https://github.com/lar9482/AssemblySimulator

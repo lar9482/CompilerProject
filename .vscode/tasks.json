@@ -1,6 +1,8 @@
 {
     "version": "2.0.0",
     "tasks": [
+
+        //Tools for Debugging the compiler
         {
             "label": "CompilerTests",
             "type": "shell",
@@ -12,7 +14,7 @@
             "group": "build"
         },
         {
-            "label": "build",
+            "label": "buildCompiler",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -25,7 +27,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "publish",
+            "label": "publishCompiler",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -37,7 +39,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "watch",
+            "label": "watchCompiler",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -45,6 +47,45 @@
                 "run",
                 "--project",
                 "${workspaceFolder}/Compiler.sln"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+
+        //Tools for Debugging the assembly simulator
+        {
+            "label": "buildSimulator",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/Simulator/Simulator.sln",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+            ],
+            // "dependsOn": "CompilerTests",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "publishSimulator",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish",
+                "${workspaceFolder}/Simulator/Simulator.sln",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "watchSimulator",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "watch",
+                "run",
+                "--project",
+                "${workspaceFolder}/Simulator/Simulator.sln"
             ],
             "problemMatcher": "$msCompile"
         }
