@@ -4,7 +4,7 @@ using CompilerProj.Visitors;
  * Making in-order traversals from the expression AST to see if they were parsed correctly.
  * This will convert expressions trees back into their original form(without parenthesis).
  */
-internal class ExprVisitor : ASTVisitor {
+internal class ExprVisitor : ASTVisitorVoid {
     public Queue<string> traverseRecord;
 
     public ExprVisitor() {

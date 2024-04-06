@@ -2,7 +2,7 @@ using CompilerProj.Visitors;
 
 namespace CompilerProj.AST;
 
-public abstract class NodeAST : ASTVisitorAccept {
+public abstract class NodeAST : ASTVisitorVoidAccept, ASTVisitorGenericAccept {
     public int lineNumber;
     public int columnNumber;
 
@@ -11,5 +11,6 @@ public abstract class NodeAST : ASTVisitorAccept {
         this.columnNumber = columnNumber;
     }
 
-    public abstract void accept(ASTVisitor visitor);
+    public abstract void accept(ASTVisitorVoid visitor);
+    public abstract T accept<T>(ASTVisitorGeneric visitor);
 }

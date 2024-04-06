@@ -20,7 +20,11 @@ public sealed class VarDeclAST : DeclAST {
         this.declType = declType;
     }
 
-    public override void accept(ASTVisitor visitor) {
+    public override void accept(ASTVisitorVoid visitor) {
         visitor.visit(this);
+    }
+
+    public override T accept<T>(ASTVisitorGeneric visitor) {
+        return visitor.visit<T>(this);
     }
 }

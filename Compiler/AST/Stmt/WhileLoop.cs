@@ -14,7 +14,11 @@ public sealed class WhileLoopAST : StmtAST {
         this.body = body;
     }
 
-    public override void accept(ASTVisitor visitor) {
+    public override void accept(ASTVisitorVoid visitor) {
         visitor.visit(this);
+    }
+
+    public override T accept<T>(ASTVisitorGeneric visitor) {
+        return visitor.visit<T>(this);
     }
 }
