@@ -19,7 +19,11 @@ public sealed class StrLiteralAST : ExprAST {
         this.type = new ArrayType<IntType>(new IntType());
     }
 
-    public override void accept(ASTVisitor visitor) {
+    public override void accept(ASTVisitorVoid visitor) {
         visitor.visit(this);
+    }
+
+    public override T accept<T>(ASTVisitorGeneric visitor) {
+        return visitor.visit<T>(this);
     }
 }

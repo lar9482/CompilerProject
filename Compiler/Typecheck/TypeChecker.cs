@@ -9,7 +9,7 @@ using CompilerProj.Visitors;
  * However, the order for typechecking declarations, functions, and the program
  * is different per pass.
  */
-public abstract class TypeChecker : ASTVisitor {
+public abstract class TypeChecker : ASTVisitorVoid {
     protected Context context;
     
     public List<string> errorMsgs;

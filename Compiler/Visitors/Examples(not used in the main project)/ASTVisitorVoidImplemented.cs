@@ -1,6 +1,6 @@
 using CompilerProj.Visitors;
 
-public sealed class ASTVisitorImplemented : ASTVisitor {
+public sealed class ASTVisitorImplemented : ASTVisitorVoid {
     public void visit(ProgramAST program) { }
     public void visit(VarDeclAST varDecl) { }
     public void visit(MultiVarDeclAST multiVarDecl) { }

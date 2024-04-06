@@ -19,7 +19,11 @@ public sealed class MultiVarDeclAST : DeclAST {
         this.declTypes = declTypes;
     }
 
-    public override void accept(ASTVisitor visitor) {
+    public override void accept(ASTVisitorVoid visitor) {
         visitor.visit(this);
+    }
+
+    public override T accept<T>(ASTVisitorGeneric visitor) {
+        return visitor.visit<T>(this);
     }
 }

@@ -2,7 +2,7 @@ using CompilerProj.AST;
 
 namespace CompilerProj.Visitors;
 
-public interface ASTVisitor {
+public interface ASTVisitorVoid {
     // Top level nodes
     public void visit(ProgramAST program);
     public void visit(VarDeclAST varDecl);

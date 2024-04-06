@@ -5,7 +5,7 @@ using CompilerProj.Visitors;
  * Traversing the AST, while ignoring the expressions. These are
  * tested separately in ExprVisitor.cs
  */
-internal class TopLvlVisitor : ASTVisitor {
+internal class TopLvlVisitor : ASTVisitorVoid {
     public Queue<string> traversalRecord;
 
     public TopLvlVisitor() {
