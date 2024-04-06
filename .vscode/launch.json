@@ -8,11 +8,11 @@
             "name": "Debug Runtime",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "buildSimulator",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/Runtime/bin/Debug/net8.0/Runtime.dll",
+            "program": "${workspaceFolder}/Simulator/Runtime/bin/Debug/net8.0/Runtime.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/Runtime",
+            "cwd": "${workspaceFolder}/Simulator/Runtime",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "internalConsole",
             "stopAtEntry": false
@@ -24,7 +24,7 @@
             "name": "Debug Compiler",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "buildCompiler",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/Compiler/bin/Debug/net8.0/Compiler.dll",
             "args": [],
