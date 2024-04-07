@@ -1,8 +1,8 @@
 using CompilerProj.Visitors;
 
 public sealed class UnaryExprAST : ExprAST {
-    public ExprAST operand;
-    public UnaryExprType exprType;
+    public readonly ExprAST operand;
+    public readonly UnaryExprType exprType;
 
     public UnaryExprAST(
         ExprAST operand,

@@ -1,8 +1,8 @@
 using CompilerProj.Visitors;
 
 public sealed class AssignAST : StmtAST{
-    public VarAccessAST variable;
-    public ExprAST value;
+    public readonly VarAccessAST variable;
+    public readonly ExprAST value;
 
     public AssignAST (
         VarAccessAST variable,

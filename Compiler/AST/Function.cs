@@ -4,11 +4,10 @@ using CompilerProj.Visitors;
 using CompilerProj.Context;
 
 public sealed class FunctionAST : NodeAST {
-    public string name;
-    public List<ParameterAST> parameters;
-    public List<SimpleType> returnTypes;
-    
-    public BlockAST block;
+    public readonly string name;
+    public readonly List<ParameterAST> parameters;
+    public readonly List<SimpleType> returnTypes; 
+    public readonly BlockAST block;
 
     public SymbolTable? scope;
     

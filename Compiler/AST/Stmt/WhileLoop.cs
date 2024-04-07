@@ -1,8 +1,8 @@
 using CompilerProj.Visitors;
 
 public sealed class WhileLoopAST : StmtAST {
-    public ExprAST condition;
-    public BlockAST body;
+    public readonly ExprAST condition;
+    public readonly BlockAST body;
 
     public WhileLoopAST(
         ExprAST condition,

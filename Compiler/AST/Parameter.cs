@@ -3,7 +3,7 @@ using CompilerProj.Types;
 using CompilerProj.Visitors;
 
 public sealed class ParameterAST : NodeAST {
-    public string name;
+    public readonly string name;
     public SimpleType type;
     
     public ParameterAST(

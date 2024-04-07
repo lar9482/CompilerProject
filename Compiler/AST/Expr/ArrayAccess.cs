@@ -2,8 +2,8 @@ using CompilerProj.Visitors;
 
 public sealed class ArrayAccessAST : ExprAST {
 
-    public string arrayName;
-    public ExprAST accessValue;
+    public readonly string arrayName;
+    public readonly ExprAST accessValue;
 
     public ArrayAccessAST(
         string arrayName,

@@ -1,7 +1,7 @@
 using CompilerProj.Visitors;
 
 public sealed class ReturnAST : StmtAST {
-    public List<ExprAST>? returnValues;
+    public readonly List<ExprAST>? returnValues;
 
     public ReturnAST(
         List<ExprAST>? returnValues,

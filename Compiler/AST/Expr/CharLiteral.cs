@@ -2,8 +2,8 @@ using CompilerProj.Types;
 using CompilerProj.Visitors;
 
 public class CharLiteralAST : ExprAST {
-    public char charValue;
-    public int asciiValue;
+    public readonly char charValue;
+    public readonly int asciiValue;
 
     public CharLiteralAST(
         char charValue,

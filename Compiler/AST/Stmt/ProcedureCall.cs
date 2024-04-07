@@ -4,8 +4,8 @@ using CompilerProj.Visitors;
  * A function that will not return anything.
  */
 public sealed class ProcedureCallAST : StmtAST {
-    public string procedureName;
-    public List<ExprAST> args;
+    public readonly string procedureName;
+    public readonly List<ExprAST> args;
 
     public ProcedureCallAST(
         string procedureName,
