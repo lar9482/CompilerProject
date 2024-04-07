@@ -1,8 +1,8 @@
 using CompilerProj.Visitors;
 
 public sealed class ArrayAssignAST : StmtAST{
-    public ArrayAccessAST arrayAccess;
-    public ExprAST value;
+    public readonly ArrayAccessAST arrayAccess;
+    public readonly ExprAST value;
 
     public ArrayAssignAST (
         ArrayAccessAST arrayAccess,

@@ -2,7 +2,7 @@ using CompilerProj.Visitors;
 
 public sealed class VarAccessAST : ExprAST {
 
-    public string variableName;
+    public readonly string variableName;
 
     public VarAccessAST(
         string variableName,

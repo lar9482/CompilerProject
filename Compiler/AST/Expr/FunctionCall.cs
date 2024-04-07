@@ -4,8 +4,8 @@ using CompilerProj.Visitors;
  * A function that will return something.
  */
 public sealed class FunctionCallAST : ExprAST {
-    public string functionName;
-    public List<ExprAST> args;
+    public readonly string functionName;
+    public readonly List<ExprAST> args;
 
     public FunctionCallAST(
         string functionName,

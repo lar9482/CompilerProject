@@ -2,8 +2,8 @@ using CompilerProj.Types;
 using CompilerProj.Visitors;
 
 public sealed class StrLiteralAST : ExprAST {
-    public string value;
-    public int[] asciiValues;
+    public readonly string value;
+    public readonly int[] asciiValues;
 
     public StrLiteralAST(
         string value,

@@ -3,8 +3,8 @@ using CompilerProj.Visitors;
 using CompilerProj.Context;
 
 public sealed class ProgramAST : NodeAST {
-    public List<DeclAST> declarations;
-    public List<FunctionAST> functions;
+    public readonly List<DeclAST> declarations;
+    public readonly List<FunctionAST> functions;
 
     public SymbolTable? scope;
     

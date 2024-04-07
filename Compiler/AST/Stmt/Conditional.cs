@@ -2,11 +2,11 @@ using CompilerProj.AST;
 using CompilerProj.Visitors;
 
 public sealed class ConditionalAST : StmtAST {
-    public ExprAST ifCondition;
-    public BlockAST ifBlock;
+    public readonly ExprAST ifCondition;
+    public readonly BlockAST ifBlock;
 
-    public Dictionary<ExprAST, BlockAST>? elseIfConditionalBlocks;
-    public BlockAST? elseBlock;
+    public readonly Dictionary<ExprAST, BlockAST>? elseIfConditionalBlocks;
+    public readonly BlockAST? elseBlock;
 
     public ConditionalAST(
         ExprAST ifCondition,

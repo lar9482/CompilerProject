@@ -4,10 +4,9 @@ using CompilerProj.Context;
 using CompilerProj.Types;
 
 public sealed class BlockAST : NodeAST {
-    public List<StmtAST> statements;
+    public readonly List<StmtAST> statements;
 
     public SymbolTable? scope;
-
     public StmtType type;
 
     public BlockAST(

@@ -2,9 +2,9 @@ using CompilerProj.Visitors;
 
 public sealed class MultiDimArrayAccessAST : ExprAST {
 
-    public string arrayName;
-    public ExprAST firstIndex;
-    public ExprAST secondIndex;
+    public readonly string arrayName;
+    public readonly ExprAST firstIndex;
+    public readonly ExprAST secondIndex;
 
     public MultiDimArrayAccessAST(
         string arrayName,

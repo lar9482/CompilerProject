@@ -2,7 +2,7 @@ using CompilerProj.Types;
 using CompilerProj.Visitors;
 
 public sealed class IntLiteralAST : ExprAST {
-    public int value;
+    public readonly int value;
 
     public IntLiteralAST(
         int value,

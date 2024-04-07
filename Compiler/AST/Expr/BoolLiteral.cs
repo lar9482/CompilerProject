@@ -2,7 +2,7 @@ using CompilerProj.Types;
 using CompilerProj.Visitors;
 
 public class BoolLiteralAST : ExprAST {
-    public bool value;
+    public readonly bool value;
 
     public BoolLiteralAST(
         bool value,

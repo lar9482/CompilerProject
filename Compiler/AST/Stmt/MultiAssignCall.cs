@@ -1,8 +1,8 @@
 using CompilerProj.Visitors;
 
 public sealed class MultiAssignCallAST : StmtAST {
-    public List<VarAccessAST> variableNames;
-    public FunctionCallAST call;
+    public readonly List<VarAccessAST> variableNames;
+    public readonly FunctionCallAST call;
 
     public MultiAssignCallAST(
         List<VarAccessAST> variableNames,

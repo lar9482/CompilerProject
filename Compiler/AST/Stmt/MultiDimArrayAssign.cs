@@ -1,8 +1,8 @@
 using CompilerProj.Visitors;
 
 public sealed class MultiDimArrayAssignAST : StmtAST{
-    public MultiDimArrayAccessAST arrayAccess;
-    public ExprAST value;
+    public readonly MultiDimArrayAccessAST arrayAccess;
+    public readonly ExprAST value;
 
     public MultiDimArrayAssignAST(
         MultiDimArrayAccessAST arrayAccess,

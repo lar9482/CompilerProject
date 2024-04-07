@@ -2,7 +2,7 @@ using CompilerProj.Visitors;
 
 public sealed class MultiAssignAST : StmtAST{
 
-    public Dictionary<VarAccessAST, ExprAST> assignments;
+    public readonly Dictionary<VarAccessAST, ExprAST> assignments;
 
     public MultiAssignAST (
         Dictionary<VarAccessAST, ExprAST> assignments,
