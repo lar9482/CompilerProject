@@ -4,7 +4,7 @@ using CompilerProj.Visitors;
 /** An intermediate representation for a compilation unit */
 public sealed class IRCompUnit : IRNode {
     public readonly string name;
-    public readonly Dictionary<String, IRFuncDecl> functions;
+    public readonly Dictionary<string, IRFuncDecl> functions;
     public readonly List<string> ctors;
     
     public IRCompUnit(
