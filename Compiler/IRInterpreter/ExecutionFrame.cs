@@ -27,7 +27,7 @@ public sealed class ExecutionFrame {
      * @param tempName name of the register
      * @return the value at the given register
      */
-    public int get(string tempName) {
+    public int getValueFromReg(string tempName) {
         if (!regs.ContainsKey(tempName)) {
             /* Referencing a temp before having written to it - initialize
             with garbage */
@@ -65,8 +65,8 @@ public sealed class ExecutionFrame {
         this.IP = IP;
     }
 
-    public IRNode getCurrentInsn(Dictionary<int, IRNode> indexToInst) {
-        IRNode inst = indexToInst[IP];
+    public IRNode getCurrentInsn(Dictionary<int, IRNode> addressToInsn) {
+        IRNode inst = addressToInsn[IP];
         if (inst == null) throw new Exception("No next instruction.  Forgot RETURN?");
         return inst;
     }

@@ -1,4 +1,5 @@
 using CompilerProj.IR;
+using CompilerProj.Visitors;
 
 /** An intermediate representation for a compilation unit */
 public sealed class IRCompUnit : IRNode {
@@ -14,5 +15,13 @@ public sealed class IRCompUnit : IRNode {
         this.name = name;
         this.functions = functions;
         this.ctors = ctors;
+    }
+
+    public override void accept(IRVisitorVoid visitor) {
+        visitor.visit(this);
+    }
+
+    public override T accept<T>(IRVisitorGeneric visitor) {
+        return visitor.visit<T>(this);
     }
 } 

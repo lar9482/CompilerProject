@@ -1,3 +1,4 @@
+using CompilerProj.Visitors;
 
 /**
  * An intermediate representation for a conditional transfer of control CJUMP(expr, trueLabel,
@@ -11,5 +12,13 @@ public sealed class IRCJump : IRStmt {
         this.cond = cond;
         this.trueLabel = trueLabel;
         this.falseLabel = falseLabel;
+    }
+
+    public override void accept(IRVisitorVoid visitor) {
+        visitor.visit(this);
+    }
+
+    public override T accept<T>(IRVisitorGeneric visitor) {
+        return visitor.visit<T>(this);
     }
 }
