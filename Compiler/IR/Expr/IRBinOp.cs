@@ -1,3 +1,4 @@
+using CompilerProj.Visitors;
 
 /** An intermediate representation for a binary operation BINOP(left, right) */
 public sealed class IRBinOp : IRExpr {
@@ -9,6 +10,14 @@ public sealed class IRBinOp : IRExpr {
         this.opType = type;
         this.left = left;
         this.right = right;
+    }
+
+    public override void accept(IRVisitorVoid visitor) {
+        visitor.visit(this);
+    }
+
+    public override T accept<T>(IRVisitorGeneric visitor) {
+        return visitor.visit<T>(this);
     }
 }
 
