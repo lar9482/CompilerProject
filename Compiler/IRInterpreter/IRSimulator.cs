@@ -13,8 +13,6 @@ using CompilerProj.IRInterpreter.ExprStack;
  */
 public sealed class IRSimulator {
     private Random r = new Random();
-
-    private IRConfiguration configuration;
     private IRCompUnit compUnit;
 
     /** map from address to instruction */
@@ -142,6 +140,7 @@ public sealed class IRSimulator {
      * @return the value at {@code addr}
      */
     public int read(int addr) {
+        if (addr < 0) throw new Exception("Attempting to read negative addresses. Invalid");
         if (addr % IRConfiguration.wordSize != 0)
             throw new Exception(
                 String.Format(
@@ -168,6 +167,7 @@ public sealed class IRSimulator {
      * @param value the value to be written
      */
     public void store(int addr, int value) {
+        if (addr < 0) throw new Exception("Attempting to read negative addresses. Invalid");
         if (addr % IRConfiguration.wordSize != 0)
             throw new Exception(
                 String.Format(
@@ -184,4 +184,6 @@ public sealed class IRSimulator {
         mem[addr+2] = valueBytes[2];
         mem[addr+3] = valueBytes[3];
     }
+
+    
 }
