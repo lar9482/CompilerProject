@@ -112,6 +112,7 @@ public sealed class InsnMapBuilder : IRVisitorVoid {
 
     public void visit(IRMem mem) { 
         mem.expr.accept(this);
+        addInsn(mem);
     }
 
     public void visit(IRName name) { 
