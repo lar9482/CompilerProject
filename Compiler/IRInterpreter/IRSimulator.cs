@@ -226,6 +226,7 @@ public sealed class IRSimulator {
                 return ret[0];
             }
         } else {
+            // TODO: FINISH CALLING FUNCTIONS DEFINED IN PROGRAM.
             IRFunctionCall(parentFunction, name, args);
         }
         return 0;
@@ -290,15 +291,76 @@ public sealed class IRSimulator {
 
     private void interpretInsn(ExecutionFrame frame, IRNode insn) {
         switch(insn) {
-            case IRFuncDecl funcDecl:
-                interpretInsn(frame, funcDecl.body);
+            case IRConst irConst:
+                exprStack.pushValue(irConst.value);
                 break;
-            case IRSeq seq:
-                foreach(IRStmt stmt in seq.statements) {
-                    interpretInsn(frame, stmt);
-                }
+            case IRTemp irTemp:
+                string tempName = irTemp.name;
+                exprStack.pushTemp(frame.getValueFromReg(tempName), tempName);
+                break;
+            case IRBinOp irBinOp:
+                break;
+            case IRUnaryOp irUnaryOp:
+                break;
+            case IRMem irMem:
+                break;
+            case IRCall irCall:
+                executeIRCall(irCall, frame);
+                break;
+            case IRName irName:
+                string name = irName.name;
+                exprStack.pushName(
+                    libraryFunctions.Contains(name) ? -1 : findLabel(name),
+                    name
+                );
+                break;
+            case IRMove irMove:
+                break;
+            case IRCallStmt irCallStmt:
+                IRCall newCall = new IRCall(
+                    irCallStmt.target, irCallStmt.args
+                );
+                interpretInsn(frame, newCall);
+                exprStack.popValue();
+                break;
+            case IRExp irExp:
+                break;
+            case IRJump irJump:
+                break;
+            case IRCJump irCJump:
+                break;
+            case IRReturn irReturn:
+                break;
+            default:
                 break;
         }
         Console.WriteLine();
+    }
+
+    private void executeIRCall(IRCall irCall, ExecutionFrame frame) {
+        int argCount = irCall.args.Count;
+        int[] args = new int[argCount];
+        for (int i = argCount-1; i>=0; i--) args[i] = exprStack.popValue();
+
+        StackItem target = exprStack.pop();
+        string targetName;
+        if (target.type == StackItemType.NAME) {
+            if (target.name == null) {
+                throw new Exception("Tried to access a null name");
+            }
+            targetName = target.name;
+        } else if (addressToInsn.ContainsKey(target.value)) {
+            IRNode node = addressToInsn[target.value];
+            if (node.GetType() == typeof(IRFuncDecl)) {
+                targetName = ((IRFuncDecl) node).name;
+            } else { throw new Exception("Tried to call a non-function"); }
+        } else {
+            throw new Exception(String.Format(
+                "Invalid function call: (target {0} is unknown)", target.value
+            ));
+        }
+
+        int retVal = call(frame, targetName, args);
+        exprStack.pushValue(retVal);
     }
 }

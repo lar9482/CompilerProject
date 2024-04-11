@@ -77,6 +77,11 @@ public sealed class InsnMapBuilder : IRVisitorVoid {
     }
 
     public void visit(IRCallStmt callStmt) {
+        callStmt.target.accept(this);
+        foreach(IRExpr exprArg in callStmt.args) {
+            exprArg.accept(this);
+        }
+        
         addInsn(callStmt);
     }
 
