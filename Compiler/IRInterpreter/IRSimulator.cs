@@ -334,14 +334,15 @@ public sealed class IRSimulator {
             default:
                 break;
         }
-        Console.WriteLine();
     }
 
     private void executeIRCall(IRCall irCall, ExecutionFrame frame) {
+        // Popping the argument values from the stack.
         int argCount = irCall.args.Count;
         int[] args = new int[argCount];
         for (int i = argCount-1; i>=0; i--) args[i] = exprStack.popValue();
 
+        // Either popping the name or the address of the function to be called.
         StackItem target = exprStack.pop();
         string targetName;
         if (target.type == StackItemType.NAME) {

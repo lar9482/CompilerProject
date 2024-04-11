@@ -29,6 +29,7 @@ public sealed class InsnMapBuilder : IRVisitorVoid {
 
     public void visit(IRFuncDecl funcDecl) { 
         addNameToCurrentAddress(funcDecl.name);
+        addInsn(funcDecl);
         funcDecl.body.accept(this);
     }
 
