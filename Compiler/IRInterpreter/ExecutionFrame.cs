@@ -50,9 +50,9 @@ public sealed class ExecutionFrame {
      * Advance the instruction pointer. Since we're dealing with a tree, this is postorder
      * traversal, one step at a time, modulo jumps.
      */
-    public bool advance(IRInterpreter interpreter) {
+    public bool advance(IRSimulator simulator) {
         int backupIP = IP;
-        interpreter.leave(this);
+        simulator.executeCurrInsn(this);
 
         if (IP == -1) return false; /* RETURN */
         if (IP != backupIP) /* A jump was performed */ 
