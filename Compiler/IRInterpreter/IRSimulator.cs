@@ -65,7 +65,7 @@ public sealed class IRSimulator {
         libraryFunctions.Add("alloc");
         libraryFunctions.Add("outOfBounds"); //Helper function for eventually detecting out of bounds errors.
 
-        LabelAddressBuilder addressBuilder = new LabelAddressBuilder();
+        InsnMapBuilder addressBuilder = new InsnMapBuilder();
         addressBuilder.visit(compUnit);
 
         addressToInsn = addressBuilder.addressToInsn;
@@ -185,5 +185,120 @@ public sealed class IRSimulator {
         mem[addr+3] = valueBytes[3];
     }
 
-    
+    /**
+     * Simulate a function call, throwing away all returned values past the first All arguments to
+     * the function call are passed via registers with prefix {@link
+     * Configuration#ABSTRACT_ARG_PREFIX} and indices starting from 1.
+     *
+     * TO ACCESS MULTIPLE RETURNS, YOU MUST GET THEM FROM THE EXECUTION FRAME!!!!!
+     * @param name name of the function call
+     * @param args arguments to the function call
+     * @return the value that would be in register {@link Configuration#ABSTRACT_RET_PREFIX} index 1
+     */
+    public int call(string name, int[] args) {
+        return call(new ExecutionFrame(-1), name, args);
+    }
+
+    /**
+     * Simulate a function call. All arguments to the function call are passed via registers with
+     * prefix {@link Configuration#ABSTRACT_ARG_PREFIX} and indices starting from 1. The function
+     * call should return the results via registers with prefix {@link
+     * Configuration#ABSTRACT_RET_PREFIX} and indices starting from 1.
+     *
+     * TO ACCESS MULTIPLE RETURNS, YOU MUST GET THEM FROM THE EXECUTION FRAME!!!!!
+     * @param parent parent call frame to write _RET values to
+     * @param name name of the function call
+     * @param args arguments to the function call
+     * @return the value of register {@link Configuration#ABSTRACT_RET_PREFIX} index 1
+     */
+    public int call(ExecutionFrame parentFunction, string name, int[] args) {
+        if (libraryFunctions.Contains(name)) {
+            List<int> ret = libraryCall(name, args);
+
+            for (int i = 0; i < ret.Count; i++) {
+                parentFunction.put(
+                    IRConfiguration.ABSTRACT_RET_PREFIX + (i+1),
+                    ret[i]
+                );
+            }
+
+            if (ret.Count > 0) {
+                return ret[0];
+            }
+        } else {
+            IRFunctionCall(parentFunction, name, args);
+        }
+        return 0;
+    }
+
+    /**
+     * Simulate a library function call, returning the list of returned values
+     *
+     * @param name name of the function call
+     * @param args arguments to the function call, which may include the pointer to the location of
+     *     multiple results
+     */
+
+    private List<int> libraryCall(string name, int[] args) {
+        List<int> ret = new List<int>();
+
+        try {
+            return ret;
+        } catch (IOException e) {
+            throw new Exception(e.Message);
+        }
+    }
+
+    private void IRFunctionCall(ExecutionFrame parentFunction, string name, int[] args) {
+        IRFuncDecl irFuncDecl = compUnit.functions[name];
+
+        //Creating a new stack frame
+        int IP = findLabel(name);
+        ExecutionFrame frame = new ExecutionFrame(IP);
+
+        //Passing remaining arguments into the stack frame registers.
+        for (int i = 0; i < args.Length; i++) {
+            frame.put(
+                IRConfiguration.ABSTRACT_ARG_PREFIX + (i+1),
+                args[i]
+            );
+        }
+        //Simulate the IR execution!!!
+
+        while (frame.advance(this));
+    }
+
+    /**
+     * @param name name of the label
+     * @return the address at the named label
+     */
+    private int findLabel(string name) {
+        if (!nameToAddress.ContainsKey(name)) 
+            throw new Exception(
+                String.Format("Could not find label {0}!", name)
+            );
+        
+        return nameToAddress[name];
+    }
+
+    /*
+     * This is where the meat and potatoes of the IR is executed.
+     */
+    public void executeCurrInsn(ExecutionFrame frame) {
+        interpretInsn(frame, frame.getCurrentInsn(addressToInsn));
+    }
+
+    private void interpretInsn(ExecutionFrame frame, IRNode insn) {
+        switch(insn) {
+            case IRFuncDecl funcDecl:
+                interpretInsn(frame, funcDecl.body);
+                break;
+            case IRSeq seq:
+                foreach(IRStmt stmt in seq.statements) {
+                    interpretInsn(frame, stmt);
+                }
+                break;
+        }
+        Console.WriteLine();
+    }
 }

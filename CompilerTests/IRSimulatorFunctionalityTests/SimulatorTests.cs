@@ -9,8 +9,13 @@ public class FunctionalityTests {
     [Test]
     public void MultiReturnTest() {
         IRCompUnit compUnit = setUp_MultiReturnTest();
+        int[] args = new int[] {
+            2, 1
+        };
+
 
         IRSimulator simulator = new IRSimulator(compUnit);
+        simulator.call("b", args);
     }
 
     private IRCompUnit setUp_MultiReturnTest() {
