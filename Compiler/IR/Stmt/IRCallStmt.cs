@@ -1,7 +1,7 @@
 using CompilerProj.Visitors;
 
 /**
- * An intermediate representation for a call statement. t_1, t_2, _, t_4 = CALL(e_target, e_1, ...,
+ * An intermediate representation for a call statement. t_1, t_2, _, t_n_returns = CALL(e_target, e_1, ...,
  * e_n) where n = n_returns.
  */
 

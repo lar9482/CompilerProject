@@ -226,7 +226,6 @@ public sealed class IRSimulator {
                 return ret[0];
             }
         } else {
-            // TODO: FINISH CALLING FUNCTIONS DEFINED IN PROGRAM.
             IRFunctionCall(parentFunction, name, args);
         }
         return 0;
@@ -267,6 +266,8 @@ public sealed class IRSimulator {
         //Simulate the IR execution!!!
 
         while (frame.advance(this));
+
+        // TODO: FINISH CALLING FUNCTIONS DEFINED IN PROGRAM.
     }
 
     /**
@@ -291,38 +292,16 @@ public sealed class IRSimulator {
 
     private void interpretInsn(ExecutionFrame frame, IRNode insn) {
         switch(insn) {
-            case IRConst irConst:
-                exprStack.pushValue(irConst.value);
-                break;
-            case IRTemp irTemp:
-                string tempName = irTemp.name;
-                exprStack.pushTemp(frame.getValueFromReg(tempName), tempName);
-                break;
-            case IRBinOp irBinOp:
-                break;
-            case IRUnaryOp irUnaryOp:
-                break;
+            case IRConst irConst: executeIRConst(irConst); break;
+            case IRTemp irTemp: executeIRTemp(irTemp, frame); break;
+            case IRBinOp irBinOp: executeIRBinOp(irBinOp); break;
+            case IRUnaryOp irUnaryOp: executeIRUnaryOp(irUnaryOp); break;
             case IRMem irMem:
                 break;
-            case IRCall irCall:
-                executeIRCall(irCall, frame);
-                break;
-            case IRName irName:
-                string name = irName.name;
-                exprStack.pushName(
-                    libraryFunctions.Contains(name) ? -1 : findLabel(name),
-                    name
-                );
-                break;
-            case IRMove irMove:
-                break;
-            case IRCallStmt irCallStmt:
-                IRCall newCall = new IRCall(
-                    irCallStmt.target, irCallStmt.args
-                );
-                interpretInsn(frame, newCall);
-                exprStack.popValue();
-                break;
+            case IRCall irCall: executeIRCall(irCall, frame); break;
+            case IRName irName: executeIRName(irName); break;
+            case IRMove irMove: executeIRMove(frame); break;
+            case IRCallStmt irCallStmt: executeIRCallStmt(irCallStmt, frame); break;
             case IRExp irExp:
                 break;
             case IRJump irJump:
@@ -334,6 +313,70 @@ public sealed class IRSimulator {
             default:
                 break;
         }
+    }
+
+    /*
+     * Pushing the const onto the expr stack.
+     */
+    private void executeIRConst(IRConst irConst) {
+        exprStack.pushValue(irConst.value);
+    }
+
+    /*
+     * Pushing the temp from the execution frame to the expr stack.
+     */
+    private void executeIRTemp(IRTemp irTemp, ExecutionFrame frame) {
+        string tempName = irTemp.name;
+        exprStack.pushTemp(frame.getValueFromReg(tempName), tempName);
+    }
+
+    private void executeIRBinOp(IRBinOp binOp) {
+        int rightVal = exprStack.popValue();
+        int leftVal = exprStack.popValue();
+        int result;
+
+        switch(binOp.opType) {
+            case BinOpType.ADD: result = leftVal + rightVal; break;
+            case BinOpType.SUB: result = leftVal - rightVal; break;
+            case BinOpType.MUL: result = leftVal * rightVal; break;
+            case BinOpType.DIV: 
+                if (rightVal == 0) throw new Exception("Division by zero");
+                result = (int) (leftVal / rightVal);
+                break;
+            case BinOpType.MOD:
+                if (rightVal == 0) throw new Exception("Division by zero");
+                result = leftVal % rightVal;
+                break;
+            case BinOpType.AND: result = leftVal & rightVal; break;
+            case BinOpType.OR: result = leftVal | rightVal; break;
+            case BinOpType.XOR: result = leftVal ^ rightVal; break;
+            case BinOpType.LSHIFT: result = leftVal << rightVal; break;
+            case BinOpType.RSHIFT: result = leftVal >> rightVal; break;
+            case BinOpType.EQ: result = (leftVal == rightVal) ? 1 : 0; break;
+            case BinOpType.NEQ: result = (leftVal != rightVal) ? 1 : 0; break;
+            case BinOpType.LT: result = (leftVal < rightVal) ? 1 : 0; break;
+            case BinOpType.GT: result = (leftVal > rightVal) ? 1 : 0; break;
+            case BinOpType.LEQ: result = (leftVal <= rightVal) ? 1 : 0; break;
+            case BinOpType.GEQ: result = (leftVal >= rightVal) ? 1 : 0; break;
+            default:
+                throw new Exception("Invalid binary operation");
+        }
+
+        exprStack.pushValue(result);
+    }
+
+    private void executeIRUnaryOp(IRUnaryOp unaryOp) {
+        int value = exprStack.popValue();
+        int result;
+
+        switch(unaryOp.opType) {
+            case UnaryOpType.NOT: result = (value == 0) ? 1 : 0; break;
+            case UnaryOpType.NEGATE: result = -value; break;
+            default:
+                throw new Exception("Invalid unary operation");
+        }
+
+        exprStack.pushValue(result);
     }
 
     private void executeIRCall(IRCall irCall, ExecutionFrame frame) {
@@ -363,5 +406,43 @@ public sealed class IRSimulator {
 
         int retVal = call(frame, targetName, args);
         exprStack.pushValue(retVal);
+    }
+
+    private void executeIRName(IRName irName) {
+        string name = irName.name;
+        exprStack.pushName(
+            libraryFunctions.Contains(name) ? -1 : findLabel(name),
+            name
+        );
+    }
+
+    /*
+     * Popping the computed src and target from the expr stack, performing move, then storing the result on the frame.
+     */
+    private void executeIRMove(ExecutionFrame frame) {
+        int srcValue = exprStack.popValue();
+        StackItem targetItem = exprStack.pop();
+
+        switch(targetItem.type) {
+            case StackItemType.MEM:
+                store(targetItem.address, srcValue);
+                break;
+            case StackItemType.TEMP:
+                if (targetItem.temp == null) {
+                    throw new Exception("TEMP is Empty");
+                }
+                frame.put(targetItem.temp, srcValue);
+                break;
+            default:
+                throw new Exception("Invalid MOVE!");
+        }
+    }
+
+    private void executeIRCallStmt(IRCallStmt irCallStmt, ExecutionFrame frame) {
+        IRCall newCall = new IRCall(
+            irCallStmt.target, irCallStmt.args
+        );
+        interpretInsn(frame, newCall);
+        exprStack.popValue();
     }
 }

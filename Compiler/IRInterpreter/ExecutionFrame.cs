@@ -43,7 +43,11 @@ public sealed class ExecutionFrame {
      * @param value value to be stored
      */
     public void put(string tempName, int value) {
-        regs.Add(tempName, value);
+        if (regs.ContainsKey(tempName)) {
+            regs[tempName] = value;
+        } else {
+            regs.Add(tempName, value);
+        }
     }
     
     /**
