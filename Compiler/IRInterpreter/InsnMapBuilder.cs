@@ -49,8 +49,8 @@ public sealed class InsnMapBuilder : IRVisitorVoid {
     }
 
     public void visit(IRMove move) { 
-        move.src.accept(this);
         move.target.accept(this);
+        move.src.accept(this);
         addInsn(move);
     }
 
