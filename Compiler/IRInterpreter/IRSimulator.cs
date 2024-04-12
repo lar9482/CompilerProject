@@ -197,7 +197,11 @@ public sealed class IRSimulator {
      * @return the value that would be in register {@link Configuration#ABSTRACT_RET_PREFIX} index 1
      */
     public int call(string name, int[] args) {
-        return call(new ExecutionFrame(-1), name, args);
+        ExecutionFrame frame = new ExecutionFrame(-1);
+        int retVal = call(frame, name, args);
+
+        Console.WriteLine();
+        return retVal;
     }
 
     /**
@@ -225,11 +229,12 @@ public sealed class IRSimulator {
 
             if (ret.Count > 0) {
                 return ret[0];
+            } else {
+                return 0;
             }
         } else {
-            IRFunctionCall(parentFunction, name, args);
+            return IRFunctionCall(parentFunction, name, args);
         }
-        return 0;
     }
 
     /**
@@ -250,8 +255,15 @@ public sealed class IRSimulator {
         }
     }
 
-    private void IRFunctionCall(ExecutionFrame parentFunction, string name, int[] args) {
-        IRFuncDecl irFuncDecl = compUnit.functions[name];
+    private int IRFunctionCall(ExecutionFrame parentFunction, string name, int[] args) {
+        
+        if (!compUnit.functions.ContainsKey(name)) {
+            throw new Exception(
+                String.Format(
+                    "{0} was never declared", name
+                )
+            );
+        }
 
         //Creating a new stack frame
         int IP = findLabel(name);
@@ -264,11 +276,23 @@ public sealed class IRSimulator {
                 args[i]
             );
         }
-        //Simulate the IR execution!!!
 
+        //Simulate the IR execution!!!
         while (frame.advance(this));
-        Console.WriteLine();
-        // TODO: FINISH CALLING FUNCTIONS DEFINED IN PROGRAM.
+
+        //Send the child frame's returns to the parent.
+        for (int i = 0; i < frame.rets.Count; i++) {
+            parentFunction.put(
+                IRConfiguration.ABSTRACT_RET_PREFIX + (i+1),
+                frame.rets[i]
+            );
+        }
+
+        if (frame.rets.Count == 0) {
+            return 0;
+        } else {
+            return frame.rets[0];
+        }
     }
 
     /**
