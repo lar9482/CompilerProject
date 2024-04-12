@@ -16,6 +16,7 @@ public class FunctionalityTests {
 
         IRSimulator simulator = new IRSimulator(compUnit);
         simulator.call("b", args);
+        Console.WriteLine();
     }
 
     private IRCompUnit setUp_MultiReturnTest() {
