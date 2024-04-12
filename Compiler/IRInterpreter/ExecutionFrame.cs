@@ -9,7 +9,7 @@ public sealed class ExecutionFrame {
     private int IP;
 
     /** return values from this frame. Only used if IRReturn in this function has children*/
-    private List<int> rets;
+    public List<int> rets;
 
     /** local registers (register name -> value)*/
     private Dictionary<string, int> regs;
