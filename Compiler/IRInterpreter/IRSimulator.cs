@@ -1,3 +1,4 @@
+using System.Runtime.Versioning;
 using CompilerProj.IR;
 using CompilerProj.IRInterpreter.ExprStack;
 
@@ -266,7 +267,7 @@ public sealed class IRSimulator {
         //Simulate the IR execution!!!
 
         while (frame.advance(this));
-
+        Console.WriteLine();
         // TODO: FINISH CALLING FUNCTIONS DEFINED IN PROGRAM.
     }
 
@@ -308,8 +309,7 @@ public sealed class IRSimulator {
                 break;
             case IRCJump irCJump:
                 break;
-            case IRReturn irReturn:
-                break;
+            case IRReturn irReturn: executeIRReturn(irReturn, frame); break;
             default:
                 break;
         }
@@ -444,5 +444,20 @@ public sealed class IRSimulator {
         );
         interpretInsn(frame, newCall);
         exprStack.popValue();
+    }
+
+    private void executeIRReturn(IRReturn irReturn, ExecutionFrame frame) {
+        int argCount = irReturn.returns.Count;
+        int[] rets = new int[argCount];
+
+        for (int i = argCount-1; i>= 0; i--) {
+            rets[i] = exprStack.popValue();
+        }
+
+        for (int i = 0; i < argCount; i++) {
+            frame.rets.Add(rets[i]);
+        }
+
+        frame.setIP(-1);
     }
 }

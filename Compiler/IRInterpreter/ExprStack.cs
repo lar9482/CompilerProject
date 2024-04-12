@@ -64,6 +64,7 @@ public struct StackItem {
 
     public StackItem(int value) {
         this.type = StackItemType.COMPUTED;
+        this.value = value;
     }
 
     public StackItem(int value, int address) {
