@@ -63,7 +63,7 @@ public sealed class IRSimulator {
         libraryFunctions.Add("assert");
 
         //Support of memory on the heap
-        libraryFunctions.Add("alloc");
+        libraryFunctions.Add("malloc");
         libraryFunctions.Add("outOfBounds"); //Helper function for eventually detecting out of bounds errors.
 
         InsnMapBuilder addressBuilder = new InsnMapBuilder();
