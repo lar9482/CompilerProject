@@ -15,8 +15,9 @@ public class FunctionalityTests {
 
 
         IRSimulator simulator = new IRSimulator(compUnit);
-        simulator.call("b", args);
-        Console.WriteLine();
+        int retVal = simulator.call("b", args);
+        
+        Assert.That(retVal, Is.EqualTo(12));
     }
 
     private IRCompUnit setUp_MultiReturnTest() {
