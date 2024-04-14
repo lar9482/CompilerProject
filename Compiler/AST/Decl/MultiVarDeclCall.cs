@@ -1,20 +1,23 @@
 using CompilerProj.Visitors;
 
 public sealed class MultiVarDeclCallAST : DeclAST {
-    public List<string> names;
-    public Dictionary<string, PrimitiveType> declTypes;
-    public FunctionCallAST functionCall;
+    public readonly List<string> names;
+    public readonly Dictionary<string, PrimitiveType> declTypes;
+    public readonly string functionName;
+    public readonly List<ExprAST> args;
 
     public MultiVarDeclCallAST(
         List<string> names, 
         Dictionary<string, PrimitiveType> declTypes,
-        FunctionCallAST functionCall,
+        string functionName,
+        List<ExprAST> args,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {
 
         this.names = names;
         this.declTypes = declTypes;
-        this.functionCall = functionCall;
+        this.functionName = functionName;
+        this.args = args;
     }
 
     public override void accept(ASTVisitorVoid visitor) {
