@@ -64,13 +64,13 @@ public class Compiler {
         return programAST;
     }
 
-    public static void generateIR(string filePath) {
+    public static IRCompUnit generateIR(string filePath) {
         ProgramAST checkedAST = ensureNoSemanticErrors(filePath);
+
         IRGenerator generator = new IRGenerator();
-
         IRCompUnit irProgram = generator.visit<IRCompUnit>(checkedAST);
-
-        Console.WriteLine();
+        
+        return irProgram;
     }
 
     public static void compileFile(string filePath) {

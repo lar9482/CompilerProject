@@ -43,6 +43,7 @@ public class FunctionalityTests {
         IRSeq aBody =
                 new IRSeq(
                     new List<IRStmt>() {
+                        new IRLabel("a"),
                         new IRMove(new IRTemp("i"), new IRTemp(arg1)),
                         new IRMove(new IRTemp("j"), new IRTemp(arg2)),
                         new IRReturn(
@@ -56,6 +57,7 @@ public class FunctionalityTests {
         IRStmt bBody =
                 new IRSeq(
                     new List<IRStmt>() {
+                        new IRLabel("b"),
                         new IRCallStmt(
                             new IRName("a"), 
                             new List<IRExpr>() {
