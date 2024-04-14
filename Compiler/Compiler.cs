@@ -66,6 +66,11 @@ public class Compiler {
 
     public static void generateIR(string filePath) {
         ProgramAST checkedAST = ensureNoSemanticErrors(filePath);
+        IRGenerator generator = new IRGenerator();
+
+        IRCompUnit irProgram = generator.visit<IRCompUnit>(checkedAST);
+
+        Console.WriteLine();
     }
 
     public static void compileFile(string filePath) {
