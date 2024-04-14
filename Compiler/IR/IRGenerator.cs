@@ -3,9 +3,11 @@ using CompilerProj.Visitors;
 
 public sealed class IRGenerator : ASTVisitorGeneric {
     private Context context;
+    private int labelCounter;
 
     public IRGenerator() {
         this.context = new Context();
+        this.labelCounter = 0;
     }
 
     // Top level nodes
@@ -111,7 +113,22 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     public T visit<T>(WhileLoopAST whileLoop) { throw new NotImplementedException(); }
 
     public T visit<T>(ReturnAST returnStmt) { 
-        throw new NotImplementedException(); 
+        List<IRExpr> irReturns = new List<IRExpr>();
+        
+        if (returnStmt.returnValues == null) {
+            return matchThenReturn<T, IRReturn>(
+                new IRReturn(irReturns)
+            );
+        }
+
+        foreach(ExprAST returnExpr in returnStmt.returnValues) {
+            IRExpr irReturn = returnExpr.accept<IRExpr>(this);
+            irReturns.Add(irReturn);
+        }
+
+        return matchThenReturn<T, IRReturn>(
+            new IRReturn(irReturns)
+        );
     }
 
     public T visit<T>(ProcedureCallAST procedureCall) { 
