@@ -4,10 +4,12 @@ using CompilerProj.Visitors;
 public sealed class IRGenerator : ASTVisitorGeneric {
     private Context context;
     private int labelCounter;
+    private int argCounter;
 
     public IRGenerator() {
         this.context = new Context();
         this.labelCounter = 0;
+        this.argCounter = 1;
     }
 
     // Top level nodes
@@ -22,10 +24,21 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         } 
 
         context.push(program.scope);
-        DummyClass test = new DummyClass();
-        
+
+        Dictionary<string, IRFuncDecl> irFuncDecls = new Dictionary<string, IRFuncDecl>();
+        foreach(FunctionAST functionAST in program.functions) {
+            IRFuncDecl irFuncDecl = functionAST.accept<IRFuncDecl>(this);
+            irFuncDecls.Add(functionAST.name, irFuncDecl);
+        }
+
         program.scope = context.pop();
-        return matchThenReturn<T, DummyClass>(test);
+        return matchThenReturn<T, IRCompUnit>(
+            new IRCompUnit(
+                "program", 
+                irFuncDecls,
+                new List<string>() { }
+            )
+        );
     }
 
     //TODO: Implement declarations
@@ -37,22 +50,66 @@ public sealed class IRGenerator : ASTVisitorGeneric {
 
     //TODO: Implement function properties.
     public T visit<T>(FunctionAST function) { 
+        if (function.scope == null) {
+            throw new Exception(
+                String.Format(
+                    "IRGenerator: Function scope was not initialized",
+                    function.lineNumber, function.columnNumber
+                )
+            );
+        } 
+
+        context.push(function.scope);
+
+        List<IRStmt> irParamsAssigns = new List<IRStmt>();
+        foreach(ParameterAST parameterAST in function.parameters) {
+            IRMove irParam = parameterAST.accept<IRMove>(this);
+            irParamsAssigns.Add(irParam);
+        }
+
+        IRSeq irParams = new IRSeq(irParamsAssigns);
         IRSeq irBlock = function.block.accept<IRSeq>(this);
         IRSeq irFuncBody = new IRSeq(
             new List<IRStmt>() {
                 new IRLabel(function.name),
+                irParams,
                 irBlock
             }
         );
 
+        argCounter = 1;
+        function.scope = context.pop();
         return matchThenReturn<T, IRFuncDecl>(
             new IRFuncDecl(function.name, irFuncBody)
         );
     }
 
-    public T visit<T>(ParameterAST parameter) { throw new NotImplementedException(); }
+    public T visit<T>(ParameterAST parameter) { 
+        IRMove irAssign = new IRMove(
+            new IRTemp(parameter.name),
+            new IRTemp(
+                IRConfiguration.ABSTRACT_ARG_PREFIX + argCounter
+            )
+        );
+
+        argCounter++;
+        return matchThenReturn<T, IRMove>(
+            irAssign
+        );
+    }
 
     public T visit<T>(BlockAST block) { 
+        if (block.scope == null) {
+            throw new Exception(
+                String.Format(
+                    "IRGenerator: Block scope was not initialized",
+                    block.lineNumber, block.columnNumber
+                )
+            );
+        } 
+
+        context.push(block.scope);
+
         List<IRStmt> irStmts = new List<IRStmt>();
 
         foreach(StmtAST stmtAST in block.statements) {
@@ -60,6 +117,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
             irStmts.Add(irStmt);
         }
 
+        block.scope = context.pop();
         return matchThenReturn<T, IRSeq>(
             new IRSeq(irStmts)
         );
