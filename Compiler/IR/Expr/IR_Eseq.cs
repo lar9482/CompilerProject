@@ -4,7 +4,7 @@ using CompilerProj.Visitors;
  * An intermediate representation for an expression evaluated under side effects ESEQ(stmt, expr)
  */
 
- public class IR_Eseq : IRStmt {
+ public class IR_Eseq : IRExpr {
     public IRStmt stmt;
     public IRExpr expr;
 
