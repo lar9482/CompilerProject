@@ -44,6 +44,7 @@ public sealed class InsnMapBuilder : IRVisitorVoid {
 
     public void visit(IRLabel label) { 
         addNameToCurrentAddress(label.name);
+        addInsn(label);
     }
 
     public void visit(IRMove move) { 
