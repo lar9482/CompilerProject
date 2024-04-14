@@ -72,8 +72,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         IRSeq irFuncBody = new IRSeq(
             new List<IRStmt>() {
                 new IRLabel(function.name),
-                irParams,
-                irBlock
+                new IRSeq(irParams.statements.Concat(irBlock.statements).ToList())
             }
         );
 
