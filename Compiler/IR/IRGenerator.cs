@@ -37,9 +37,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
 
     public T visit<T>(AssignAST assign) { 
         IRExpr irSrc = assign.value.accept<IRExpr>(this);
-        IRTemp irDest = new IRTemp(
-            assign.variable.variableName
-        );
+        IRTemp irDest = assign.variable.accept<IRTemp>(this);
 
         IRMove irAssign = new IRMove(
             irDest, irSrc
@@ -56,9 +54,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
             VarAccessAST destAST = assignAST.Key;
 
             IRExpr irSrc = srcAST.accept<IRExpr>(this);
-            IRTemp irDest = new IRTemp(
-                destAST.variableName
-            );
+            IRTemp irDest = destAST.accept<IRTemp>(this);
 
             IRMove irAssign = new IRMove(
                 irDest, irSrc
@@ -95,7 +91,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         for (int i = 0; i < multiAssignCall.variableNames.Count; i++) {
             VarAccessAST variable = multiAssignCall.variableNames[i];
             IRExpr irSrc = new IRTemp(IRConfiguration.ABSTRACT_RET_PREFIX + (i+1));
-            IRExpr irDest = new IRTemp(variable.variableName);
+            IRTemp irDest = variable.accept<IRTemp>(this);
 
             IRMove irAssign = new IRMove(irDest, irSrc);
             irStmts.Add(irAssign);
@@ -192,7 +188,6 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     
     public T visit<T>(VarAccessAST varAccess) { 
         IRTemp temp = new IRTemp(varAccess.variableName);
-
         return matchThenReturn<T, IRTemp>(temp);
     }
 
