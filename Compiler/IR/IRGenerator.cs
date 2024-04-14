@@ -81,7 +81,6 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         );
     }
 
-    //TODO: Implement these
     public T visit<T>(MultiVarDeclCallAST multiVarDeclCall) { 
         SymbolFunction symbolFunction = lookUpSymbolFromContext<SymbolFunction>(
             multiVarDeclCall.functionName, -1, -1
@@ -116,6 +115,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IRSeq>(irSequence);
     }
 
+    //TODO: Implement these
     public T visit<T>(ArrayDeclAST array) { throw new NotImplementedException(); }
     public T visit<T>(MultiDimArrayDeclAST multiDimArray) { throw new NotImplementedException(); }
 
