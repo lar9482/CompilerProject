@@ -9,7 +9,8 @@ public class ValidTypecheckTests {
 
     private void ensureNoTypecheckErrors(string filePath) {
         try {
-            List<string> errorMsgs = Compiler.typecheck(filePath);
+            Tuple<ProgramAST, List<string>> ASTWithErrors = Compiler.typecheck(filePath);
+            List<string> errorMsgs = ASTWithErrors.Item2;
             Assert.That(errorMsgs.Count, Is.EqualTo(0));
         } catch (Exception e) {
             Assert.Fail(e.Message);

@@ -18,7 +18,8 @@ public class InvalidTypecheckTests {
             return;
         }
         
-        List<string> errorMsgs = Compiler.typecheck(filePath);
+        Tuple<ProgramAST, List<string>> ASTWithErrors = Compiler.typecheck(filePath);
+        List<string> errorMsgs = ASTWithErrors.Item2;
         Assert.That(errorMsgs.Count, Is.GreaterThan(0));
     }
 

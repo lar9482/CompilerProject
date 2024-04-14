@@ -5,10 +5,17 @@ using CompilerProj.Tokens;
 namespace CompilerProj;
 
 public class Compiler {
-    public static Queue<Token> lex(string filePath) {
+
+    public static string readFile(string filePath) {
         StreamReader sr = new StreamReader(filePath);
         string programText = sr.ReadToEnd();
         sr.Close();
+
+        return programText;
+    }
+
+    public static Queue<Token> lex(string filePath) {
+        string programText = readFile(filePath);
         
         Lexer lexer = new Lexer();
         Queue<Token> tokenQueue = lexer.lexProgram(programText);
@@ -23,7 +30,7 @@ public class Compiler {
         return parser.parseProgram();
     }
 
-    public static List<string> typecheck(string filePath) {
+    public static Tuple<ProgramAST, List<string>> typecheck(string filePath) {
         ProgramAST programAST = parse(filePath);
 
         TypecheckerP1 topLvlDeclBuilder = new TypecheckerP1();
@@ -40,29 +47,28 @@ public class Compiler {
         allErrorMsgs.AddRange(topLvlDeclChecker.errorMsgs);
         allErrorMsgs.AddRange(functionChecker.errorMsgs);
 
-        return allErrorMsgs;
+        return Tuple.Create<ProgramAST, List<string>>(programAST, allErrorMsgs);
+    }
+
+    public static ProgramAST ensureNoSemanticErrors(string filePath) {
+        Tuple<ProgramAST, List<string>> ASTWithErrors = typecheck(filePath);
+        ProgramAST programAST = ASTWithErrors.Item1;
+        List<string> semanticErrors = ASTWithErrors.Item2;
+
+        if (semanticErrors.Count > 0) {
+            throw new Exception(
+                string.Join(Environment.NewLine, semanticErrors)
+            );
+        }
+
+        return programAST;
+    }
+
+    public static void generateIR(string filePath) {
+        ProgramAST checkedAST = ensureNoSemanticErrors(filePath);
     }
 
     public static void compileFile(string filePath) {
-        StreamReader sr = new StreamReader(filePath);
-        string programText = sr.ReadToEnd();
-        sr.Close();
-        
-        Lexer lexer = new Lexer();
-        Queue<Token> tokenQueue = lexer.lexProgram(programText);
-
-        Parser parser = new Parser(tokenQueue);
-        ProgramAST programAST = parser.parseProgram();
-
-        TypecheckerP1 topLvlDeclBuilder = new TypecheckerP1();
-        topLvlDeclBuilder.visit(programAST);
-        
-        TypecheckerP2 topLvlDeclChecker = new TypecheckerP2();
-        topLvlDeclChecker.visit(programAST);
-        
-        TypecheckerP3 functionChecker = new TypecheckerP3();
-        functionChecker.visit(programAST);
-        
-        Console.WriteLine();
+        generateIR(filePath);
     }
 }
