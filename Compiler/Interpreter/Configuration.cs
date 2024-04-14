@@ -7,6 +7,9 @@ public struct IRConfiguration {
     /** Prefix for return registers */
     public const string ABSTRACT_RET_PREFIX = "_RV";
 
+    /** Prefix for stack register */
+    public const string ABSTRACT_STACK_PREFIX = "_ST";
+    
     /** Word size; assumes a 32-bit architecture */
     public const int wordSize = 4;
 }
