@@ -3,9 +3,9 @@ using CompilerProj.Types;
 using CompilerProj.Visitors;
 
 public sealed class VarDeclAST : DeclAST {
-    public string name;
-    public ExprAST? initialValue;
-    public PrimitiveType declType;
+    public readonly string name;
+    public readonly ExprAST? initialValue;
+    public readonly PrimitiveType declType;
 
     public VarDeclAST(
         string name, 

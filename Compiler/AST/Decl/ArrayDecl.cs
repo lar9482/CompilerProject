@@ -3,10 +3,10 @@ using CompilerProj.Types;
 using CompilerProj.Visitors;
 
 public sealed class ArrayDeclAST : DeclAST {
-    public string name;
-    public ExprAST size;
-    public ArrayType<PrimitiveType> declType;
-    public ExprAST[]? initialValues;
+    public readonly string name;
+    public readonly ExprAST size;
+    public readonly ArrayType<PrimitiveType> declType;
+    public readonly ExprAST[]? initialValues;
 
     public ArrayDeclAST(
         string name,
