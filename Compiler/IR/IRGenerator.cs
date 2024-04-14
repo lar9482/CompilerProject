@@ -26,11 +26,14 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, DummyClass>(test);
     }
 
+    //TODO: Implement declarations
     public T visit<T>(VarDeclAST varDecl) { throw new NotImplementedException(); }
     public T visit<T>(MultiVarDeclAST multiVarDecl) { throw new NotImplementedException(); }
     public T visit<T>(MultiVarDeclCallAST multiVarDeclCall) { throw new NotImplementedException(); }
     public T visit<T>(ArrayDeclAST array) { throw new NotImplementedException(); }
     public T visit<T>(MultiDimArrayDeclAST multiDimArray) { throw new NotImplementedException(); }
+
+    //TODO: Implement function properties.
     public T visit<T>(FunctionAST function) { throw new NotImplementedException(); }
     public T visit<T>(ParameterAST parameter) { throw new NotImplementedException(); }
     public T visit<T>(BlockAST block) { throw new NotImplementedException(); }
@@ -101,10 +104,9 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IRSeq>(irSequence);
     }
     
+    //TODO: Implement conditionals, while loops, and array assigns.
     public T visit<T>(ArrayAssignAST arrayAssign) { throw new NotImplementedException(); }
     public T visit<T>(MultiDimArrayAssignAST multiDimArrayAssign) { throw new NotImplementedException(); }
-
-    //TODO: Implement conditionals and while loops.
     public T visit<T>(ConditionalAST conditional) { throw new NotImplementedException(); }
     public T visit<T>(WhileLoopAST whileLoop) { throw new NotImplementedException(); }
 
@@ -113,7 +115,20 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     }
 
     public T visit<T>(ProcedureCallAST procedureCall) { 
-        throw new NotImplementedException(); 
+        List<IRExpr> irArgs = new List<IRExpr>();
+
+        foreach(ExprAST argAST in procedureCall.args) {
+            IRExpr irArg = argAST.accept<IRExpr>(this);
+            irArgs.Add(irArg);
+        }
+
+        IRCallStmt callStmt = new IRCallStmt(
+            new IRName(procedureCall.procedureName),
+            irArgs,
+            0
+        );
+
+        return matchThenReturn<T, IRCallStmt>(callStmt);
     }
     
     //TODO: Implement binary expressions for booleans with short circuiting.
