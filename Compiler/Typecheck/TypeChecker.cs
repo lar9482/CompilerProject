@@ -647,7 +647,7 @@ public abstract class TypeChecker : ASTVisitorVoid {
 
     public void visit(MultiAssignCallAST multiAssignCall) { 
         SymbolFunction symbolFunction = lookUpSymbolFromContext<SymbolFunction>(
-            multiAssignCall.call.functionName, multiAssignCall.lineNumber, multiAssignCall.columnNumber
+            multiAssignCall.functionName, multiAssignCall.lineNumber, multiAssignCall.columnNumber
         );
 
         // Checking the variables against the return types of the function.
@@ -655,7 +655,7 @@ public abstract class TypeChecker : ASTVisitorVoid {
             errorMsgs.Add(
                 String.Format(
                     "{0}:{1} SemanticError: The number of assignments is not equal to the number of return types for {2}",
-                    multiAssignCall.lineNumber, multiAssignCall.columnNumber, multiAssignCall.call.functionName
+                    multiAssignCall.lineNumber, multiAssignCall.columnNumber, multiAssignCall.functionName
                 )
             );
             multiAssignCall.type = new UnitType();
@@ -681,19 +681,18 @@ public abstract class TypeChecker : ASTVisitorVoid {
         }
 
         //Checking parameter types
-        FunctionCallAST functionCall = multiAssignCall.call;
-        if (functionCall.args.Count != symbolFunction.parameterTypes.Length) {
+        if (multiAssignCall.args.Count != symbolFunction.parameterTypes.Length) {
             errorMsgs.Add(
                 String.Format(
                     "{0}:{1} SemanticError: The number of arguments is not equal to the number of parameters for {2}",
-                    multiAssignCall.lineNumber, multiAssignCall.columnNumber, functionCall.functionName
+                    multiAssignCall.lineNumber, multiAssignCall.columnNumber, multiAssignCall.functionName
                 )
             );
             multiAssignCall.type = new UnitType();
             return;
         }
-        for (int i = 0; i < functionCall.args.Count; i++) {
-            ExprAST param = functionCall.args[i];
+        for (int i = 0; i < multiAssignCall.args.Count; i++) {
+            ExprAST param = multiAssignCall.args[i];
             param.accept(this);
 
             SimpleType paramType = param.type;
