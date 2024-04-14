@@ -36,9 +36,34 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     public T visit<T>(MultiDimArrayDeclAST multiDimArray) { throw new NotImplementedException(); }
 
     //TODO: Implement function properties.
-    public T visit<T>(FunctionAST function) { throw new NotImplementedException(); }
+    public T visit<T>(FunctionAST function) { 
+        IRSeq irBlock = function.block.accept<IRSeq>(this);
+        IRSeq irFuncBody = new IRSeq(
+            new List<IRStmt>() {
+                new IRLabel(function.name),
+                irBlock
+            }
+        );
+
+        return matchThenReturn<T, IRFuncDecl>(
+            new IRFuncDecl(function.name, irFuncBody)
+        );
+    }
+
     public T visit<T>(ParameterAST parameter) { throw new NotImplementedException(); }
-    public T visit<T>(BlockAST block) { throw new NotImplementedException(); }
+
+    public T visit<T>(BlockAST block) { 
+        List<IRStmt> irStmts = new List<IRStmt>();
+
+        foreach(StmtAST stmtAST in block.statements) {
+            IRStmt irStmt = stmtAST.accept<IRStmt>(this);
+            irStmts.Add(irStmt);
+        }
+
+        return matchThenReturn<T, IRSeq>(
+            new IRSeq(irStmts)
+        );
+    }
 
     public T visit<T>(AssignAST assign) { 
         IRExpr irSrc = assign.value.accept<IRExpr>(this);
