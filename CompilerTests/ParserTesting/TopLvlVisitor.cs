@@ -135,7 +135,11 @@ internal class TopLvlVisitor : ASTVisitorVoid {
         foreach (var variableName in multiAssignCall.variableNames) {
             variableName.accept(this);
         }
-        multiAssignCall.call.accept(this);
+
+        traversalRecord.Enqueue(multiAssignCall.functionName);
+        foreach(ExprAST arg in multiAssignCall.args) {
+            traversalRecord.Enqueue("EXPR");
+        }
     }
 
     public void visit(ArrayAssignAST arrayAssign) { 
