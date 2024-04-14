@@ -3,9 +3,9 @@ using CompilerProj.Types;
 using CompilerProj.Visitors;
 
 public sealed class MultiVarDeclAST : DeclAST {
-    public List<string> names;
-    public Dictionary<string, ExprAST?> initialValues;
-    public Dictionary<string, PrimitiveType> declTypes;
+    public readonly List<string> names;
+    public readonly Dictionary<string, ExprAST?> initialValues;
+    public readonly Dictionary<string, PrimitiveType> declTypes;
 
     public MultiVarDeclAST(
         List<string> names, 
