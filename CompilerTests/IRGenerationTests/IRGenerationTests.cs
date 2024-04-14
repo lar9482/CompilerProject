@@ -14,8 +14,8 @@ public class IRGenerationTests {
             2, 1
         };
 
-        // IRSimulator simulator = new IRSimulator(IR);
-        // int retVal = simulator.call("b", args);
-        // Assert.That(retVal, Is.EqualTo(12));
+        IRSimulator simulator = new IRSimulator(IR);
+        int retVal = simulator.call("b", args);
+        Assert.That(retVal, Is.EqualTo(12));
     }
 }
