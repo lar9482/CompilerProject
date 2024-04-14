@@ -140,7 +140,7 @@ public abstract class TypeChecker : ASTVisitorVoid {
 
     protected void checkMultiVarDeclCall(MultiVarDeclCallAST multiVarDeclCall) {
         SymbolFunction symbolFunction = lookUpSymbolFromContext<SymbolFunction>(
-            multiVarDeclCall.functionCall.functionName,
+            multiVarDeclCall.functionName,
             multiVarDeclCall.lineNumber, multiVarDeclCall.columnNumber
         );
 
@@ -149,7 +149,7 @@ public abstract class TypeChecker : ASTVisitorVoid {
             errorMsgs.Add(
                 String.Format(
                     "{0}:{1} SemanticError: The number of variable declarations is not equal to the number of return types for {2}",
-                    multiVarDeclCall.lineNumber, multiVarDeclCall.columnNumber, multiVarDeclCall.functionCall.functionName
+                    multiVarDeclCall.lineNumber, multiVarDeclCall.columnNumber, multiVarDeclCall.functionName
                 )
             );
             return;
@@ -175,19 +175,18 @@ public abstract class TypeChecker : ASTVisitorVoid {
         }
         
         //Checking parameter types
-        FunctionCallAST functionCall = multiVarDeclCall.functionCall;
-        if (functionCall.args.Count != symbolFunction.parameterTypes.Length) {
+        if (multiVarDeclCall.args.Count != symbolFunction.parameterTypes.Length) {
             errorMsgs.Add(
                 String.Format(
                     "{0}:{1} SemanticError: The number of arguments is not equal to the number of parameters for {2}",
-                    multiVarDeclCall.lineNumber, multiVarDeclCall.columnNumber, functionCall.functionName
+                    multiVarDeclCall.lineNumber, multiVarDeclCall.columnNumber, multiVarDeclCall.functionName
                 )
             );
             return;
         }
 
-        for (int i = 0; i < functionCall.args.Count; i++) {
-            ExprAST param = functionCall.args[i];
+        for (int i = 0; i < multiVarDeclCall.args.Count; i++) {
+            ExprAST param = multiVarDeclCall.args[i];
             param.accept(this);
 
             SimpleType paramType = param.type;

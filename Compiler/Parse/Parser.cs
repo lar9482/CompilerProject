@@ -253,10 +253,12 @@ public sealed class Parser {
         List<ExprAST> initialValues = parseOptionalMultipleValues_Or_FunctionCall();
 
         if (initialValues.Count == 1 && initialValues[0].GetType() == typeof(FunctionCallAST)) {
+            FunctionCallAST functionCall = (FunctionCallAST) initialValues[0];
             return new MultiVarDeclCallAST(
                 new List<string>(identifierTypeMap.Keys),
                 identifierTypeMap,
-                (FunctionCallAST) initialValues[0],
+                functionCall.functionName,
+                functionCall.args,
                 firstIdentifierToken.line,
                 firstIdentifierToken.column
             );

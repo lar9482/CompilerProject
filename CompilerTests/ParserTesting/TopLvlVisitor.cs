@@ -53,7 +53,11 @@ internal class TopLvlVisitor : ASTVisitorVoid {
                 String.Format("{0}: {1}", pair.Key, SimpleTypeToString(pair.Value))
             );
         }
-        multiVarDeclCall.functionCall.accept(this);
+        traversalRecord.Enqueue(multiVarDeclCall.functionName);
+
+        foreach (var arg in multiVarDeclCall.args) {
+            traversalRecord.Enqueue("EXPR");
+        }
     }
     
     public void visit(ArrayDeclAST array) {  

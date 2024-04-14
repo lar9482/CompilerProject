@@ -88,7 +88,6 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     public T visit<T>(ArrayDeclAST array) { throw new NotImplementedException(); }
     public T visit<T>(MultiDimArrayDeclAST multiDimArray) { throw new NotImplementedException(); }
 
-    //TODO: Implement function properties.
     public T visit<T>(FunctionAST function) { 
         if (function.scope == null) {
             throw new Exception(
