@@ -892,9 +892,12 @@ public sealed class Parser {
                     )
                 );
             }
+            
+            FunctionCallAST functionCallAST = (FunctionCallAST) firstExpr;
             return new MultiAssignCallAST(
                 variableAssigns,
-                (FunctionCallAST) firstExpr,
+                functionCallAST.functionName,
+                functionCallAST.args,
                 variableAssigns[0].lineNumber,
                 variableAssigns[0].columnNumber
             );

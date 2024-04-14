@@ -2,16 +2,19 @@ using CompilerProj.Visitors;
 
 public sealed class MultiAssignCallAST : StmtAST {
     public readonly List<VarAccessAST> variableNames;
-    public readonly FunctionCallAST call;
+    public readonly string functionName;
+    public readonly List<ExprAST> args;
 
     public MultiAssignCallAST(
         List<VarAccessAST> variableNames,
-        FunctionCallAST call,
+        string functionName,
+        List<ExprAST> args,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {
 
         this.variableNames = variableNames;
-        this.call = call;
+        this.functionName = functionName;
+        this.args = args;
     }
 
     public override void accept(ASTVisitorVoid visitor) {
