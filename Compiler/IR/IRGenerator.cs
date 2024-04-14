@@ -83,8 +83,39 @@ public sealed class IRGenerator : ASTVisitorGeneric {
 
     //TODO: Implement these
     public T visit<T>(MultiVarDeclCallAST multiVarDeclCall) { 
-        throw new NotImplementedException(); 
+        SymbolFunction symbolFunction = lookUpSymbolFromContext<SymbolFunction>(
+            multiVarDeclCall.functionName, -1, -1
+        );
+
+        List<IRStmt> irStmts = new List<IRStmt>();
+        List<IRExpr> irFuncArgs = new List<IRExpr>();
+        
+        foreach(ExprAST funcArgAST in multiVarDeclCall.args) {
+            IRExpr irFuncArg = funcArgAST.accept<IRExpr>(this);
+            irFuncArgs.Add(irFuncArg);
+        }
+
+        irStmts.Add(
+            new IRCallStmt(
+                new IRName(multiVarDeclCall.functionName),
+                irFuncArgs,
+                symbolFunction.returnTypes.Length
+            )
+        );
+
+        for (int i = 0; i < multiVarDeclCall.names.Count; i++) {
+            string variableName = multiVarDeclCall.names[i];
+            IRExpr irSrc = new IRTemp(IRConfiguration.ABSTRACT_RET_PREFIX + (i+1));
+            IRTemp irDest = new IRTemp(variableName);
+
+            IRMove irAssign = new IRMove(irDest, irSrc);
+            irStmts.Add(irAssign);
+        }
+
+        IRSeq irSequence = new IRSeq(irStmts);
+        return matchThenReturn<T, IRSeq>(irSequence);
     }
+
     public T visit<T>(ArrayDeclAST array) { throw new NotImplementedException(); }
     public T visit<T>(MultiDimArrayDeclAST multiDimArray) { throw new NotImplementedException(); }
 
