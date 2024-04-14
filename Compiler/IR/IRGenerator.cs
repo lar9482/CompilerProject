@@ -41,10 +41,50 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         );
     }
 
-    //TODO: Implement declarations
-    public T visit<T>(VarDeclAST varDecl) { throw new NotImplementedException(); }
-    public T visit<T>(MultiVarDeclAST multiVarDecl) { throw new NotImplementedException(); }
-    public T visit<T>(MultiVarDeclCallAST multiVarDeclCall) { throw new NotImplementedException(); }
+    public T visit<T>(VarDeclAST varDecl) { 
+        //TODO: Handle empty expressions.
+        if (varDecl.initialValue == null) {
+            throw new Exception("IRGenerator: Handle empty expressions later");
+        }
+
+        IRExpr srcExpr = varDecl.initialValue.accept<IRExpr>(this);
+        IRMove irMove = new IRMove(
+            new IRTemp(varDecl.name),
+            srcExpr
+        );
+
+        return matchThenReturn<T, IRMove>(irMove);
+    }
+
+    public T visit<T>(MultiVarDeclAST multiVarDecl) { 
+        List<IRStmt> irStmts = new List<IRStmt>();
+
+        foreach(KeyValuePair<string, ExprAST?> varWithInitVal in multiVarDecl.initialValues) {
+            string varDecl = varWithInitVal.Key;
+            ExprAST? initialVal = varWithInitVal.Value;
+
+            //TODO: Handle empty expressions.
+            if (initialVal == null) {
+                throw new Exception("IRGenerator: Handle empty expressions later");
+            }
+
+            IRExpr irInitial = initialVal.accept<IRExpr>(this);
+            IRMove irMove = new IRMove(
+                new IRTemp(varDecl),
+                irInitial
+            );
+            irStmts.Add(irMove);
+        }
+
+        return matchThenReturn<T, IRSeq>(
+            new IRSeq(irStmts)
+        );
+    }
+
+    //TODO: Implement these
+    public T visit<T>(MultiVarDeclCallAST multiVarDeclCall) { 
+        throw new NotImplementedException(); 
+    }
     public T visit<T>(ArrayDeclAST array) { throw new NotImplementedException(); }
     public T visit<T>(MultiDimArrayDeclAST multiDimArray) { throw new NotImplementedException(); }
 
