@@ -382,7 +382,24 @@ public sealed class IRGenerator : ASTVisitorGeneric {
      * This implementation should only be invoked from an expression.
      */
     public T visit<T>(FunctionCallAST functionCall) { 
-        throw new NotImplementedException();
+        List<IRExpr> irFuncArgs = new List<IRExpr>();
+        foreach(ExprAST funcArgAST in functionCall.args) {
+            IRExpr irFuncArg = funcArgAST.accept<IRExpr>(this);
+            irFuncArgs.Add(irFuncArg);
+        }
+
+        IRCallStmt irFunctionCall = new IRCallStmt(
+            new IRName(functionCall.functionName),
+            irFuncArgs,
+            1
+        );
+
+        IR_Eseq evalThenExe = new IR_Eseq(
+            irFunctionCall,
+            new IRTemp(IRConfiguration.ABSTRACT_RET_PREFIX + 1)
+        );
+
+        return matchThenReturn<T, IR_Eseq>(evalThenExe);
     }
 
     public T visit<T>(IntLiteralAST intLiteral) { 

@@ -15,12 +15,10 @@ public class Compiler {
     }
 
     public static Queue<Token> lex(string filePath) {
-        string programText = readFile(filePath);
-        
+        string programText = readFile(filePath);        
         Lexer lexer = new Lexer();
-        Queue<Token> tokenQueue = lexer.lexProgram(programText);
 
-        return tokenQueue;
+        return lexer.lexProgram(programText);
     }
 
     public static ProgramAST parse(string filePath) {

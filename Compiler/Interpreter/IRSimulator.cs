@@ -321,18 +321,14 @@ public sealed class IRSimulator {
             case IRTemp irTemp: executeIRTemp(irTemp, frame); break;
             case IRBinOp irBinOp: executeIRBinOp(irBinOp); break;
             case IRUnaryOp irUnaryOp: executeIRUnaryOp(irUnaryOp); break;
-            case IRMem irMem:
-                break;
+            case IRMem irMem: executeIRMem(irMem); break;
             case IRCall irCall: executeIRCall(irCall, frame); break;
             case IRName irName: executeIRName(irName); break;
             case IRMove irMove: executeIRMove(frame); break;
             case IRCallStmt irCallStmt: executeIRCallStmt(irCallStmt, frame); break;
-            case IRExp irExp:
-                break;
-            case IRJump irJump:
-                break;
-            case IRCJump irCJump:
-                break;
+            case IRExp irExp: executeIRExp(irExp); break;
+            case IRJump irJump: executeIRJump(irJump); break;
+            case IRCJump irCJump: executeIRCJump(irCJump); break;
             case IRReturn irReturn: executeIRReturn(irReturn, frame); break;
             default:
                 break;
@@ -403,6 +399,10 @@ public sealed class IRSimulator {
         exprStack.pushValue(result);
     }
 
+    private void executeIRMem(IRMem mem) {
+        
+    }
+
     private void executeIRCall(IRCall irCall, ExecutionFrame frame) {
         // Popping the argument values from the stack.
         int argCount = irCall.args.Count;
@@ -468,6 +468,18 @@ public sealed class IRSimulator {
         );
         interpretInsn(frame, newCall);
         exprStack.popValue();
+    }
+
+    private void executeIRExp(IRExp irExp) {
+
+    }
+
+    private void executeIRJump(IRJump irJump) {
+
+    }
+
+    private void executeIRCJump(IRCJump irCJump) {
+
     }
 
     private void executeIRReturn(IRReturn irReturn, ExecutionFrame frame) {
