@@ -480,7 +480,7 @@ public sealed class IRSimulator {
     }
 
     private void executeIRJump(IRJump irJump, ExecutionFrame frame) {
-        
+        frame.setIP(exprStack.popValue());
     }
 
     private void executeIRCJump(IRCJump irCJump, ExecutionFrame frame) {
