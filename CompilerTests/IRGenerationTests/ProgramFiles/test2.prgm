@@ -1,0 +1,14 @@
+function1(x: int): int {
+    return x;
+}
+
+function2(): int {
+    return 1 + 1 + 1 + 1 + 1;
+}
+
+main(x: int): int {
+    func1: int = function1(10);
+    func2: int = function2();
+
+    return func1 + func2 + x;
+}
