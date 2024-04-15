@@ -40,4 +40,16 @@ public class IRGenerationTests {
         int retVal = simulator.call("main", args);
         Assert.That(retVal, Is.EqualTo(600));
     }
+
+    [Test]
+    public void exprInteger() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/exprInteger.prgm";
+
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+
+        IRSimulator simulator = new IRSimulator(IR);
+        int retVal = simulator.call("main", args);
+        Assert.That(retVal, Is.EqualTo(40));
+    }
 }
