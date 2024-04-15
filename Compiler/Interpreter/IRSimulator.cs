@@ -81,12 +81,16 @@ public sealed class IRSimulator {
 
         int startAddress = calloc(IRConfiguration.wordSize * dataSize);
         for (int i = 0; i < dataSize; i++) {
-            store(startAddress + IRConfiguration.wordSize * i, dummyData[i]);
+            store(getMemoryAddress(startAddress, i), dummyData[i]);
         }
         
         for (int i = 0; i < dataSize; i++) {
-            int test = read(startAddress + IRConfiguration.wordSize * i);
+            int test = read(getMemoryAddress(startAddress, i));
         }
+    }
+
+    private int getMemoryAddress(int startAddr, int index) {
+        return startAddr + IRConfiguration.wordSize * index;
     }
 
     /**
@@ -327,8 +331,8 @@ public sealed class IRSimulator {
             case IRMove irMove: executeIRMove(frame); break;
             case IRCallStmt irCallStmt: executeIRCallStmt(irCallStmt, frame); break;
             case IRExp irExp: executeIRExp(irExp); break;
-            case IRJump irJump: executeIRJump(irJump); break;
-            case IRCJump irCJump: executeIRCJump(irCJump); break;
+            case IRJump irJump: executeIRJump(irJump, frame); break;
+            case IRCJump irCJump: executeIRCJump(irCJump, frame); break;
             case IRReturn irReturn: executeIRReturn(irReturn, frame); break;
             default:
                 break;
@@ -400,7 +404,8 @@ public sealed class IRSimulator {
     }
 
     private void executeIRMem(IRMem mem) {
-        
+        int addr = exprStack.popValue();
+        exprStack.pushAddress(read(addr), addr);
     }
 
     private void executeIRCall(IRCall irCall, ExecutionFrame frame) {
@@ -471,15 +476,33 @@ public sealed class IRSimulator {
     }
 
     private void executeIRExp(IRExp irExp) {
-
+        exprStack.pop();
     }
 
-    private void executeIRJump(IRJump irJump) {
-
+    private void executeIRJump(IRJump irJump, ExecutionFrame frame) {
+        
     }
 
-    private void executeIRCJump(IRCJump irCJump) {
+    private void executeIRCJump(IRCJump irCJump, ExecutionFrame frame) {
+        int CJumpResult = exprStack.popValue();
+        string labelToJumpTo;
 
+        if (CJumpResult == 0) {
+            labelToJumpTo = irCJump.falseLabel;
+        } else if(CJumpResult == 1) {
+            labelToJumpTo = irCJump.trueLabel;
+        } else {
+            throw new Exception(
+                String.Format(
+                    "Invalid value in CJump: Expected 0/1, but got {0}",
+                    CJumpResult
+                )
+            );
+        }
+
+        frame.setIP(
+            findLabel(labelToJumpTo)
+        );
     }
 
     private void executeIRReturn(IRReturn irReturn, ExecutionFrame frame) {
