@@ -116,7 +116,10 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     }
 
     //TODO: Implement these
-    public T visit<T>(ArrayDeclAST array) { throw new NotImplementedException(); }
+    public T visit<T>(ArrayDeclAST array) { 
+        throw new NotImplementedException(); 
+    }
+    
     public T visit<T>(MultiDimArrayDeclAST multiDimArray) { throw new NotImplementedException(); }
 
     public T visit<T>(FunctionAST function) { 
