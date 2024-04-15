@@ -1,0 +1,12 @@
+function1(): int {
+    return 10;
+}
+
+function2(): int {
+    return 100;
+}
+
+main(x: int): int {
+    // 1000
+    return function1() * function2();
+}

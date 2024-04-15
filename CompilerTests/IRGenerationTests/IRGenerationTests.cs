@@ -42,6 +42,18 @@ public class IRGenerationTests {
     }
 
     [Test]
+    public void funcCall_singleReturn3() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/funcCall_singleReturn3.prgm";
+
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+
+        IRSimulator simulator = new IRSimulator(IR);
+        int retVal = simulator.call("main", args);
+        Assert.That(retVal, Is.EqualTo(1000));
+    }
+
+    [Test]
     public void exprInteger() {
         string filePath = "../../../IRGenerationTests/ProgramFiles/exprInteger.prgm";
 
