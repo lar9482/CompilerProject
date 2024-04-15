@@ -7,8 +7,8 @@ public class IRGenerationTests {
     public void Setup() {}
 
     [Test]
-    public void test1() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/test1.prgm";
+    public void funcCall_multiReturn() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/funcCall_multiReturn.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] {
             2, 1
@@ -20,8 +20,8 @@ public class IRGenerationTests {
     }
 
     [Test]
-    public void test2() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/test2.prgm";
+    public void funcCall_singleReturn1() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/funcCall_singleReturn1.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { 10 };
 
@@ -31,8 +31,8 @@ public class IRGenerationTests {
     }
 
     [Test]
-    public void test3() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/test3.prgm";
+    public void funcCall_singleReturn2() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/funcCall_singleReturn2.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
 
