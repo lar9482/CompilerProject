@@ -29,13 +29,17 @@ public enum BinOpType {
     MOD,
     AND,
     OR,
+
     XOR,
     LSHIFT,
     RSHIFT,
+
     EQ,
     NEQ,
     LT,
     GT,
     LEQ,
-    GEQ
+    GEQ,
+    
+    ULT
 }
