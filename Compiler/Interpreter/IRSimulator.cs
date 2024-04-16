@@ -409,7 +409,6 @@ public sealed class IRSimulator {
     }
 
     private void executeIRMem(IRMem mem) {
-        //TODO: Solve addressing bug.
         int addr = exprStack.popValue();
         exprStack.pushAddress(read(addr), addr);
     }
