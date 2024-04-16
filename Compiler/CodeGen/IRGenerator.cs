@@ -115,11 +115,72 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IRSeq>(irSequence);
     }
 
-    //TODO: Implement these
-    public T visit<T>(ArrayDeclAST array) { 
-        throw new NotImplementedException(); 
+    public T visit<T>(ArrayDeclAST array) {
+
+        if (array.initialValues == null) {
+            return matchThenReturn<T, IRSeq>(
+                allocateArrayDecl_WithoutExpr(array)
+            );
+        } else {
+            throw new NotImplementedException(); 
+        }
+    }
+
+    /**
+     * Translating S(x: t[e])
+     */
+    private IRSeq allocateArrayDecl_WithoutExpr(ArrayDeclAST array) {
+        // Step1: Computing size of the array, then moving it into "tSize"
+        IRExpr irSize = array.size.accept<IRExpr>(this);
+        IRMove computeSize = new IRMove(
+            new IRTemp("tSize"),
+            irSize
+        );
+
+        //Step 2: Using "tSize", allocating memory and storing the start address in "tArrayAddr"
+        IRBinOp ir_BytesToAlloc = new IRBinOp(
+            BinOpType.ADD,
+            new IRBinOp(
+                BinOpType.MUL,
+                new IRTemp("tSize"),
+                new IRConst(IRConfiguration.wordSize)
+            ),
+            new IRConst(IRConfiguration.wordSize)
+        );
+        IRCall irCallMalloc = new IRCall(
+            new IRName("malloc"),
+            new List<IRExpr>() { ir_BytesToAlloc }
+        );
+        IRMove allocateMem = new IRMove(
+            new IRTemp("tArrayAddr"),
+            irCallMalloc
+        );
+
+        //Step 3: Using "tArrayAddr", place the size at that address in memory.
+        IRMove storeSizeInMem = new IRMove(
+            new IRMem(MemType.NORMAL, new IRTemp("tArrayAddr")),
+            new IRTemp("tSize")
+        );
+
+        //Step 4: A register named after the array will now hold the starting address for the array.
+        IRMove createArrayRegister = new IRMove(
+            new IRTemp(array.name),
+            new IRBinOp(
+                BinOpType.ADD,
+                new IRTemp("tArrayAddr"),
+                new IRConst(IRConfiguration.wordSize)
+            )
+        );
+
+        return new IRSeq(new List<IRStmt>() {
+            computeSize,
+            allocateMem,
+            storeSizeInMem,
+            createArrayRegister
+        });
     }
     
+    //TODO: Implement these
     public T visit<T>(MultiDimArrayDeclAST multiDimArray) { throw new NotImplementedException(); }
 
     public T visit<T>(FunctionAST function) { 
