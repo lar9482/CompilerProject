@@ -253,6 +253,11 @@ public sealed class IRSimulator {
         List<int> ret = new List<int>();
 
         try {
+            switch(name) {
+                case "malloc":
+                    ret.Add(calloc(args[0]));
+                    break;
+            }
             return ret;
         } catch (IOException e) {
             throw new Exception(e.Message);
@@ -404,6 +409,7 @@ public sealed class IRSimulator {
     }
 
     private void executeIRMem(IRMem mem) {
+        //TODO: Solve addressing bug.
         int addr = exprStack.popValue();
         exprStack.pushAddress(read(addr), addr);
     }

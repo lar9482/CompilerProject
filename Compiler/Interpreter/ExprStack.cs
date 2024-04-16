@@ -23,7 +23,7 @@ public sealed class ExprStack {
 
     public void pushAddress(int value, int address) {
         stack.Push(
-            new StackItem(value, address)
+            new StackItem(StackItemType.MEM, value, address)
         );
     }
 
@@ -67,7 +67,8 @@ public struct StackItem {
         this.value = value;
     }
 
-    public StackItem(int value, int address) {
+    public StackItem(StackItemType type, int value, int address) {
+        this.type = type;
         this.value = value;
         this.address = address;
     }

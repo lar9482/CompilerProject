@@ -64,4 +64,16 @@ public class IRGenerationTests {
         int retVal = simulator.call("main", args);
         Assert.That(retVal, Is.EqualTo(40));
     }
+
+    [Test]
+    public void arrayDecl_noInitialValues() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDecl_noInitialValues.prgm";
+
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+
+        IRSimulator simulator = new IRSimulator(IR);
+        simulator.call("main", args);
+        Console.WriteLine();
+    }
 }
