@@ -25,6 +25,11 @@ public sealed class InsnMapBuilder : IRVisitorVoid {
             funcDecl.accept(this);
         }
 
+        // Adding out of bounds support.
+        IRLabel outOfBoundsLabel = new IRLabel("outOfBounds");
+        IRCall outOfBoundsCall = new IRCall(new IRName("outOfBounds"), new List<IRExpr>() {});  
+        outOfBoundsLabel.accept(this);
+        outOfBoundsCall.accept(this);
     }
 
     public void visit(IRFuncDecl funcDecl) { 
