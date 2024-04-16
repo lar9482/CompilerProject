@@ -5,5 +5,4 @@ main() {
     // array[2] = 30;
     // array[3] = 40;
     // array[4] = 50;
-    return;
 }
