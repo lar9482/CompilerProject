@@ -381,9 +381,6 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     public T visit<T>(ArrayAccessAST arrayAccess) { throw new NotImplementedException(); }
     public T visit<T>(MultiDimArrayAccessAST multiDimArrayAccess) { throw new NotImplementedException(); }
 
-    /*
-     * This implementation should only be invoked from an expression.
-     */
     public T visit<T>(FunctionCallAST functionCall) { 
         List<IRExpr> irFuncArgs = new List<IRExpr>();
         foreach(ExprAST funcArgAST in functionCall.args) {
@@ -391,18 +388,12 @@ public sealed class IRGenerator : ASTVisitorGeneric {
             irFuncArgs.Add(irFuncArg);
         }
 
-        IRCallStmt irFunctionCall = new IRCallStmt(
+        IRCall irCall = new IRCall(
             new IRName(functionCall.functionName),
-            irFuncArgs,
-            1
+            irFuncArgs
         );
 
-        IR_Eseq evalThenExe = new IR_Eseq(
-            irFunctionCall,
-            new IRTemp(IRConfiguration.ABSTRACT_RET_PREFIX + 1)
-        );
-
-        return matchThenReturn<T, IR_Eseq>(evalThenExe);
+        return matchThenReturn<T, IRCall>(irCall);
     }
 
     public T visit<T>(IntLiteralAST intLiteral) { 
