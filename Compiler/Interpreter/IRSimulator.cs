@@ -257,6 +257,10 @@ public sealed class IRSimulator {
                 case "malloc":
                     ret.Add(calloc(args[0]));
                     break;
+                case "outOfBounds":
+                    throw new Exception("Out of bounds!");
+                default:
+                    throw new Exception("Unrecognized library call.");
             }
             return ret;
         } catch (IOException e) {
