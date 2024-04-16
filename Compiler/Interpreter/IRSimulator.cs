@@ -391,6 +391,11 @@ public sealed class IRSimulator {
             case BinOpType.GT: result = (leftVal > rightVal) ? 1 : 0; break;
             case BinOpType.LEQ: result = (leftVal <= rightVal) ? 1 : 0; break;
             case BinOpType.GEQ: result = (leftVal >= rightVal) ? 1 : 0; break;
+            case BinOpType.ULT:
+                uint leftUnsigned = (uint) leftVal;
+                uint rightUnsigned = (uint) rightVal;
+                result = (leftUnsigned < rightUnsigned) ? 1 : 0;
+                break;
             default:
                 throw new Exception("Invalid binary operation");
         }
