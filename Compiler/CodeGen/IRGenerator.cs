@@ -203,10 +203,22 @@ public sealed class IRGenerator : ASTVisitorGeneric {
 
         IRSeq irParams = new IRSeq(irParamsAssigns);
         IRSeq irBlock = function.block.accept<IRSeq>(this);
+        List<IRStmt> funcInstructions = irParams.statements.Concat(irBlock.statements).ToList();
+
+        //Edge case for procedures that don't "return" anything
+        //An return instruction will be added to exit the function body.
+        if (function.returnTypes.Count == 0) {
+            funcInstructions.Add(
+                new IRReturn(
+                    new List<IRExpr>() {}
+                )
+            );
+        } 
+
         IRSeq irFuncBody = new IRSeq(
             new List<IRStmt>() {
                 new IRLabel(function.name),
-                new IRSeq(irParams.statements.Concat(irBlock.statements).ToList())
+                new IRSeq(funcInstructions)
             }
         );
 
