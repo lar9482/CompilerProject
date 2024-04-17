@@ -76,4 +76,34 @@ public class IRGenerationTests {
         int retVal = simulator.call("main", args);
         Assert.That(retVal, Is.EqualTo(150));
     }
+
+    [Test]
+    public void arrayDecl_outOfBounds_Positive() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDecl_outOfBounds_Positive.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        try {
+            int[] args = new int[] { };
+            IRSimulator simulator = new IRSimulator(IR);
+            int retVal = simulator.call("main", args);
+        } catch(Exception e) {
+            string errorMsg = e.Message;
+            bool isSemanticError = errorMsg.Contains("Out of bounds!");
+            Assert.That(isSemanticError, Is.True);
+        }
+    }
+
+    [Test]
+    public void arrayDecl_outOfBounds_Negative() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDecl_outOfBounds_Negative.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        try {
+            int[] args = new int[] { };
+            IRSimulator simulator = new IRSimulator(IR);
+            int retVal = simulator.call("main", args);
+        } catch(Exception e) {
+            string errorMsg = e.Message;
+            bool isSemanticError = errorMsg.Contains("Out of bounds!");
+            Assert.That(isSemanticError, Is.True);
+        }
+    }
 }
