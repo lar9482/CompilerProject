@@ -78,6 +78,18 @@ public class IRGenerationTests {
     }
 
     [Test]
+    public void arrayDecl_hasInitialValues() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDecl_hasInitialValues.prgm";
+
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+
+        IRSimulator simulator = new IRSimulator(IR);
+        int retVal = simulator.call("main", args);
+        Assert.That(retVal, Is.EqualTo(150));
+    }
+
+    [Test]
     public void arrayDecl_outOfBounds_Positive() {
         string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDecl_outOfBounds_Positive.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);

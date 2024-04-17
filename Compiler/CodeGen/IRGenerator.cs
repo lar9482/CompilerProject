@@ -116,13 +116,17 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     }
 
     public T visit<T>(ArrayDeclAST array) {
-
         if (array.initialValues == null) {
             return matchThenReturn<T, IRSeq>(
                 allocateArrayDecl_WithoutExpr(array)
             );
         } else {
-            throw new NotImplementedException(); 
+            return matchThenReturn<T, IRSeq>(
+                allocateArrayDecl_WithExpr(
+                    array.name,
+                    array.initialValues
+                )
+            );
         }
     }
 
@@ -183,6 +187,71 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         });
     }
     
+    private IRSeq allocateArrayDecl_WithExpr(string arrayName, ExprAST[] initialValues) {
+        IRTemp tM = new IRTemp(
+            String.Format(
+                "{0}A", arrayName
+            )
+        );
+
+        IRBinOp bytesToAllocate = new IRBinOp(
+            BinOpType.ADD,
+            new IRBinOp(
+                BinOpType.MUL,
+                new IRConst(initialValues.Length),
+                new IRConst(IRConfiguration.wordSize)
+            ),
+            new IRConst(IRConfiguration.wordSize)
+        );
+
+        IRCall callMalloc = new IRCall(
+            new IRName("malloc"),
+            new List<IRExpr>() { bytesToAllocate }
+        );
+
+        List<IRStmt> allMoves = new List<IRStmt>();
+        IRMove moveMallocIntoTM = new IRMove(
+            tM, callMalloc
+        );
+        IRMove move_Length_Into_DereferencedTM = new IRMove(
+            new IRMem(MemType.NORMAL, tM),
+            new IRConst(initialValues.Length)
+        );
+        allMoves.Add(moveMallocIntoTM);
+        allMoves.Add(move_Length_Into_DereferencedTM);
+
+        for (int i = 0; i < initialValues.Length; i++) {
+            IRMem dereferencedOffsetFromTM = new IRMem(
+                MemType.NORMAL, new IRBinOp(
+                    BinOpType.ADD,
+                    tM,
+                    new IRConst((i+1)*IRConfiguration.wordSize)
+                )
+            );
+            IRExpr initialValue = initialValues[i].accept<IRExpr>(this);
+
+            IRMove move_InitVal_Into_DereferencedOffsetFromTM = new IRMove(
+                dereferencedOffsetFromTM,
+                initialValue
+            );
+            allMoves.Add(
+                move_InitVal_Into_DereferencedOffsetFromTM
+            );
+        }
+        IRMove createArrayRefReg = new IRMove(
+            new IRTemp(arrayName),
+            new IRBinOp(
+                BinOpType.ADD,
+                tM, new IRConst(IRConfiguration.wordSize)
+            )
+        );
+        allMoves.Add(createArrayRefReg);
+
+        return new IRSeq(
+            allMoves
+        );
+    }
+
     //TODO: Implement these
     public T visit<T>(MultiDimArrayDeclAST multiDimArray) { throw new NotImplementedException(); }
 
