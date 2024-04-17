@@ -99,8 +99,8 @@ public class IRGenerationTests {
             int retVal = simulator.call("main", args);
         } catch(Exception e) {
             string errorMsg = e.Message;
-            bool isSemanticError = errorMsg.Contains("Out of bounds!");
-            Assert.That(isSemanticError, Is.True);
+            bool isOutOfBounds = errorMsg.Contains("Out of bounds!");
+            Assert.That(isOutOfBounds, Is.True);
         }
     }
 
@@ -114,8 +114,8 @@ public class IRGenerationTests {
             int retVal = simulator.call("main", args);
         } catch(Exception e) {
             string errorMsg = e.Message;
-            bool isSemanticError = errorMsg.Contains("Out of bounds!");
-            Assert.That(isSemanticError, Is.True);
+            bool isOutOfBounds = errorMsg.Contains("Out of bounds!");
+            Assert.That(isOutOfBounds, Is.True);
         }
     }
 }
