@@ -26,8 +26,8 @@ public sealed class InsnMapBuilder : IRVisitorVoid {
         }
 
         // Adding out of bounds support.
-        IRLabel outOfBoundsLabel = new IRLabel("outOfBounds");
-        IRCall outOfBoundsCall = new IRCall(new IRName("outOfBounds"), new List<IRExpr>() {});  
+        IRLabel outOfBoundsLabel = new IRLabel(IRConfiguration.OUT_OF_BOUNDS_FLAG);
+        IRCall outOfBoundsCall = new IRCall(new IRName(IRConfiguration.OUT_OF_BOUNDS_FLAG), new List<IRExpr>() {});  
         outOfBoundsLabel.accept(this);
         outOfBoundsCall.accept(this);
     }

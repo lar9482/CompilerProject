@@ -130,19 +130,22 @@ public sealed class IRGenerator : ASTVisitorGeneric {
      * Translating S(x: t[e])
      */
     private IRSeq allocateArrayDecl_WithoutExpr(ArrayDeclAST array) {
+        IRTemp tSize = new IRTemp(String.Format("{0}Size", array.name));
+        IRTemp tArray = new IRTemp(String.Format("{0}A", array.name));
+
         // Step1: Computing size of the array, then moving it into "tSize"
         IRExpr irSize = array.size.accept<IRExpr>(this);
         IRMove computeSize = new IRMove(
-            new IRTemp("tSize"),
+            tSize,
             irSize
         );
 
-        //Step 2: Using "tSize", allocating memory and storing the start address in "tArrayAddr"
+        //Step 2: Using "tSize", allocating memory and storing the start address in "tArray"
         IRBinOp ir_BytesToAlloc = new IRBinOp(
             BinOpType.ADD,
             new IRBinOp(
                 BinOpType.MUL,
-                new IRTemp("tSize"),
+                tSize,
                 new IRConst(IRConfiguration.wordSize)
             ),
             new IRConst(IRConfiguration.wordSize)
@@ -152,14 +155,14 @@ public sealed class IRGenerator : ASTVisitorGeneric {
             new List<IRExpr>() { ir_BytesToAlloc }
         );
         IRMove allocateMem = new IRMove(
-            new IRTemp("tArrayAddr"),
+            new IRTemp(String.Format("{0}A", array.name)),
             irCallMalloc
         );
 
         //Step 3: Using "tArrayAddr", place the size at that address in memory.
         IRMove storeSizeInMem = new IRMove(
-            new IRMem(MemType.NORMAL, new IRTemp("tArrayAddr")),
-            new IRTemp("tSize")
+            new IRMem(MemType.NORMAL, tArray),
+            new IRTemp(String.Format("{0}Size", array.name))
         );
 
         //Step 4: A register named after the array will now hold the starting address for the array.
@@ -167,7 +170,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
             new IRTemp(array.name),
             new IRBinOp(
                 BinOpType.ADD,
-                new IRTemp("tArrayAddr"),
+                tArray,
                 new IRConst(IRConfiguration.wordSize)
             )
         );
@@ -334,8 +337,35 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IRSeq>(irSequence);
     }
     
+    public T visit<T>(ArrayAssignAST arrayAssign) { 
+        IR_Eseq computeThenDeref_accessAddr = arrayAssign.arrayAccess.accept<IR_Eseq>(this);
+        if (computeThenDeref_accessAddr.stmt.GetType() != typeof(IRSeq)) {
+            throw new Exception("Computation of the access access was expected to be an IRSeq");
+        }
+
+        if (computeThenDeref_accessAddr.expr.GetType() != typeof(IRMem)) {
+            throw new Exception("Dereference of the access access was expected to be an IRMem");
+        }
+
+        IRSeq computeAccessAddr = (IRSeq) computeThenDeref_accessAddr.stmt;
+        IRMem derefAccessAddr = (IRMem) computeThenDeref_accessAddr.expr;
+        IRExpr assignValue = arrayAssign.value.accept<IRExpr>(this);
+
+        IRMove moveValueIntoDeref = new IRMove(
+            derefAccessAddr,
+            assignValue
+        );
+
+        List<IRStmt> allStmts = computeAccessAddr.statements;
+        allStmts.Add(moveValueIntoDeref);
+        IRSeq compute_Deref_ThenAssign = new IRSeq(
+            allStmts
+        );
+
+        return matchThenReturn<T, IRSeq>(compute_Deref_ThenAssign);
+    }
+
     //TODO: Implement conditionals, while loops, and array assigns.
-    public T visit<T>(ArrayAssignAST arrayAssign) { throw new NotImplementedException(); }
     public T visit<T>(MultiDimArrayAssignAST multiDimArrayAssign) { throw new NotImplementedException(); }
     public T visit<T>(ConditionalAST conditional) { throw new NotImplementedException(); }
     public T visit<T>(WhileLoopAST whileLoop) { throw new NotImplementedException(); }
@@ -451,7 +481,72 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IRTemp>(temp);
     }
 
-    public T visit<T>(ArrayAccessAST arrayAccess) { throw new NotImplementedException(); }
+    public T visit<T>(ArrayAccessAST arrayAccess) { 
+        IRTemp tA = new IRTemp(String.Format("{0}A", arrayAccess.arrayName));
+        IRTemp tI = new IRTemp(String.Format("{0}I", arrayAccess.arrayName));
+
+        //Step 1
+        IRMove regStartAddr = new IRMove(
+            tA,
+            new IRTemp(arrayAccess.arrayName)
+        );
+
+        //Step 2:
+        IRExpr arrayIndexAddr = arrayAccess.accessValue.accept<IRExpr>(this);
+        IRMove regIndexAddr = new IRMove(
+            tI,
+            arrayIndexAddr
+        );
+        
+
+        //Step 3:
+        IRLabel okLabel = createNewLabel();
+        IRCJump determineOutOfBounds = new IRCJump(
+            new IRBinOp(
+                BinOpType.ULT,
+                tI,
+                new IRMem(
+                    MemType.NORMAL,
+                    new IRBinOp(
+                        BinOpType.SUB,
+                        tA,
+                        new IRConst(IRConfiguration.wordSize)
+                    )
+                )
+            ),
+            okLabel.name,
+            IRConfiguration.OUT_OF_BOUNDS_FLAG
+        );
+
+        IRSeq computeAccessAddr = new IRSeq(new List<IRStmt>() {
+            regStartAddr,
+            regIndexAddr,
+            determineOutOfBounds,
+            okLabel
+        });
+
+        IRMem dereferenceAccessAddr = new IRMem(
+            MemType.NORMAL,
+            new IRBinOp(
+                BinOpType.ADD,
+                tA,
+                new IRBinOp(
+                    BinOpType.MUL,
+                    tI,
+                    new IRConst(IRConfiguration.wordSize)
+                )
+            )
+        );
+
+        IR_Eseq evalThenExe = new IR_Eseq(
+            computeAccessAddr,
+            dereferenceAccessAddr
+        );
+        
+        return matchThenReturn<T, IR_Eseq>(evalThenExe);
+    }
+
+    //TODO: Implement this later.
     public T visit<T>(MultiDimArrayAccessAST multiDimArrayAccess) { throw new NotImplementedException(); }
 
     public T visit<T>(FunctionCallAST functionCall) { 
@@ -512,5 +607,12 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         }
 
         return symbol;
+    }
+
+    private IRLabel createNewLabel() {
+        IRLabel label = new IRLabel(labelCounter.ToString());
+        labelCounter++;
+
+        return label;
     }
 }
