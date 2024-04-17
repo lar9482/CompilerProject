@@ -351,6 +351,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         IRMem derefAccessAddr = (IRMem) computeThenDeref_accessAddr.expr;
         IRExpr assignValue = arrayAssign.value.accept<IRExpr>(this);
 
+        // Mem[tA + 4*tI] <- assignValue
         IRMove moveValueIntoDeref = new IRMove(
             derefAccessAddr,
             assignValue
@@ -485,13 +486,13 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         IRTemp tA = new IRTemp(String.Format("{0}A", arrayAccess.arrayName));
         IRTemp tI = new IRTemp(String.Format("{0}I", arrayAccess.arrayName));
 
-        //Step 1
+        //Step 1: Moving the name of the array into a new register (tA).
         IRMove regStartAddr = new IRMove(
             tA,
             new IRTemp(arrayAccess.arrayName)
         );
 
-        //Step 2:
+        //Step 2: Computing the index, then moving it into the tI register.
         IRExpr arrayIndexAddr = arrayAccess.accessValue.accept<IRExpr>(this);
         IRMove regIndexAddr = new IRMove(
             tI,
@@ -499,7 +500,11 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         );
         
 
-        //Step 3:
+        //Step 3: Comparing tI with the length of the array, which lives at tA-4 in memory(wordSize = 4)
+
+        //Jumping to the out of bounds error is there is a problem.
+        //NOTE: unsigned less than is used to handle negative indexes, because
+        //this is result in a large number. Neat trick.
         IRLabel okLabel = createNewLabel();
         IRCJump determineOutOfBounds = new IRCJump(
             new IRBinOp(
@@ -525,6 +530,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
             okLabel
         });
 
+        // Finally dereferencing by Mem[tA + 4*tI] 
         IRMem dereferenceAccessAddr = new IRMem(
             MemType.NORMAL,
             new IRBinOp(
