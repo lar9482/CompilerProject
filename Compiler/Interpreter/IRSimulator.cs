@@ -27,7 +27,7 @@ public sealed class IRSimulator {
     
     /** heap maximum size. The maximum number of words supported */
     private int heapSizeMax;
-    private const int DEFAULT_HEAP_SIZE = 327680;
+    private const int DEFAULT_HEAP_SIZE = 32768000;
 
     private ExprStack exprStack;
 
@@ -64,7 +64,7 @@ public sealed class IRSimulator {
 
         //Support of memory on the heap
         libraryFunctions.Add("malloc");
-        libraryFunctions.Add("outOfBounds"); //Helper function for eventually detecting out of bounds errors.
+        libraryFunctions.Add(IRConfiguration.OUT_OF_BOUNDS_FLAG); //Helper function for eventually detecting out of bounds errors.
 
         InsnMapBuilder addressBuilder = new InsnMapBuilder();
         addressBuilder.visit(compUnit);
@@ -257,7 +257,7 @@ public sealed class IRSimulator {
                 case "malloc":
                     ret.Add(calloc(args[0]));
                     break;
-                case "outOfBounds":
+                case IRConfiguration.OUT_OF_BOUNDS_FLAG:
                     throw new Exception("Out of bounds!");
                 default:
                     throw new Exception("Unrecognized library call.");
@@ -315,7 +315,7 @@ public sealed class IRSimulator {
     private int findLabel(string name) {
         if (!nameToAddress.ContainsKey(name)) 
             throw new Exception(
-                String.Format("Could not find label {0}!", name)
+                String.Format("Could not find label {0}", name)
             );
         
         return nameToAddress[name];

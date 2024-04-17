@@ -73,7 +73,7 @@ public class IRGenerationTests {
         int[] args = new int[] { };
 
         IRSimulator simulator = new IRSimulator(IR);
-        simulator.call("main", args);
-        Console.WriteLine();
+        int retVal = simulator.call("main", args);
+        Assert.That(retVal, Is.EqualTo(150));
     }
 }
