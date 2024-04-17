@@ -6,6 +6,5 @@ main(): int {
     array[3] = 40;
     array[4] = 50;
     array[5] = array[0] + array[1] + array[2] + array[3] + array[4];
-
     return array[5];
 }

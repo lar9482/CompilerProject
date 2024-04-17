@@ -1,0 +1,4 @@
+main() {
+    array: int[10];
+    array[-1] = 0;
+}
