@@ -118,7 +118,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     public T visit<T>(ArrayDeclAST array) {
         if (array.initialValues == null) {
             return matchThenReturn<T, IRSeq>(
-                allocateArrayDecl_WithoutExpr(array)
+                allocateArrayDecl_WithoutExpr(array.name, array.size)
             );
         } else {
             return matchThenReturn<T, IRSeq>(
@@ -133,12 +133,12 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     /**
      * Translating S(x: t[e])
      */
-    private IRSeq allocateArrayDecl_WithoutExpr(ArrayDeclAST array) {
-        IRTemp tSize = new IRTemp(String.Format("{0}Size", array.name));
-        IRTemp tArray = new IRTemp(String.Format("{0}A", array.name));
+    private IRSeq allocateArrayDecl_WithoutExpr(string arrayName, ExprAST arraySize) {
+        IRTemp tSize = new IRTemp(String.Format("{0}Size", arrayName));
+        IRTemp tArray = new IRTemp(String.Format("{0}A", arrayName));
 
         // Step1: Computing size of the array, then moving it into "tSize"
-        IRExpr irSize = array.size.accept<IRExpr>(this);
+        IRExpr irSize = arraySize.accept<IRExpr>(this);
         IRMove computeSize = new IRMove(
             tSize,
             irSize
@@ -159,19 +159,19 @@ public sealed class IRGenerator : ASTVisitorGeneric {
             new List<IRExpr>() { ir_BytesToAlloc }
         );
         IRMove allocateMem = new IRMove(
-            new IRTemp(String.Format("{0}A", array.name)),
+            new IRTemp(String.Format("{0}A", arrayName)),
             irCallMalloc
         );
 
         //Step 3: Using "tArrayAddr", place the size at that address in memory.
         IRMove storeSizeInMem = new IRMove(
             new IRMem(MemType.NORMAL, tArray),
-            new IRTemp(String.Format("{0}Size", array.name))
+            new IRTemp(String.Format("{0}Size", arrayName))
         );
 
         //Step 4: A register named after the array will now hold the starting address for the array.
         IRMove createArrayRegister = new IRMove(
-            new IRTemp(array.name),
+            new IRTemp(arrayName),
             new IRBinOp(
                 BinOpType.ADD,
                 tArray,
