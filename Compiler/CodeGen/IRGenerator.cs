@@ -616,7 +616,9 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     }
 
     private IRLabel createNewLabel() {
-        IRLabel label = new IRLabel(labelCounter.ToString());
+        IRLabel label = new IRLabel(String.Format(
+            "L{0}:", labelCounter.ToString()
+        ));
         labelCounter++;
 
         return label;
