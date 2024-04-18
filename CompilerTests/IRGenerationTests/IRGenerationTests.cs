@@ -96,11 +96,12 @@ public class IRGenerationTests {
         try {
             int[] args = new int[] { };
             IRSimulator simulator = new IRSimulator(IR);
-            int retVal = simulator.call("main", args);
+            simulator.call("main", args);
+            Assert.Fail();
         } catch(Exception e) {
             string errorMsg = e.Message;
-            bool isOutOfBounds = errorMsg.Contains("Out of bounds!");
-            Assert.That(isOutOfBounds, Is.True);
+            bool isOutOfBoundsError = errorMsg.Contains("Out of bounds!");
+            Assert.That(isOutOfBoundsError, Is.True);
         }
     }
 
@@ -111,11 +112,12 @@ public class IRGenerationTests {
         try {
             int[] args = new int[] { };
             IRSimulator simulator = new IRSimulator(IR);
-            int retVal = simulator.call("main", args);
+            simulator.call("main", args);
+            Assert.Fail();
         } catch(Exception e) {
             string errorMsg = e.Message;
-            bool isOutOfBounds = errorMsg.Contains("Out of bounds!");
-            Assert.That(isOutOfBounds, Is.True);
+            bool isOutOfBoundsError = errorMsg.Contains("Out of bounds!");
+            Assert.That(isOutOfBoundsError, Is.True);
         }
     }
 }
