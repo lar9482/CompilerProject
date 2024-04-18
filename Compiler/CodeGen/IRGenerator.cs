@@ -253,7 +253,9 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     }
 
     //TODO: Implement these
-    public T visit<T>(MultiDimArrayDeclAST multiDimArray) { throw new NotImplementedException(); }
+    public T visit<T>(MultiDimArrayDeclAST multiDimArray) { 
+        throw new NotImplementedException(); 
+    }
 
     public T visit<T>(FunctionAST function) { 
         if (function.scope == null) {
@@ -691,5 +693,95 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         labelCounter++;
 
         return label;
+    }
+
+    /*
+     * Control flow is used for generating IR for expressions that output booleans.
+     */
+    private IRStmt translateBoolExprByCF(ExprAST expr, IRLabel trueLabel, IRLabel falseLabel) {
+        switch(expr) {
+            case BinaryExprAST binExpr:
+                return matchBinaryExprBool(binExpr, trueLabel, falseLabel);
+            case UnaryExprAST unaryExpr:
+                return matchUnaryExprBool(unaryExpr, trueLabel, falseLabel);
+            case BoolLiteralAST boolLit:
+                return matchBoolLiteral(boolLit, trueLabel, falseLabel);
+            default:
+                IRExpr irExpr = expr.accept<IRExpr>(this);
+                IRCJump condJump = new IRCJump(
+                    irExpr, trueLabel.name, falseLabel.name
+                );
+                return condJump;
+        }
+    }
+
+    private IRStmt matchBinaryExprBool(BinaryExprAST binExpr, IRLabel trueLabel, IRLabel falseLabel) {
+        switch(binExpr.exprType) {
+            case BinaryExprType.AND:
+                IRLabel L1 = createNewLabel();
+                IRStmt leftControlFlow_AND = translateBoolExprByCF(
+                    binExpr.leftOperand, L1, falseLabel
+                );
+                IRStmt rightControlFlow_AND = translateBoolExprByCF(
+                    binExpr.rightOperand, trueLabel, falseLabel
+                );
+                return new IRSeq(new List<IRStmt>() {
+                    leftControlFlow_AND,
+                    L1,
+                    rightControlFlow_AND
+                });
+            case BinaryExprType.OR:
+                IRLabel L2 = createNewLabel();
+                IRStmt leftControlFlow_OR = translateBoolExprByCF(
+                    binExpr.leftOperand, L2, trueLabel
+                );
+                IRStmt rightControlFlow_OR = translateBoolExprByCF(
+                    binExpr.rightOperand, trueLabel, falseLabel
+                );
+                return new IRSeq(new List<IRStmt>() {
+                    leftControlFlow_OR,
+                    L2,
+                    rightControlFlow_OR
+                });
+            default:
+                throw new Exception(
+                    String.Format(
+                        "{0} is not supported for binary boolean expressions",
+                        binExpr.exprType.ToString()
+                    )
+                );
+        }
+    }
+
+    private IRStmt matchUnaryExprBool(UnaryExprAST unaryExpr, IRLabel trueLabel, IRLabel falseLabel) {
+        switch(unaryExpr.exprType) {
+            case UnaryExprType.NOT:
+                return translateBoolExprByCF(
+                    unaryExpr.operand,
+                    falseLabel,
+                    trueLabel
+                );
+            default:
+                throw new Exception(
+                    String.Format(
+                        "{0} is not supported for unary boolean expressions",
+                        unaryExpr.exprType.ToString()
+                    )
+                );
+        }
+        throw new Exception();
+    }
+
+    private IRStmt matchBoolLiteral(BoolLiteralAST boolLit, IRLabel trueLabel, IRLabel falseLabel) {
+        switch(boolLit.value) {
+            case true:
+                return new IRJump(
+                    new IRName(trueLabel.name)
+                );
+            case false:
+                return new IRJump(
+                    new IRName(falseLabel.name)
+                );
+        }
     }
 }
