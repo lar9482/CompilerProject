@@ -826,11 +826,11 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     private IRStmt translateBoolExprByCF(ExprAST expr, IRLabel trueLabel, IRLabel falseLabel) {
         switch(expr) {
             case BinaryExprAST binExpr:
-                return matchBinaryExprBool(binExpr, trueLabel, falseLabel);
+                return generateBinaryExprBoolByCF(binExpr, trueLabel, falseLabel);
             case UnaryExprAST unaryExpr:
-                return matchUnaryExprBool(unaryExpr, trueLabel, falseLabel);
+                return generateUnaryExprBoolByCF(unaryExpr, trueLabel, falseLabel);
             case BoolLiteralAST boolLit:
-                return matchBoolLiteral(boolLit, trueLabel, falseLabel);
+                return generateBoolLiteralByCF(boolLit, trueLabel, falseLabel);
             default:
                 IRExpr irExpr = expr.accept<IRExpr>(this);
                 IRCJump condJump = new IRCJump(
@@ -840,7 +840,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         }
     }
 
-    private IRStmt matchBinaryExprBool(BinaryExprAST binExpr, IRLabel trueLabel, IRLabel falseLabel) {
+    private IRStmt generateBinaryExprBoolByCF(BinaryExprAST binExpr, IRLabel trueLabel, IRLabel falseLabel) {
         switch(binExpr.exprType) {
             case BinaryExprType.AND:
                 IRLabel L1 = createNewLabel();
@@ -879,7 +879,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         }
     }
 
-    private IRStmt matchUnaryExprBool(UnaryExprAST unaryExpr, IRLabel trueLabel, IRLabel falseLabel) {
+    private IRStmt generateUnaryExprBoolByCF(UnaryExprAST unaryExpr, IRLabel trueLabel, IRLabel falseLabel) {
         switch(unaryExpr.exprType) {
             case UnaryExprType.NOT:
                 return translateBoolExprByCF(
@@ -895,10 +895,9 @@ public sealed class IRGenerator : ASTVisitorGeneric {
                     falseLabel.name
                 );
         }
-        throw new Exception();
     }
 
-    private IRStmt matchBoolLiteral(BoolLiteralAST boolLit, IRLabel trueLabel, IRLabel falseLabel) {
+    private IRStmt generateBoolLiteralByCF(BoolLiteralAST boolLit, IRLabel trueLabel, IRLabel falseLabel) {
         switch(boolLit.value) {
             case true:
                 return new IRJump(
