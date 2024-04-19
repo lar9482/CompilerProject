@@ -443,7 +443,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
 
     public T visit<T>(ConditionalAST conditional) { 
         IRSeq seqStmts;
-        if (conditional.elseIfConditionalBlocks == null) {
+        if (conditional.elseIfConditionalBlocks == null || conditional.elseIfConditionalBlocks.Count == 0) {
             if (conditional.elseBlock == null) {
                 seqStmts = generateIfStmt(
                     conditional.ifCondition, conditional.ifBlock
@@ -492,7 +492,13 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     }
 
     private IRSeq generateIfElseStmt(ExprAST ifCondition, BlockAST ifBlock, BlockAST elseBlock) {
-        throw new Exception();
+        IRSeq irIfStmt = generateIfStmt(ifCondition, ifBlock);
+        List<IRStmt> stmts = irIfStmt.statements;
+
+        IRSeq irElseBlock = elseBlock.accept<IRSeq>(this);
+        stmts.Add(irElseBlock);
+
+        return new IRSeq(stmts);
     }
 
     private IRSeq generateIf_ElseIf_Stmt(
