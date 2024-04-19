@@ -1,3 +1,4 @@
+using System.Reflection.Emit;
 using CompilerProj.Context;
 using CompilerProj.Visitors;
 
@@ -440,7 +441,27 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     //TODO: Implement conditionals, while loops, and array assigns.
     public T visit<T>(MultiDimArrayAssignAST multiDimArrayAssign) { throw new NotImplementedException(); }
     public T visit<T>(ConditionalAST conditional) { throw new NotImplementedException(); }
-    public T visit<T>(WhileLoopAST whileLoop) { throw new NotImplementedException(); }
+
+    public T visit<T>(WhileLoopAST whileLoop) { 
+        IRLabel beginLoopLabel = createNewLabel();
+        IRLabel trueLabel = createNewLabel();
+        IRLabel falseLabel = createNewLabel();
+
+        IRStmt conditionIR = translateBoolExprByCF(
+            whileLoop.condition, trueLabel, falseLabel
+        );
+
+        IRSeq bodyIR = whileLoop.body.accept<IRSeq>(this);
+
+        return matchThenReturn<T, IRSeq>(new IRSeq(new List<IRStmt>() {
+            beginLoopLabel,
+            conditionIR,
+            trueLabel,
+            bodyIR,
+            new IRJump(new IRName(beginLoopLabel.name)),
+            falseLabel
+        }));
+    }
 
     public T visit<T>(ReturnAST returnStmt) { 
         List<IRExpr> irReturns = new List<IRExpr>();
@@ -478,27 +499,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IRCallStmt>(callStmt);
     }
     
-    //TODO: Implement binary expressions for booleans with short circuiting.
     public T visit<T>(BinaryExprAST binaryExpr) { 
-        switch(binaryExpr.exprType) {
-            case BinaryExprType.ADD:
-            case BinaryExprType.SUB:
-            case BinaryExprType.MULT:
-            case BinaryExprType.DIV:
-            case BinaryExprType.MOD:
-                return matchThenReturn<T, IRBinOp>(
-                    processIntegerBinExpr(binaryExpr)
-                );
-            default:
-                throw new Exception(
-                    String.Format(
-                        "IRGenerator: {0} is not a supported binary operator", binaryExpr.exprType
-                    )
-                );
-        }
-    }
-
-    private IRBinOp processIntegerBinExpr(BinaryExprAST binaryExpr) {
         IRExpr irLeft = binaryExpr.leftOperand.accept<IRExpr>(this);
         IRExpr irRight = binaryExpr.rightOperand.accept<IRExpr>(this);
         BinOpType opType;
@@ -509,27 +510,36 @@ public sealed class IRGenerator : ASTVisitorGeneric {
             case BinaryExprType.MULT: opType = BinOpType.MUL; break;
             case BinaryExprType.DIV: opType = BinOpType.DIV; break;
             case BinaryExprType.MOD: opType = BinOpType.MOD; break;
+            case BinaryExprType.EQUAL: opType = BinOpType.EQ; break;
+            case BinaryExprType.NOTEQ: opType = BinOpType.NEQ; break;
+            case BinaryExprType.LT: opType = BinOpType.LT; break;
+            case BinaryExprType.LEQ: opType = BinOpType.LEQ; break;
+            case BinaryExprType.GEQ: opType = BinOpType.GEQ; break;
+            case BinaryExprType.GT: opType = BinOpType.GT; break;
+            case BinaryExprType.OR: opType = BinOpType.OR; break;
+            case BinaryExprType.AND: opType = BinOpType.AND; break;
             default:
                 throw new Exception(
                     String.Format(
-                        "IRGenerator: {0} is not supported as a binary operation inbetween two integers.",
+                        "IRGenerator: {0} is not a supported binary operator for IR generation. Use control flow instead.", 
                         binaryExpr.exprType
                     )
                 );
         }
 
-        return new IRBinOp(
-            opType, irLeft, irRight
+        return matchThenReturn<T, IRBinOp>(
+            new IRBinOp(
+                opType, irLeft, irRight
+            )
         );
     }
 
-    //TODO: Implement unary expressions for booleans with short circuiting.
     public T visit<T>(UnaryExprAST unaryExpr) { 
+        IRExpr irOperand = unaryExpr.operand.accept<IRExpr>(this);
+        UnaryOpType opType;
         switch(unaryExpr.exprType) {
-            case UnaryExprType.NEGATE:
-                return matchThenReturn<T, IRUnaryOp>(
-                    processIntegerUnaryExpr(unaryExpr)
-                );
+            case UnaryExprType.NEGATE: opType = UnaryOpType.NEGATE; break;
+            case UnaryExprType.NOT: opType = UnaryOpType.NOT; break;
             default:
                 throw new Exception(
                     String.Format(
@@ -538,13 +548,11 @@ public sealed class IRGenerator : ASTVisitorGeneric {
                     )
                 );
         }
-    }
 
-    private IRUnaryOp processIntegerUnaryExpr(UnaryExprAST unaryExpr) {
-        IRExpr irOperand = unaryExpr.operand.accept<IRExpr>(this);
-
-        return new IRUnaryOp(
-            UnaryOpType.NEGATE, irOperand
+        return matchThenReturn<T, IRUnaryOp>(
+            new IRUnaryOp(
+                opType, irOperand
+            )
         );
     }
     
@@ -744,11 +752,12 @@ public sealed class IRGenerator : ASTVisitorGeneric {
                     rightControlFlow_OR
                 });
             default:
-                throw new Exception(
-                    String.Format(
-                        "{0} is not supported for binary boolean expressions",
-                        binExpr.exprType.ToString()
-                    )
+                IRBinOp binOp = binExpr.accept<IRBinOp>(this);
+
+                return new IRCJump(
+                    binOp,
+                    trueLabel.name,
+                    falseLabel.name
                 );
         }
     }
@@ -762,11 +771,11 @@ public sealed class IRGenerator : ASTVisitorGeneric {
                     trueLabel
                 );
             default:
-                throw new Exception(
-                    String.Format(
-                        "{0} is not supported for unary boolean expressions",
-                        unaryExpr.exprType.ToString()
-                    )
+                IRUnaryOp unaryOp = unaryExpr.accept<IRUnaryOp>(this);
+                return new IRCJump(
+                    unaryOp, 
+                    trueLabel.name, 
+                    falseLabel.name
                 );
         }
         throw new Exception();
