@@ -543,7 +543,16 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         Dictionary<ExprAST, BlockAST> elseIfConditionalBlocks,
         BlockAST elseBlock
     ) {
-        throw new Exception();
+        IRSeq irIf_ElseIf_Stmts = generateIf_ElseIf_Stmt(
+            ifCondition, ifBlock,
+            elseIfConditionalBlocks
+        );
+
+        List<IRStmt> irStmts = irIf_ElseIf_Stmts.statements;
+        IRSeq irElseBlock = elseBlock.accept<IRSeq>(this);
+        irStmts.Add(irElseBlock);
+
+        return new IRSeq(irStmts);
     }
 
     public T visit<T>(WhileLoopAST whileLoop) { 
