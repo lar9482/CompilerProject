@@ -704,7 +704,11 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     }
 
     /*
-     * Control flow is used for generating IR for expressions that output booleans.
+     * If there is a boolean expression that needs to utilize short circuiting,
+     * then control flow is utilized when emitting IR.
+     *
+     * Notably happens with statements that have boolean conditions embedded in them.
+     * (E.G conditional statements, while loops.)
      */
     private IRStmt translateBoolExprByCF(ExprAST expr, IRLabel trueLabel, IRLabel falseLabel) {
         switch(expr) {
