@@ -120,4 +120,15 @@ public class IRGenerationTests {
             Assert.That(isOutOfBoundsError, Is.True);
         }
     }
+
+    [Test]
+    public void whileLoop_10Iterations() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/whileLoop_10Iterations.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+
+        IRSimulator simulator = new IRSimulator(IR);
+        int retVal = simulator.call("main", args);
+        Assert.That(retVal, Is.EqualTo(10));
+    }
 }
