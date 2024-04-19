@@ -2,6 +2,10 @@ using System.Reflection.Emit;
 using CompilerProj.Context;
 using CompilerProj.Visitors;
 
+/*
+ * This is where the fun begins.
+ * This visitor will emit the middle level intermediate representation.
+ */
 public sealed class IRGenerator : ASTVisitorGeneric {
     private Context context;
     private int labelCounter;
