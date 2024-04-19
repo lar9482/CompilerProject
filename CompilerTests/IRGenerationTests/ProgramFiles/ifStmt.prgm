@@ -1,0 +1,16 @@
+main(): int {
+    x: int = 0;
+    y: int = 0;
+
+    // Testing that a true condition executes the block.
+    if (5 > 0) {
+        x = 10;
+    }
+
+    // Testing that false condition executes skips the block.
+    if (0 > 5) {
+        y = -10;
+    }
+
+    return x + y;
+}

@@ -440,7 +440,75 @@ public sealed class IRGenerator : ASTVisitorGeneric {
 
     //TODO: Implement conditionals, while loops, and array assigns.
     public T visit<T>(MultiDimArrayAssignAST multiDimArrayAssign) { throw new NotImplementedException(); }
-    public T visit<T>(ConditionalAST conditional) { throw new NotImplementedException(); }
+
+    public T visit<T>(ConditionalAST conditional) { 
+        IRSeq seqStmts;
+        if (conditional.elseIfConditionalBlocks == null) {
+            if (conditional.elseBlock == null) {
+                seqStmts = generateIfStmt(
+                    conditional.ifCondition, conditional.ifBlock
+                );
+            } else {
+                seqStmts = generateIfElseStmt(
+                    conditional.ifCondition, conditional.ifBlock, conditional.elseBlock
+                );
+            }
+        } else {
+            if (conditional.elseBlock == null) {
+                seqStmts = generateIf_ElseIf_Stmt(
+                    conditional.ifCondition,
+                    conditional.ifBlock,
+                    conditional.elseIfConditionalBlocks
+                );
+
+            } else {
+                seqStmts = generateIf_ElseIf_ElseStmt(
+                    conditional.ifCondition,
+                    conditional.ifBlock,
+                    conditional.elseIfConditionalBlocks,
+                    conditional.elseBlock
+                );
+            }
+        }
+        
+        return matchThenReturn<T, IRSeq>(seqStmts);
+    }
+
+    private IRSeq generateIfStmt(ExprAST ifCondition, BlockAST ifBlock) {
+        IRLabel trueLabel = createNewLabel();
+        IRLabel falseLabel = createNewLabel();
+
+        IRStmt irIfCondition = translateBoolExprByCF(
+            ifCondition, trueLabel, falseLabel
+        );
+        IRSeq irIfBlock = ifBlock.accept<IRSeq>(this);
+
+        return new IRSeq(new List<IRStmt>() {
+            irIfCondition,
+            trueLabel,
+            irIfBlock,
+            falseLabel
+        });
+    }
+
+    private IRSeq generateIfElseStmt(ExprAST ifCondition, BlockAST ifBlock, BlockAST elseBlock) {
+        throw new Exception();
+    }
+
+    private IRSeq generateIf_ElseIf_Stmt(
+        ExprAST ifCondition, BlockAST ifBlock, 
+        Dictionary<ExprAST, BlockAST> elseIfConditionalBlocks
+    ) {
+        throw new Exception();
+    }
+
+    private IRSeq generateIf_ElseIf_ElseStmt(
+        ExprAST ifCondition, BlockAST ifBlock, 
+        Dictionary<ExprAST, BlockAST> elseIfConditionalBlocks,
+        BlockAST elseBlock
+    ) {
+        throw new Exception();
+    }
 
     public T visit<T>(WhileLoopAST whileLoop) { 
         IRLabel beginLoopLabel = createNewLabel();
