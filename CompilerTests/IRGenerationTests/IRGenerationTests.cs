@@ -164,4 +164,15 @@ public class IRGenerationTests {
         int retVal = simulator.call("main", args);
         Assert.That(retVal, Is.EqualTo(0));
     }
+
+    [Test]
+    public void if_else_stmt() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/if_else_stmt.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+
+        IRSimulator simulator = new IRSimulator(IR);
+        int retVal = simulator.call("main", args);
+        Assert.That(retVal, Is.EqualTo(10));
+    }
 }
