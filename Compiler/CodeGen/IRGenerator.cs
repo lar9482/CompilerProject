@@ -164,14 +164,14 @@ public sealed class IRGenerator : ASTVisitorGeneric {
             new List<IRExpr>() { ir_BytesToAlloc }
         );
         IRMove allocateMem = new IRMove(
-            new IRTemp(String.Format("{0}A", arrayName)),
+            tArray,
             irCallMalloc
         );
 
         //Step 3: Using "tArrayAddr", place the size at that address in memory.
         IRMove storeSizeInMem = new IRMove(
             new IRMem(MemType.NORMAL, tArray),
-            new IRTemp(String.Format("{0}Size", arrayName))
+            tSize
         );
 
         //Step 4: A register named after the array will now hold the starting address for the array.
@@ -259,7 +259,139 @@ public sealed class IRGenerator : ASTVisitorGeneric {
 
     //TODO: Implement these
     public T visit<T>(MultiDimArrayDeclAST multiDimArray) { 
+        if (multiDimArray.initialValues == null) {
+            return matchThenReturn<T, IRSeq>(
+                allocateMultiDimArray_WithoutExprs(
+                    multiDimArray.name,
+                    multiDimArray.rowSize,
+                    multiDimArray.colSize
+                )
+            );
+        } else {
+
+        }
         throw new NotImplementedException(); 
+    }
+
+    private IRSeq allocateMultiDimArray_WithoutExprs(string arrayName, ExprAST rowSize, ExprAST colSize) {
+        IRTemp tI = new IRTemp(String.Format("{0}I", arrayName));
+        IRTemp tRow = new IRTemp(String.Format("{0}Row", arrayName));
+        IRTemp tCol = new IRTemp(String.Format("{0}Col", arrayName));
+        IRTemp tBase = new IRTemp(String.Format("{0}Base", arrayName));
+        IRTemp tOffset = new IRTemp(String.Format("{0}Offset", arrayName));
+
+        List<IRStmt> irStmts = new List<IRStmt>();
+
+        /// Allocating space for the array rows ///
+        IRMove initializeRowSize = new IRMove(
+            tRow,
+            rowSize.accept<IRExpr>(this)
+        );
+        IRBinOp rowBytesToAllocate = new IRBinOp(
+            BinOpType.ADD,
+            new IRBinOp(
+                BinOpType.MUL,
+                tRow,
+                new IRConst(IRConfiguration.wordSize)
+            ),
+            new IRConst(IRConfiguration.wordSize)
+        );
+        IRMove initializeBaseAddr = new IRMove(
+            tBase, new IRCall(
+                new IRName("malloc"),
+                new List<IRExpr>() { rowBytesToAllocate }
+            )
+        );
+        IRMove moveRowSize_Into_tBaseLocation = new IRMove(
+            new IRMem(MemType.NORMAL, tBase), tRow
+        );
+        IRMove moveTBaseIntoArrayRef = new IRMove(
+            new IRTemp(arrayName), new IRBinOp(
+                BinOpType.ADD,
+                tBase, new IRConst(IRConfiguration.wordSize)
+            )
+        );
+        irStmts.Add(initializeRowSize);
+        irStmts.Add(initializeBaseAddr);
+        irStmts.Add(moveRowSize_Into_tBaseLocation);
+        irStmts.Add(moveTBaseIntoArrayRef);
+
+        /// Setting up the loop for allocating space for the columns///
+        IRMove initializeTI_To_0 = new IRMove(tI, new IRConst(0));
+        IRLabel highLabel = createNewLabel();
+        IRLabel trueLabel = createNewLabel();
+        IRLabel falseLabel = createNewLabel();
+        IRCJump loopCondition = new IRCJump(
+            new IRBinOp(BinOpType.LT, tI, tRow),
+            trueLabel.name,
+            falseLabel.name
+        );
+        irStmts.Add(initializeTI_To_0);
+        irStmts.Add(highLabel);
+        irStmts.Add(loopCondition);
+        irStmts.Add(trueLabel);
+
+        /// Allocating space for the array columns ///
+        IRMove moveColSize_into_tCol = new IRMove(
+            tCol, 
+            colSize.accept<IRExpr>(this)
+        );
+        IRBinOp colBytesToAllocate = new IRBinOp(
+            BinOpType.ADD,
+            new IRBinOp(
+                BinOpType.MUL,
+                tCol,
+                new IRConst(IRConfiguration.wordSize)
+            ),
+            new IRConst(IRConfiguration.wordSize)
+        );
+        IRMove initializeOffsetAddr = new IRMove(
+            tOffset, new IRCall(
+                new IRName("malloc"),
+                new List<IRExpr>() { colBytesToAllocate }
+            )
+        );
+        IRMove moveTCol_Into_tOffsetLocation = new IRMove(
+            new IRMem(MemType.NORMAL, tOffset), tCol
+        );
+        IRMove calculateArrayLocation = new IRMove(
+            new IRMem(MemType.NORMAL, new IRBinOp(
+                BinOpType.ADD, 
+                new IRBinOp(BinOpType.ADD, tBase, new IRConst(IRConfiguration.wordSize)), 
+                new IRBinOp(
+                    BinOpType.MUL, tI, new IRConst(IRConfiguration.wordSize)
+                )
+            )),
+            new IRBinOp(
+                BinOpType.ADD,
+                tOffset, new IRConst(IRConfiguration.wordSize)
+            )
+        );
+        IRMove incrementTI = new IRMove(
+            tI, new IRBinOp(
+                BinOpType.ADD,
+                tI, new IRConst(1)
+            )
+        );
+        irStmts.Add(moveColSize_into_tCol);
+        irStmts.Add(initializeOffsetAddr);
+        irStmts.Add(moveTCol_Into_tOffsetLocation);
+        irStmts.Add(calculateArrayLocation);
+        irStmts.Add(incrementTI);
+
+        /// Finishing loop ///
+        IRJump jumpToTopOfLoop = new IRJump(
+            new IRName(highLabel.name)
+        );
+        irStmts.Add(jumpToTopOfLoop);
+        irStmts.Add(falseLabel);
+
+
+        return new IRSeq(irStmts);
+    }
+
+    private void allocateMultiDimArray_WithExprs() {
+
     }
 
     public T visit<T>(FunctionAST function) { 
@@ -698,7 +830,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
 
         //Step 3: Comparing tI with the length of the array, which lives at tA-4 in memory(wordSize = 4)
 
-        //Jumping to the out of bounds error is there is a problem.
+        //Jumping to the out of bounds error when there is a problem.
         //NOTE: unsigned less than is used to handle negative indexes, because
         //this is result in a large number. Neat trick.
         IRLabel okLabel = createNewLabel();
