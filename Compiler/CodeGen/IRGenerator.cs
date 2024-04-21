@@ -122,15 +122,18 @@ public sealed class IRGenerator : ASTVisitorGeneric {
 
     public T visit<T>(ArrayDeclAST array) {
         if (array.initialValues == null) {
+            Tuple<List<IRTemp>, IRSeq> regsAndIR = allocateArrayDecl_WithoutExpr(array.name, array.size);
             return matchThenReturn<T, IRSeq>(
-                allocateArrayDecl_WithoutExpr(array.name, array.size)
+                regsAndIR.Item2
             );
+            
         } else {
+            Tuple<List<IRTemp>, IRSeq> regsAndIR = allocateArrayDecl_WithExpr(
+                array.name,
+                array.initialValues
+            );
             return matchThenReturn<T, IRSeq>(
-                allocateArrayDecl_WithExpr(
-                    array.name,
-                    array.initialValues
-                )
+                regsAndIR.Item2
             );
         }
     }
@@ -138,9 +141,10 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     /**
      * Translating S(x: t[e])
      */
-    private IRSeq allocateArrayDecl_WithoutExpr(string arrayName, ExprAST arraySize) {
+    private Tuple<List<IRTemp>, IRSeq> allocateArrayDecl_WithoutExpr(string arrayName, ExprAST arraySize) {
         IRTemp tSize = new IRTemp(String.Format("{0}Size", arrayName));
-        IRTemp tArray = new IRTemp(String.Format("{0}A", arrayName));
+        IRTemp tArrayAddr = new IRTemp(String.Format("{0}A", arrayName));
+        IRTemp tArray = new IRTemp(arrayName);
 
         // Step1: Computing size of the array, then moving it into "tSize"
         IRExpr irSize = arraySize.accept<IRExpr>(this);
@@ -164,40 +168,48 @@ public sealed class IRGenerator : ASTVisitorGeneric {
             new List<IRExpr>() { ir_BytesToAlloc }
         );
         IRMove allocateMem = new IRMove(
-            tArray,
+            tArrayAddr,
             irCallMalloc
         );
 
         //Step 3: Using "tArrayAddr", place the size at that address in memory.
         IRMove storeSizeInMem = new IRMove(
-            new IRMem(MemType.NORMAL, tArray),
+            new IRMem(MemType.NORMAL, tArrayAddr),
             tSize
         );
 
         //Step 4: A register named after the array will now hold the starting address for the array.
         IRMove createArrayRegister = new IRMove(
-            new IRTemp(arrayName),
+            tArray,
             new IRBinOp(
                 BinOpType.ADD,
-                tArray,
+                tArrayAddr,
                 new IRConst(IRConfiguration.wordSize)
             )
         );
 
-        return new IRSeq(new List<IRStmt>() {
-            computeSize,
-            allocateMem,
-            storeSizeInMem,
-            createArrayRegister
-        });
+        return Tuple.Create<List<IRTemp>, IRSeq>(
+            new List<IRTemp>() {
+                tSize,
+                tArrayAddr,
+                tArray
+            },
+            new IRSeq(new List<IRStmt>() {
+                computeSize,
+                allocateMem,
+                storeSizeInMem,
+                createArrayRegister
+            })
+        );
     }
     
-    private IRSeq allocateArrayDecl_WithExpr(string arrayName, ExprAST[] initialValues) {
+    private Tuple<List<IRTemp>, IRSeq> allocateArrayDecl_WithExpr(string arrayName, ExprAST[] initialValues) {
         IRTemp tM = new IRTemp(
             String.Format(
                 "{0}A", arrayName
             )
         );
+        IRTemp tArray = new IRTemp(arrayName);
 
         IRBinOp bytesToAllocate = new IRBinOp(
             BinOpType.ADD,
@@ -244,7 +256,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
             );
         }
         IRMove createArrayRefReg = new IRMove(
-            new IRTemp(arrayName),
+            tArray,
             new IRBinOp(
                 BinOpType.ADD,
                 tM, new IRConst(IRConfiguration.wordSize)
@@ -252,8 +264,14 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         );
         allMoves.Add(createArrayRefReg);
 
-        return new IRSeq(
-            allMoves
+        return Tuple.Create<List<IRTemp>, IRSeq>(
+            new List<IRTemp>() {
+                tM,
+                tArray
+            },
+            new IRSeq(
+                allMoves
+            )
         );
     }
 
@@ -268,7 +286,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
                 )
             );
         } else {
-
+            
         }
         throw new NotImplementedException(); 
     }
