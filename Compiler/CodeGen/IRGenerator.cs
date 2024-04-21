@@ -126,7 +126,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
             return matchThenReturn<T, IRSeq>(
                 regsAndIR.Item2
             );
-            
+
         } else {
             Tuple<List<IRTemp>, IRSeq> regsAndIR = allocateArrayDecl_WithExpr(
                 array.name,
@@ -140,10 +140,16 @@ public sealed class IRGenerator : ASTVisitorGeneric {
 
     /**
      * Translating S(x: t[e])
+     * 
      */
     private Tuple<List<IRTemp>, IRSeq> allocateArrayDecl_WithoutExpr(string arrayName, ExprAST arraySize) {
+        /** Register that holds the array size **/
         IRTemp tSize = new IRTemp(String.Format("{0}Size", arrayName));
-        IRTemp tArrayAddr = new IRTemp(String.Format("{0}A", arrayName));
+
+        /** Register that holds starting address for the entire array INCLUDING THE SIZE. **/
+        IRTemp tArrayAddr = new IRTemp(String.Format("{0}Addr", arrayName));
+
+        /** Register that holds the starting address for indexing the array **/
         IRTemp tArray = new IRTemp(arrayName);
 
         // Step1: Computing size of the array, then moving it into "tSize"
@@ -290,122 +296,66 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         }
         throw new NotImplementedException(); 
     }
-
+    
     private IRSeq allocateMultiDimArray_WithoutExprs(string arrayName, ExprAST rowSize, ExprAST colSize) {
-        IRTemp tI = new IRTemp(String.Format("{0}I", arrayName));
-        IRTemp tRow = new IRTemp(String.Format("{0}Row", arrayName));
-        IRTemp tCol = new IRTemp(String.Format("{0}Col", arrayName));
-        IRTemp tBase = new IRTemp(String.Format("{0}Base", arrayName));
-        IRTemp tOffset = new IRTemp(String.Format("{0}Offset", arrayName));
-
-        List<IRStmt> irStmts = new List<IRStmt>();
-
         /// Allocating space for the array rows ///
-        IRMove initializeRowSize = new IRMove(
-            tRow,
-            rowSize.accept<IRExpr>(this)
-        );
-        IRBinOp rowBytesToAllocate = new IRBinOp(
-            BinOpType.ADD,
-            new IRBinOp(
-                BinOpType.MUL,
-                tRow,
-                new IRConst(IRConfiguration.wordSize)
-            ),
-            new IRConst(IRConfiguration.wordSize)
-        );
-        IRMove initializeBaseAddr = new IRMove(
-            tBase, new IRCall(
-                new IRName("malloc"),
-                new List<IRExpr>() { rowBytesToAllocate }
-            )
-        );
-        IRMove moveRowSize_Into_tBaseLocation = new IRMove(
-            new IRMem(MemType.NORMAL, tBase), tRow
-        );
-        IRMove moveTBaseIntoArrayRef = new IRMove(
-            new IRTemp(arrayName), new IRBinOp(
-                BinOpType.ADD,
-                tBase, new IRConst(IRConfiguration.wordSize)
-            )
-        );
-        irStmts.Add(initializeRowSize);
-        irStmts.Add(initializeBaseAddr);
-        irStmts.Add(moveRowSize_Into_tBaseLocation);
-        irStmts.Add(moveTBaseIntoArrayRef);
+        Tuple<List<IRTemp>, IRSeq> allocateArrayRows_WithRegs = allocateArrayDecl_WithoutExpr(
+            arrayName + "Row",
+            rowSize
+        ); 
+        IRTemp tRowSize = allocateArrayRows_WithRegs.Item1[0];
+        IRTemp tArrayAddr_Base = allocateArrayRows_WithRegs.Item1[1];
+        List<IRStmt> allStmts = allocateArrayRows_WithRegs.Item2.statements;
 
         /// Setting up the loop for allocating space for the columns///
-        IRMove initializeTI_To_0 = new IRMove(tI, new IRConst(0));
-        IRLabel highLabel = createNewLabel();
-        IRLabel trueLabel = createNewLabel();
-        IRLabel falseLabel = createNewLabel();
+        IRTemp tI = new IRTemp(String.Format("{0}RowI", arrayName));
+        IRMove initialize_TI_To_0 = new IRMove(tI, new IRConst(0));
+        IRLabel startLoopLabel = createNewLabel();
+        IRLabel trueLoopLabel = createNewLabel();
+        IRLabel falseLoopLabel = createNewLabel();
         IRCJump loopCondition = new IRCJump(
-            new IRBinOp(BinOpType.LT, tI, tRow),
-            trueLabel.name,
-            falseLabel.name
+             new IRBinOp(BinOpType.LT, tI, tRowSize),
+             trueLoopLabel.name,
+             falseLoopLabel.name
         );
-        irStmts.Add(initializeTI_To_0);
-        irStmts.Add(highLabel);
-        irStmts.Add(loopCondition);
-        irStmts.Add(trueLabel);
+        allStmts.Add(initialize_TI_To_0);
+        allStmts.Add(startLoopLabel);
+        allStmts.Add(loopCondition);
+        allStmts.Add(trueLoopLabel);
 
-        /// Allocating space for the array columns ///
-        IRMove moveColSize_into_tCol = new IRMove(
-            tCol, 
-            colSize.accept<IRExpr>(this)
-        );
-        IRBinOp colBytesToAllocate = new IRBinOp(
-            BinOpType.ADD,
-            new IRBinOp(
-                BinOpType.MUL,
-                tCol,
-                new IRConst(IRConfiguration.wordSize)
-            ),
-            new IRConst(IRConfiguration.wordSize)
-        );
-        IRMove initializeOffsetAddr = new IRMove(
-            tOffset, new IRCall(
-                new IRName("malloc"),
-                new List<IRExpr>() { colBytesToAllocate }
-            )
-        );
-        IRMove moveTCol_Into_tOffsetLocation = new IRMove(
-            new IRMem(MemType.NORMAL, tOffset), tCol
-        );
-        IRMove calculateArrayLocation = new IRMove(
+        /// Allocating space for the array columns, wrapped in a loop: while(i < row) ///
+        Tuple<List<IRTemp>, IRSeq> allocateArrayCols_WithRegs = allocateArrayDecl_WithoutExpr(
+            arrayName + "Col",
+            colSize
+        ); 
+        IRTemp tArrayLocation = allocateArrayCols_WithRegs.Item1[2];
+        allStmts = allStmts.Concat(allocateArrayCols_WithRegs.Item2.statements).ToList();
+        IRMove pointToArrayLocation = new IRMove(
             new IRMem(MemType.NORMAL, new IRBinOp(
                 BinOpType.ADD, 
-                new IRBinOp(BinOpType.ADD, tBase, new IRConst(IRConfiguration.wordSize)), 
-                new IRBinOp(
-                    BinOpType.MUL, tI, new IRConst(IRConfiguration.wordSize)
-                )
+                new IRBinOp(BinOpType.ADD, tArrayAddr_Base, new IRConst(IRConfiguration.wordSize)), 
+                new IRBinOp(BinOpType.MUL, tI, new IRConst(IRConfiguration.wordSize))
             )),
-            new IRBinOp(
-                BinOpType.ADD,
-                tOffset, new IRConst(IRConfiguration.wordSize)
-            )
+            tArrayLocation
         );
+        allStmts.Add(pointToArrayLocation);
+
+        /// Incrementing tI, and closing the while loop ///
         IRMove incrementTI = new IRMove(
-            tI, new IRBinOp(
+            tI,
+            new IRBinOp(
                 BinOpType.ADD,
                 tI, new IRConst(1)
             )
         );
-        irStmts.Add(moveColSize_into_tCol);
-        irStmts.Add(initializeOffsetAddr);
-        irStmts.Add(moveTCol_Into_tOffsetLocation);
-        irStmts.Add(calculateArrayLocation);
-        irStmts.Add(incrementTI);
-
-        /// Finishing loop ///
         IRJump jumpToTopOfLoop = new IRJump(
-            new IRName(highLabel.name)
+            new IRName(startLoopLabel.name)
         );
-        irStmts.Add(jumpToTopOfLoop);
-        irStmts.Add(falseLabel);
+        allStmts.Add(incrementTI);
+        allStmts.Add(jumpToTopOfLoop);
+        allStmts.Add(falseLoopLabel);
 
-
-        return new IRSeq(irStmts);
+        return new IRSeq(allStmts);
     }
 
     private void allocateMultiDimArray_WithExprs() {
