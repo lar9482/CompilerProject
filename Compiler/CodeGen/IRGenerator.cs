@@ -46,6 +46,9 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         );
     }
 
+    /*
+     * S[x: t = e] = MOVE(TEMP(x), E(e))
+     */
     public T visit<T>(VarDeclAST varDecl) { 
         //TODO: Handle empty expressions.
         if (varDecl.initialValue == null) {
@@ -61,6 +64,16 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IRMove>(irMove);
     }
 
+    /*
+     * S[x1: t1, x2: t2,...,xn: tn = e1, e2,...,en] = SEQ(
+     *    MOVE(TEMP(x1), E(e1)),
+     *    MOVE(TEMP(x2), E(e2)),
+     *    .
+     *    .
+     *    .
+     *    MOVE(TEMP(xn), E(en)),
+     * )
+     */
     public T visit<T>(MultiVarDeclAST multiVarDecl) { 
         List<IRStmt> irStmts = new List<IRStmt>();
 
@@ -86,6 +99,17 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         );
     }
 
+    /*
+     * S[x1: t1, x2: t2,...,xn: tn = function(e1, e2,...,en)] = SEQ(
+     *   CALLStmt(NAME(function), E[e1], E[e2],...,E[en]),
+     *   MOVE(TEMP(x1), RET1),
+     *   MOVE(TEMP(x2), RET2),
+     *   .
+     *   .
+     *   .
+     *   MOVE(TEMP(xn), RETn),
+     * )
+     */
     public T visit<T>(MultiVarDeclCallAST multiVarDeclCall) { 
         SymbolFunction symbolFunction = lookUpSymbolFromContext<SymbolFunction>(
             multiVarDeclCall.functionName, -1, -1
@@ -120,6 +144,9 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IRSeq>(irSequence);
     }
 
+    /*
+     * Either S[x: t[e]] or S[x: t[] = {e1, e2,...,en}]
+     */
     public T visit<T>(ArrayDeclAST array) {
         if (array.initialValues == null) {
             Tuple<List<IRTemp>, IRSeq> regsAndIR = allocateArrayDecl_WithoutExpr(array.name, array.size);
@@ -138,9 +165,17 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         }
     }
 
-    /**
-     * Translating S(x: t[e])
+    /*
+     * S[x: t[e]] = SEQ (
+     *   MOVE(tSize, E[e]),
+     *   MOVE(tArrayAddr, Call(Name("malloc"), tSize*wordSize + wordSize)), NOTE: wordSize = 4)
+     *   MOVE(MEM(tArrayAddr), tSize)
+     *   MOVE(TEMP(x), tArrayAddr + wordSize)
+     * )
      * 
+     * NOTE:
+     * Since this is a reused function, tSize, tArrayAddr, and TEMP(x) are explicited
+     * returned as well.
      */
     private Tuple<List<IRTemp>, IRSeq> allocateArrayDecl_WithoutExpr(string arrayName, ExprAST arraySize) {
         /** Register that holds the array size **/
@@ -209,8 +244,23 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         );
     }
     
+    /*
+     * S[x: t[] = {e1, e2,...,en}] = ESEQ(
+     *   SEQ(
+     *       MOVE(tArrayAddr, Call(Name("malloc"), n*wordSize + wordSize)), NOTE: wordSize=4
+     *       MOVE(MEM(tArrayAddr), CONST(n))
+     *       MOVE(MEM(tArrayAddr + wordSize), E[e1])
+     *       MOVE(MEM(tArrayAddr + wordSize*2), E[e2])
+     *       .
+     *       .
+     *       .
+     *       MOVE(MEM(tArrayAddr + wordSize*n), E[en])
+     *   ),
+     *   IRMOVE(TEMP(x), tArrayAddr + wordSize)
+     * )
+     */
     private Tuple<List<IRTemp>, IRSeq> allocateArrayDecl_WithExpr(string arrayName, ExprAST[] initialValues) {
-        IRTemp tM = new IRTemp(
+        IRTemp tArrayAddr = new IRTemp(
             String.Format(
                 "{0}A", arrayName
             )
@@ -233,46 +283,46 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         );
 
         List<IRStmt> allMoves = new List<IRStmt>();
-        IRMove moveMallocIntoTM = new IRMove(
-            tM, callMalloc
+        IRMove moveMallocIntoArrayAddr = new IRMove(
+            tArrayAddr, callMalloc
         );
-        IRMove move_Length_Into_DereferencedTM = new IRMove(
-            new IRMem(MemType.NORMAL, tM),
+        IRMove move_Length_Into_DereferencedArrayAddr = new IRMove(
+            new IRMem(MemType.NORMAL, tArrayAddr),
             new IRConst(initialValues.Length)
         );
-        allMoves.Add(moveMallocIntoTM);
-        allMoves.Add(move_Length_Into_DereferencedTM);
+        allMoves.Add(moveMallocIntoArrayAddr);
+        allMoves.Add(move_Length_Into_DereferencedArrayAddr);
 
         for (int i = 0; i < initialValues.Length; i++) {
-            IRMem dereferencedOffsetFromTM = new IRMem(
+            IRMem dereferencedOffsetFromArrayAddr = new IRMem(
                 MemType.NORMAL, new IRBinOp(
                     BinOpType.ADD,
-                    tM,
+                    tArrayAddr,
                     new IRConst((i+1)*IRConfiguration.wordSize)
                 )
             );
             IRExpr initialValue = initialValues[i].accept<IRExpr>(this);
 
-            IRMove move_InitVal_Into_DereferencedOffsetFromTM = new IRMove(
-                dereferencedOffsetFromTM,
+            IRMove move_InitVal_Into_DereferencedOffsetFromArrayAddr = new IRMove(
+                dereferencedOffsetFromArrayAddr,
                 initialValue
             );
             allMoves.Add(
-                move_InitVal_Into_DereferencedOffsetFromTM
+                move_InitVal_Into_DereferencedOffsetFromArrayAddr
             );
         }
         IRMove createArrayRefReg = new IRMove(
             tArray,
             new IRBinOp(
                 BinOpType.ADD,
-                tM, new IRConst(IRConfiguration.wordSize)
+                tArrayAddr, new IRConst(IRConfiguration.wordSize)
             )
         );
         allMoves.Add(createArrayRefReg);
 
         return Tuple.Create<List<IRTemp>, IRSeq>(
             new List<IRTemp>() {
-                tM,
+                tArrayAddr,
                 tArray
             },
             new IRSeq(
@@ -362,6 +412,17 @@ public sealed class IRGenerator : ASTVisitorGeneric {
 
     }
 
+    /*
+     * f(x1: t1,...,xn:tn): p1,...,pn Body = SEQ(
+     *   LABEL(f)
+     *   S[p1]
+     *   .
+     *   .
+     *   .
+     *   S[pn]
+     *   S[Body]
+     * )
+     */
     public T visit<T>(FunctionAST function) { 
         if (function.scope == null) {
             throw new Exception(
@@ -408,6 +469,9 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         );
     }
 
+    /*
+     * S[p] = MOVE(P, Temp(ARG))
+     */
     public T visit<T>(ParameterAST parameter) { 
         IRMove irAssign = new IRMove(
             new IRTemp(parameter.name),
@@ -422,6 +486,16 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         );
     }
 
+    /*
+     *
+     * S[body] = SEQ(
+     *   S[s1]
+     *   .
+     *   .
+     *   .
+     *   S[sn]  
+     * )
+     */
     public T visit<T>(BlockAST block) { 
         if (block.scope == null) {
             throw new Exception(
@@ -447,6 +521,9 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         );
     }
 
+    /*
+     * S[x = e] = MOVE(TEMP(x), E(e))
+     */
     public T visit<T>(AssignAST assign) { 
         IRExpr irSrc = assign.value.accept<IRExpr>(this);
         IRTemp irDest = assign.variable.accept<IRTemp>(this);
@@ -458,6 +535,16 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IRMove>(irAssign);
     }
 
+    /*
+     * S[x1, x2,...,xn = e1, e2,...,en] = SEQ(
+     *    MOVE(TEMP(x1), E(e1)),
+     *    MOVE(TEMP(x2), E(e2)),
+     *    .
+     *    .
+     *    .
+     *    MOVE(TEMP(xn), E(en)),
+     * )
+     */
     public T visit<T>(MultiAssignAST multiAssign) { 
         List<IRStmt> irAssigns = new List<IRStmt>();
 
@@ -479,6 +566,17 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IRSeq>(irSeq);
     }
 
+    /*
+     * S[x1, x2,...,xn] = function(e1, e2,...,en)] = SEQ(
+     *   CALLStmt(NAME(function), E[e1], E[e2],...,E[en]),
+     *   MOVE(TEMP(x1), RET1),
+     *   MOVE(TEMP(x2), RET2),
+     *   .
+     *   .
+     *   .
+     *   MOVE(TEMP(xn), RETn),
+     * )
+     */
     public T visit<T>(MultiAssignCallAST multiAssignCall) { 
         SymbolFunction symbolFunction = lookUpSymbolFromContext<SymbolFunction>(
             multiAssignCall.functionName, -1, -1
@@ -513,6 +611,12 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IRSeq>(irSequence);
     }
     
+    /*
+     * S[x[e1] = e2] = SEQ(
+     *   E[x[e1]],
+     *   MOVE(MEM(tA + tI * wordSize), E[e2])
+     * ) 
+     */
     public T visit<T>(ArrayAssignAST arrayAssign) { 
         IR_Eseq computeThenDeref_accessAddr = arrayAssign.arrayAccess.accept<IR_Eseq>(this);
         if (computeThenDeref_accessAddr.stmt.GetType() != typeof(IRSeq)) {
@@ -659,6 +763,16 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return new IRSeq(irStmts);
     }
 
+    /*
+     * S[while (e) s] = SEQ(
+     *   Label(lH),
+     *   C[e, true, false],
+     *   Label(true),
+     *   S[s],
+     *   JUMP(lH),
+     *   Label(false)
+     * )
+     */
     public T visit<T>(WhileLoopAST whileLoop) { 
         IRLabel beginLoopLabel = createNewLabel();
         IRLabel trueLabel = createNewLabel();
@@ -680,6 +794,9 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         }));
     }
 
+    /*
+     * S[return(e1,...,en)] = Return(E[e1],...,E[en])
+     */
     public T visit<T>(ReturnAST returnStmt) { 
         List<IRExpr> irReturns = new List<IRExpr>();
         
@@ -699,6 +816,9 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         );
     }
 
+    /*
+     * S[procedure(e1,...,en)] = CallStmt(Name(procedure), E[e1],...,E[en])
+     */
     public T visit<T>(ProcedureCallAST procedureCall) { 
         List<IRExpr> irArgs = new List<IRExpr>();
 
@@ -716,6 +836,9 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IRCallStmt>(callStmt);
     }
     
+    /*
+     * E[e1 OP e2] = BinOP(OP, E[e1], E[e2])
+     */
     public T visit<T>(BinaryExprAST binaryExpr) { 
         IRExpr irLeft = binaryExpr.leftOperand.accept<IRExpr>(this);
         IRExpr irRight = binaryExpr.rightOperand.accept<IRExpr>(this);
@@ -751,6 +874,9 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         );
     }
 
+    /*
+     * E[OP e] = UnaryOp(OP, E[e])
+     */
     public T visit<T>(UnaryExprAST unaryExpr) { 
         IRExpr irOperand = unaryExpr.operand.accept<IRExpr>(this);
         UnaryOpType opType;
@@ -773,11 +899,25 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         );
     }
     
+    /*
+     * E[x] = TEMP(x)
+     */
     public T visit<T>(VarAccessAST varAccess) { 
         IRTemp temp = new IRTemp(varAccess.variableName);
         return matchThenReturn<T, IRTemp>(temp);
     }
 
+    /*
+     * E[array[e2]] = ESEQ(
+     *   SEQ(
+     *       MOVE(tA, TEMP(array)),
+     *       MOVE(tI, E[e2])
+     *       CJUMP(ULT (tI, MEM(tA - wordSize)), trueLabel, outOfBoundsLabel),
+     *       Label(trueLabel)
+     *   ),
+     *   MEM(tA + tI * wordSize)
+     * )
+     */
     public T visit<T>(ArrayAccessAST arrayAccess) { 
         IRTemp tA = new IRTemp(String.Format("{0}A", arrayAccess.arrayName));
         IRTemp tI = new IRTemp(String.Format("{0}I", arrayAccess.arrayName));
@@ -851,6 +991,9 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     //TODO: Implement this later.
     public T visit<T>(MultiDimArrayAccessAST multiDimArrayAccess) { throw new NotImplementedException(); }
 
+    /*
+     * E[e1 OP e2] = BinOP(OP, E[e1], E[e2])
+     */
     public T visit<T>(FunctionCallAST functionCall) { 
         List<IRExpr> irFuncArgs = new List<IRExpr>();
         foreach(ExprAST funcArgAST in functionCall.args) {
@@ -866,16 +1009,26 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IRCall>(irCall);
     }
 
+    /*
+     * E[n] = CONST(n)
+     */
     public T visit<T>(IntLiteralAST intLiteral) { 
         IRConst irConst = new IRConst(intLiteral.value);
         return matchThenReturn<T, IRConst>(irConst);
     }
 
+    /*
+     * E[true] = CONST(1)
+     * E[false] = CONST(0)
+     */
     public T visit<T>(BoolLiteralAST boolLiteral) { 
         IRConst irConst = new IRConst(boolLiteral.value ? 1 : 0);
         return matchThenReturn<T, IRConst>(irConst);
     }
 
+    /*
+     * E[c] = CONST(c.asciiValue)
+     */
     public T visit<T>(CharLiteralAST charLiteral) { 
         IRConst irConst = new IRConst(charLiteral.asciiValue);
         return matchThenReturn<T, IRConst>(irConst);
@@ -921,6 +1074,8 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     }
 
     /*
+     * Translation represented as C[E, t, f]
+     * 
      * If there is a boolean expression that needs to utilize short circuiting,
      * then control flow is utilized when emitting IR.
      *
@@ -944,6 +1099,11 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         }
     }
 
+    /*
+     * C[e1&&e2, t, f] = SEQ(C[e1, L1, f], Label(L1), C[e2, t, f])
+     * C[e1||e2, t, f] = SEQ(C[e1, L1, t], Label(L1), C[e2, t, f])
+     * C[e, t, f] = CJump(E[e], t, f)
+     */
     private IRStmt generateBinaryExprBoolByCF(BinaryExprAST binExpr, IRLabel trueLabel, IRLabel falseLabel) {
         switch(binExpr.exprType) {
             case BinaryExprType.AND:
@@ -983,6 +1143,9 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         }
     }
 
+    /*
+     * C[!e, t, f] = C[e, f, t]
+     */
     private IRStmt generateUnaryExprBoolByCF(UnaryExprAST unaryExpr, IRLabel trueLabel, IRLabel falseLabel) {
         switch(unaryExpr.exprType) {
             case UnaryExprType.NOT:
@@ -1001,6 +1164,10 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         }
     }
 
+    /*
+     * C[true, t, f] = JUMP(Name(t))
+     * C[false, t, f] = JUMP(Name(f))
+     */
     private IRStmt generateBoolLiteralByCF(BoolLiteralAST boolLit, IRLabel trueLabel, IRLabel falseLabel) {
         switch(boolLit.value) {
             case true:
