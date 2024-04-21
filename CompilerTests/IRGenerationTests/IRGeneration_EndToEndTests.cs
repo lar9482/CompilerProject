@@ -2,7 +2,7 @@ using CompilerProj;
 
 namespace CompilerTests;
 
-public class EndToEndTests {
+public class IRGeneration_EndToEndTests {
     [SetUp]
     public void Setup() {}
 
