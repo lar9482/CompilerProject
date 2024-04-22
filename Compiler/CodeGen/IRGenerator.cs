@@ -350,7 +350,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     private IRSeq allocateMultiDimArray_WithoutExprs(string arrayName, ExprAST rowSize, ExprAST colSize) {
         /// Allocating space for the array rows ///
         Tuple<List<IRTemp>, IRSeq> allocateArrayRows_WithRegs = allocateArrayDecl_WithoutExpr(
-            arrayName + "Row",
+            arrayName,
             rowSize
         ); 
         IRTemp tRowSize = allocateArrayRows_WithRegs.Item1[0];
@@ -631,7 +631,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         IRMem derefAccessAddr = (IRMem) computeThenDeref_accessAddr.expr;
         IRExpr assignValue = arrayAssign.value.accept<IRExpr>(this);
 
-        // Mem[tA + 4*tI] <- assignValue
+        // Mem[tA + wordSize*tI] <- assignValue
         IRMove moveValueIntoDeref = new IRMove(
             derefAccessAddr,
             assignValue
@@ -647,7 +647,34 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     }
 
     //TODO: Implement conditionals, while loops, and array assigns.
-    public T visit<T>(MultiDimArrayAssignAST multiDimArrayAssign) { throw new NotImplementedException(); }
+    public T visit<T>(MultiDimArrayAssignAST multiDimArrayAssign) { 
+        IR_Eseq computeThenDeref_accessAddr = multiDimArrayAssign.arrayAccess.accept<IR_Eseq>(this);
+        if (computeThenDeref_accessAddr.stmt.GetType() != typeof(IRSeq)) {
+            throw new Exception("Computation of the access access was expected to be an IRSeq");
+        }
+
+        if (computeThenDeref_accessAddr.expr.GetType() != typeof(IRMem)) {
+            throw new Exception("Dereference of the access access was expected to be an IRMem");
+        }
+
+        IRSeq computeAccessAddr = (IRSeq) computeThenDeref_accessAddr.stmt;
+        IRMem derefAccessAddr = (IRMem) computeThenDeref_accessAddr.expr;
+        IRExpr assignValue = multiDimArrayAssign.value.accept<IRExpr>(this);
+
+        // Mem[tArray + wordSize*tE2] <- assignValue
+        IRMove moveValueIntoDeref = new IRMove(
+            derefAccessAddr,
+            assignValue
+        );
+
+        List<IRStmt> allStmts = computeAccessAddr.statements;
+        allStmts.Add(moveValueIntoDeref);
+        IRSeq compute_Deref_ThenAssign = new IRSeq(
+            allStmts
+        );
+
+        return matchThenReturn<T, IRSeq>(compute_Deref_ThenAssign);
+    }
 
     public T visit<T>(ConditionalAST conditional) { 
         IRSeq seqStmts;
@@ -910,25 +937,19 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     /*
      * E[array[e2]] = ESEQ(
      *   SEQ(
-     *       MOVE(tA, TEMP(array)),
+     *       MOVE(tArray, TEMP(array)),
      *       MOVE(tI, E[e2])
-     *       CJUMP(ULT (tI, MEM(tA - wordSize)), trueLabel, outOfBoundsLabel),
+     *       CJUMP(ULT (tI, MEM(tArray - wordSize)), trueLabel, outOfBoundsLabel),
      *       Label(trueLabel)
      *   ),
-     *   MEM(tA + tI * wordSize)
+     *   MEM(tArray + tI * wordSize)
      * )
      */
     public T visit<T>(ArrayAccessAST arrayAccess) { 
-        IRTemp tA = new IRTemp(String.Format("{0}A", arrayAccess.arrayName));
+        IRTemp tArray = new IRTemp(arrayAccess.arrayName);
         IRTemp tI = new IRTemp(String.Format("{0}I", arrayAccess.arrayName));
 
-        //Step 1: Moving the name of the array into a new register (tA).
-        IRMove regStartAddr = new IRMove(
-            tA,
-            new IRTemp(arrayAccess.arrayName)
-        );
-
-        //Step 2: Computing the index, then moving it into the tI register.
+        //Step 1: Computing the index, then moving it into the tI register.
         IRExpr arrayIndexAddr = arrayAccess.accessValue.accept<IRExpr>(this);
         IRMove regIndexAddr = new IRMove(
             tI,
@@ -936,7 +957,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         );
         
 
-        //Step 3: Comparing tI with the length of the array, which lives at tA-4 in memory(wordSize = 4)
+        //Step 2: Comparing tI with the length of the array, which lives at tA-4 in memory(wordSize = 4)
 
         //Jumping to the out of bounds error when there is a problem.
         //NOTE: unsigned less than is used to handle negative indexes, because
@@ -950,7 +971,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
                     MemType.NORMAL,
                     new IRBinOp(
                         BinOpType.SUB,
-                        tA,
+                        tArray,
                         new IRConst(IRConfiguration.wordSize)
                     )
                 )
@@ -960,7 +981,6 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         );
 
         IRSeq computeAccessAddr = new IRSeq(new List<IRStmt>() {
-            regStartAddr,
             regIndexAddr,
             determineOutOfBounds,
             okLabel
@@ -971,7 +991,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
             MemType.NORMAL,
             new IRBinOp(
                 BinOpType.ADD,
-                tA,
+                tArray,
                 new IRBinOp(
                     BinOpType.MUL,
                     tI,
@@ -988,8 +1008,127 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IR_Eseq>(evalThenExe);
     }
 
-    //TODO: Implement this later.
-    public T visit<T>(MultiDimArrayAccessAST multiDimArrayAccess) { throw new NotImplementedException(); }
+    /*
+     * E[array[e1][e2]] = ESEQ(SEQ(
+     *      MOVE(tName, TEMP(array)),
+     *      MOVE(tE1, E[e1]),
+     *      CJUMP(ULT(tE1, MEM(tName - 4), ok1, outOfBounds)),
+     *      LABEL(ok1),
+     *
+     *      MOVE(tArray, MEM(tName + tE1*wordSize)),
+     *      MOVE(tE2, E[e2])
+     *      CJUMP(ULT(tE2, MEM(tArray - 4), ok2, outOfBounds)),
+     *      LABEL(ok2),   
+     *   ),
+     *   MEM(tArray + tE2*wordSize) //wordSize = 4
+     * )
+     */
+    public T visit<T>(MultiDimArrayAccessAST multiDimArrayAccess) {
+        string arrayName = multiDimArrayAccess.arrayName;
+        IRTemp tName = new IRTemp(arrayName);
+        IRTemp tE1 = new IRTemp(String.Format("{0}E1", arrayName));
+        IRTemp tE2 = new IRTemp(String.Format("{0}E2", arrayName));
+        IRTemp tArray = new IRTemp(String.Format("{0}A", arrayName));
+        
+        IRLabel firstOkLabel = createNewLabel();
+        IRLabel secondOkLabel = createNewLabel();
+
+        //Step 1: Computing e1.
+        IRMove initializeRowIndex = new IRMove(
+            tE1, 
+            multiDimArrayAccess.firstIndex.accept<IRExpr>(this)
+        );
+
+        //Step2: Making the row index out of bounds check.
+        IRCJump rowCheck = new IRCJump(
+            new IRBinOp(
+                BinOpType.ULT,
+                tE1,
+                new IRMem(
+                    MemType.NORMAL,
+                    new IRBinOp(
+                        BinOpType.SUB,
+                        tName,
+                        new IRConst(IRConfiguration.wordSize)
+                    )
+                )
+            ),
+            firstOkLabel.name,
+            IRConfiguration.OUT_OF_BOUNDS_FLAG
+        );
+
+        //Step 3: Moving the row array address into 'tArray'
+        IRMove computeRowAddr = new IRMove(
+            tArray,
+            new IRMem(
+                MemType.NORMAL, 
+                new IRBinOp(
+                    BinOpType.ADD,
+                    tName,
+                    new IRBinOp(
+                        BinOpType.MUL,
+                        tE1,
+                        new IRConst(IRConfiguration.wordSize)
+                    )
+                )
+            )
+        );
+
+        // Step 4: Computing e2
+        IRMove initializeColIndex = new IRMove(
+            tE2,
+            multiDimArrayAccess.secondIndex.accept<IRExpr>(this)
+        );
+
+        // Step 5: Making the column index out of bounds check.
+        IRCJump colCheck = new IRCJump(
+            new IRBinOp(
+                BinOpType.ULT,
+                tE2,
+                new IRMem(
+                    MemType.NORMAL,
+                    new IRBinOp(
+                        BinOpType.SUB,
+                        tArray,
+                        new IRConst(IRConfiguration.wordSize)
+                    )
+                )
+            ),
+            secondOkLabel.name,
+            IRConfiguration.OUT_OF_BOUNDS_FLAG
+        );
+
+        IRSeq computeAccessAddr = new IRSeq(new List<IRStmt>() {
+            initializeRowIndex,
+            rowCheck,
+            firstOkLabel,
+            computeRowAddr,
+            initializeColIndex,
+            colCheck,
+            secondOkLabel
+        });
+
+        // Finally dereferencing by Mem[tArray + wordSize*tE2] 
+        IRMem dereferenceAccessAddr = new IRMem(
+            MemType.NORMAL,
+            new IRBinOp(
+                BinOpType.ADD,
+                tArray,
+                new IRBinOp(
+                    BinOpType.MUL,
+                    tE2,
+                    new IRConst(IRConfiguration.wordSize)
+                )
+            )
+        );
+
+        IR_Eseq evalThenExe = new IR_Eseq(
+            computeAccessAddr,
+            dereferenceAccessAddr
+        );
+        
+        return matchThenReturn<T, IR_Eseq>(evalThenExe);
+    }
 
     /*
      * E[e1 OP e2] = BinOP(OP, E[e1], E[e2])
