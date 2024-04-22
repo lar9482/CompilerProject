@@ -50,12 +50,13 @@ public sealed class IRGenerator : ASTVisitorGeneric {
      * S[x: t = e] = MOVE(TEMP(x), E(e))
      */
     public T visit<T>(VarDeclAST varDecl) { 
-        //TODO: Handle empty expressions.
+        IRExpr srcExpr;
         if (varDecl.initialValue == null) {
-            throw new Exception("IRGenerator: Handle empty expressions later");
+            srcExpr = new IRConst(0);
+        } else {
+            srcExpr = varDecl.initialValue.accept<IRExpr>(this);
         }
 
-        IRExpr srcExpr = varDecl.initialValue.accept<IRExpr>(this);
         IRMove irMove = new IRMove(
             new IRTemp(varDecl.name),
             srcExpr
@@ -80,13 +81,14 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         foreach(KeyValuePair<string, ExprAST?> varWithInitVal in multiVarDecl.initialValues) {
             string varDecl = varWithInitVal.Key;
             ExprAST? initialVal = varWithInitVal.Value;
+            IRExpr irInitial;
 
-            //TODO: Handle empty expressions.
             if (initialVal == null) {
-                throw new Exception("IRGenerator: Handle empty expressions later");
+                irInitial = new IRConst(0);
+            } else {
+                irInitial = initialVal.accept<IRExpr>(this);
             }
 
-            IRExpr irInitial = initialVal.accept<IRExpr>(this);
             IRMove irMove = new IRMove(
                 new IRTemp(varDecl),
                 irInitial
@@ -347,6 +349,20 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         throw new NotImplementedException(); 
     }
     
+    /*
+     * S[array: t[e1][e2]] = SEQ(
+     *      S[array: t[e1]], //access to tRowSize, tArrayAddr_Base too
+     *      MOVE(tI, 0),
+     *      LABEL(lH),
+     *      C[tI < tRowSize, t, f], 
+     *      LABEL(t),
+     *      S[array: t[e2]], //access to tArrayLocation
+     *      MOVE(MEM( (tArrayAddr_Base+wordSize) + (tI*wordSize)), tArrayLocation) ,
+     *      MOVE(tI, Add(tI, 1)),
+     *      JUMP(lH),
+     *      LABEL(f)
+     * )
+     */
     private IRSeq allocateMultiDimArray_WithoutExprs(string arrayName, ExprAST rowSize, ExprAST colSize) {
         /// Allocating space for the array rows ///
         Tuple<List<IRTemp>, IRSeq> allocateArrayRows_WithRegs = allocateArrayDecl_WithoutExpr(
@@ -646,7 +662,12 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IRSeq>(compute_Deref_ThenAssign);
     }
 
-    //TODO: Implement conditionals, while loops, and array assigns.
+    /*
+     * S[array[e1][e2] = e3] = SEQ(
+     *   S[array[e1][e2]],
+     *   MOVE(MEM(tArray + tE2 * wordSize), E[e3])
+     * )
+     */
     public T visit<T>(MultiDimArrayAssignAST multiDimArrayAssign) { 
         IR_Eseq computeThenDeref_accessAddr = multiDimArrayAssign.arrayAccess.accept<IR_Eseq>(this);
         if (computeThenDeref_accessAddr.stmt.GetType() != typeof(IRSeq)) {
