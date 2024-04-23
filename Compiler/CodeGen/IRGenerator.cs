@@ -336,7 +336,6 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         );
     }
 
-    //TODO: Implement these
     public T visit<T>(MultiDimArrayDeclAST multiDimArray) { 
         if (multiDimArray.initialValues == null) {
             return matchThenReturn<T, IRSeq>(
@@ -511,6 +510,15 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         allMoves.Add(createArrayRefReg);
 
         return new IRSeq(allMoves);
+    }
+
+    //TODO: Implement these
+    public T visit<T>(ArrayDeclCallAST arrayCall) {
+        throw new NotImplementedException();
+    }
+
+    public T visit<T>(MultiDimArrayDeclCallAST multiDimArrayCall) {
+        throw new NotImplementedException();
     }
 
     /*

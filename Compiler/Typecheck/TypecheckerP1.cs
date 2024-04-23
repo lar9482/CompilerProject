@@ -51,6 +51,15 @@ public sealed class TypecheckerP1 : TypeChecker {
         initializeMultiDimArrayDecl(multiDimArray);
     }
 
+    //TODO: Implement this later.
+    public override void visit(ArrayDeclCallAST arrayCall) {
+        throw new NotImplementedException();
+    }
+
+    public override void visit(MultiDimArrayDeclCallAST multiDimArrayCall) {
+        throw new NotImplementedException();
+    }
+
     public override void visit(FunctionAST function) { 
         initializeFunction(function);
     }

@@ -1,13 +1,17 @@
 namespace CompilerProj.Visitors;
 
 public interface ASTVisitorGeneric {
-    // Top level nodes
+    // Declarations
     public T visit<T>(ProgramAST program);
     public T visit<T>(VarDeclAST varDecl);
     public T visit<T>(MultiVarDeclAST multiVarDecl);
     public T visit<T>(MultiVarDeclCallAST multiVarDeclCall);
     public T visit<T>(ArrayDeclAST array);
     public T visit<T>(MultiDimArrayDeclAST multiDimArray);
+    public T visit<T>(ArrayDeclCallAST arrayCall);
+    public T visit<T>(MultiDimArrayDeclCallAST multiDimArrayCall);
+
+    //Function support nodes.
     public T visit<T>(FunctionAST function);
     public T visit<T>(ParameterAST parameter);
     public T visit<T>(BlockAST block);

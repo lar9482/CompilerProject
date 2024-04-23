@@ -25,6 +25,8 @@ public class ASTVisitorGenericImplemented : ASTVisitorGeneric {
     public T visit<T>(MultiVarDeclCallAST multiVarDeclCall) { throw new NotImplementedException(); }
     public T visit<T>(ArrayDeclAST array) { throw new NotImplementedException(); }
     public T visit<T>(MultiDimArrayDeclAST multiDimArray) { throw new NotImplementedException(); }
+    public T visit<T>(ArrayDeclCallAST arrayCall) { throw new NotImplementedException(); }
+    public T visit<T>(MultiDimArrayDeclCallAST multiDimArrayCall) { throw new NotImplementedException(); }
     public T visit<T>(FunctionAST function) { throw new NotImplementedException(); }
     public T visit<T>(ParameterAST parameter) { throw new NotImplementedException(); }
     public T visit<T>(BlockAST block) { throw new NotImplementedException(); }

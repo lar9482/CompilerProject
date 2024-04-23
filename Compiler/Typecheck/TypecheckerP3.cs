@@ -56,6 +56,15 @@ public sealed class TypecheckerP3 : TypeChecker {
         multiDimArray.type = new UnitType();
         initializeMultiDimArrayDecl(multiDimArray);
         checkMultiDimArrayDecl(multiDimArray);
+    }   
+
+    //TODO: Implement these
+    public override void visit(ArrayDeclCallAST arrayCall) {
+        throw new NotImplementedException();
+    }
+
+    public override void visit(MultiDimArrayDeclCallAST multiDimArrayCall) {
+        throw new NotImplementedException();
     }
 
     public override void visit(FunctionAST function) { 
