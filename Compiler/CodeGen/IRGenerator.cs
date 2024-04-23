@@ -157,12 +157,18 @@ public sealed class IRGenerator : ASTVisitorGeneric {
             );
 
         } else {
-            Tuple<List<IRTemp>, IRSeq> regsAndIR = allocateArrayDecl_WithExpr(
+            Tuple<List<IRTemp>, IR_Eseq> regsAndIR = allocateArrayDecl_WithExpr(
                 array.name,
                 array.initialValues
             );
-            return matchThenReturn<T, IRSeq>(
+            
+            IRTemp tArray = regsAndIR.Item1[1];
+            IRMove moveFinalAddr_Into_tArray = new IRMove(
+                tArray,
                 regsAndIR.Item2
+            );
+            return matchThenReturn<T, IRSeq>(
+                new IRSeq(new List<IRStmt>() {moveFinalAddr_Into_tArray})
             );
         }
     }
@@ -258,10 +264,10 @@ public sealed class IRGenerator : ASTVisitorGeneric {
      *       .
      *       MOVE(MEM(tArrayAddr + wordSize*n), E[en])
      *   ),
-     *   IRMOVE(TEMP(x), tArrayAddr + wordSize)
+     *   MOVE(TEMP(x), tArrayAddr + wordSize)
      * )
      */
-    private Tuple<List<IRTemp>, IRSeq> allocateArrayDecl_WithExpr(string arrayName, ExprAST[] initialValues) {
+    private Tuple<List<IRTemp>, IR_Eseq> allocateArrayDecl_WithExpr(string arrayName, ExprAST[] initialValues) {
         IRTemp tArrayAddr = new IRTemp(
             String.Format(
                 "{0}A", arrayName
@@ -313,24 +319,39 @@ public sealed class IRGenerator : ASTVisitorGeneric {
                 move_InitVal_Into_DereferencedOffsetFromArrayAddr
             );
         }
-        IRMove createArrayRefReg = new IRMove(
-            tArray,
-            new IRBinOp(
-                BinOpType.ADD,
-                tArrayAddr, new IRConst(IRConfiguration.wordSize)
-            )
-        );
-        allMoves.Add(createArrayRefReg);
+        
 
-        return Tuple.Create<List<IRTemp>, IRSeq>(
+        return Tuple.Create<List<IRTemp>, IR_Eseq>(
             new List<IRTemp>() {
-                tArrayAddr,
-                tArray
+                 tArrayAddr,
+                 tArray
             },
-            new IRSeq(
-                allMoves
+            new IR_Eseq(
+                new IRSeq(allMoves),
+                new IRBinOp(
+                    BinOpType.ADD,
+                    tArrayAddr, new IRConst(IRConfiguration.wordSize)
+                )
             )
         );
+        // IRMove createArrayRefReg = new IRMove(
+        //     tArray,
+        //     new IRBinOp(
+        //         BinOpType.ADD,
+        //         tArrayAddr, new IRConst(IRConfiguration.wordSize)
+        //     )
+        // );
+        // allMoves.Add(createArrayRefReg);
+
+        // return Tuple.Create<List<IRTemp>, IRSeq>(
+        //     new List<IRTemp>() {
+        //         tArrayAddr,
+        //         tArray
+        //     },
+        //     new IRSeq(
+        //         allMoves
+        //     )
+        // );
     }
 
     //TODO: Implement these
@@ -344,7 +365,12 @@ public sealed class IRGenerator : ASTVisitorGeneric {
                 )
             );
         } else {
-            
+            return matchThenReturn<T, IRSeq>(
+                allocateMultiDimArray_WithExprs(
+                    multiDimArray.name, 
+                    multiDimArray.initialValues
+                )
+            );
         }
         throw new NotImplementedException(); 
     }
@@ -423,9 +449,86 @@ public sealed class IRGenerator : ASTVisitorGeneric {
 
         return new IRSeq(allStmts);
     }
+    /*
+     * S[array: t[][] = {{e11,...,e1n},...,{em1,...,emn}}] = SEQ(
+     *      MOVE(tArrayAddr, Call(Name("malloc"), m*wordSize + wordSize)), NOTE: wordSize=4
+     *      MOVE(MEM(tArrayAddr), CONST(m))
+     *      MOVE(MEM(tArrayAddr + wordSize), E[array: t[] = {e11,,,e1n}])
+     *      MOVE(MEM(tArrayAddr + wordSize*2), E[array: t[] = {e21,,,e2n}])
+     *      .
+     *      .
+     *      .
+     *      MOVE(MEM(tArrayAddr + wordSize*m), E[array: t[] = {em1,,,emn}]),
+     *      MOVE(TEMP(x), tArrayAddr + wordSize)
+     * )
+     */
+    private IRSeq allocateMultiDimArray_WithExprs(string arrayName, ExprAST[][] initialValues) {
+        int numRows = initialValues.Length;
+        IRTemp tArrayAddr = new IRTemp(
+            String.Format(
+                "{0}A", arrayName
+            )
+        );
+        IRTemp tArray = new IRTemp(arrayName);
 
-    private void allocateMultiDimArray_WithExprs() {
+        IRBinOp bytesToAllocate = new IRBinOp(
+            BinOpType.ADD,
+            new IRBinOp(
+                BinOpType.MUL,
+                new IRConst(numRows),
+                new IRConst(IRConfiguration.wordSize)
+            ),
+            new IRConst(IRConfiguration.wordSize)
+        );
+        IRCall callMalloc = new IRCall(
+            new IRName("malloc"),
+            new List<IRExpr>() { bytesToAllocate }
+        );
+        IRMove initialize_tArrayAddr = new IRMove(
+            tArrayAddr,
+            callMalloc
+        );
+        IRMove move_Length_Into_DereferencedArrayAddr = new IRMove(
+            new IRMem(MemType.NORMAL, tArrayAddr),
+            new IRConst(numRows)
+        );
 
+        List<IRStmt> allMoves = new List<IRStmt>();
+        allMoves.Add(initialize_tArrayAddr);
+        allMoves.Add(move_Length_Into_DereferencedArrayAddr);
+
+        for (int i = 0; i < numRows; i++) {
+            IRMem dereferencedOffsetFromArrayAddr = new IRMem(
+                MemType.NORMAL, new IRBinOp(
+                    BinOpType.ADD,
+                    tArrayAddr,
+                    new IRConst((i+1)*IRConfiguration.wordSize)
+                )
+            );
+            Tuple<List<IRTemp>, IR_Eseq> subArrayWithRegs = allocateArrayDecl_WithExpr(
+                String.Format("{0}{1}", arrayName, i),
+                initialValues[i]
+            );
+            IR_Eseq allocatingSubArray = subArrayWithRegs.Item2;
+
+            IRMove move_InitVal_Into_DereferencedOffsetFromArrayAddr = new IRMove(
+                dereferencedOffsetFromArrayAddr,
+                allocatingSubArray
+            );
+            allMoves.Add(
+                move_InitVal_Into_DereferencedOffsetFromArrayAddr
+            );
+        }
+        IRMove createArrayRefReg = new IRMove(
+            tArray,
+            new IRBinOp(
+                BinOpType.ADD,
+                tArrayAddr, new IRConst(IRConfiguration.wordSize)
+            )
+        );
+        allMoves.Add(createArrayRefReg);
+
+        return new IRSeq(allMoves);
     }
 
     /*
