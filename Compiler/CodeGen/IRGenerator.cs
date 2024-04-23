@@ -334,24 +334,6 @@ public sealed class IRGenerator : ASTVisitorGeneric {
                 )
             )
         );
-        // IRMove createArrayRefReg = new IRMove(
-        //     tArray,
-        //     new IRBinOp(
-        //         BinOpType.ADD,
-        //         tArrayAddr, new IRConst(IRConfiguration.wordSize)
-        //     )
-        // );
-        // allMoves.Add(createArrayRefReg);
-
-        // return Tuple.Create<List<IRTemp>, IRSeq>(
-        //     new List<IRTemp>() {
-        //         tArrayAddr,
-        //         tArray
-        //     },
-        //     new IRSeq(
-        //         allMoves
-        //     )
-        // );
     }
 
     //TODO: Implement these
