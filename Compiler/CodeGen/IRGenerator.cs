@@ -161,7 +161,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
                 array.name,
                 array.initialValues
             );
-            
+
             IRTemp tArray = regsAndIR.Item1[1];
             IRMove moveFinalAddr_Into_tArray = new IRMove(
                 tArray,
@@ -264,7 +264,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
      *       .
      *       MOVE(MEM(tArrayAddr + wordSize*n), E[en])
      *   ),
-     *   MOVE(TEMP(x), tArrayAddr + wordSize)
+     *   ADD(tArrayAddr, wordSize)
      * )
      */
     private Tuple<List<IRTemp>, IR_Eseq> allocateArrayDecl_WithExpr(string arrayName, ExprAST[] initialValues) {
