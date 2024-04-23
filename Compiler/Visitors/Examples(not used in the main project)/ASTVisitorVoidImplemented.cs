@@ -7,6 +7,9 @@ public sealed class ASTVisitorImplemented : ASTVisitorVoid {
     public void visit(MultiVarDeclCallAST multiVarDeclCallAST) { }
     public void visit(ArrayDeclAST array) { }
     public void visit(MultiDimArrayDeclAST multiDimArray) { }
+    public void visit(ArrayDeclCallAST arrayCall) { }
+    public void visit(MultiDimArrayDeclCallAST multiDimArrayCall) { }
+
     public void visit(FunctionAST function) { }
     public void visit(ParameterAST parameter) { }
     public void visit(BlockAST block) { }

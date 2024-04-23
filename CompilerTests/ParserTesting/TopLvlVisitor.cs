@@ -82,6 +82,14 @@ internal class TopLvlVisitor : ASTVisitorVoid {
         }
     }
 
+    public void visit(ArrayDeclCallAST arrayCall) {
+
+    }
+
+    public void visit(MultiDimArrayDeclCallAST multiDimArrayCall) {
+
+    }
+
     public void visit(FunctionAST function) { 
         traversalRecord.Enqueue(function.name);
 

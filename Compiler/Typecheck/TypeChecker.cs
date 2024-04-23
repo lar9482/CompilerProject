@@ -26,6 +26,10 @@ public abstract class TypeChecker : ASTVisitorVoid {
     public abstract void visit(MultiVarDeclCallAST multiVarDeclCallAST);
     public abstract void visit(ArrayDeclAST array);
     public abstract void visit(MultiDimArrayDeclAST multiDimArray);
+    
+    //TODO: Implement 'initialize' and 'check' routine for these two nodes.
+    public abstract void visit(ArrayDeclCallAST arrayCall);
+    public abstract void visit(MultiDimArrayDeclCallAST multiDimArrayCall);
 
     protected void initializeVarDecl(VarDeclAST varDecl) {
         if (context.lookup<SymbolVariable>(varDecl.name) != null) {
