@@ -1,3 +1,5 @@
+
+// A simple program that calculates the length of the collatz sequence.
 main(args: int[][]) {
     limit: int = 260000000;
     n: int = 48394839;

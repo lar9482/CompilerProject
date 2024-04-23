@@ -1,5 +1,5 @@
 binary_search(a: int[], x: int): int {
-    n:int = length(a);
+    n:int = lengthInt(a);
     l:int = 0;
     r:int = n-1;
 
