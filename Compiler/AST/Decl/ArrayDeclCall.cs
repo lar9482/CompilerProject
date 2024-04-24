@@ -12,13 +12,13 @@ public sealed class ArrayDeclCallAST : DeclAST {
         string name,
         string functionName,
         List<ExprAST> args,
-        ArrayType<PrimitiveType> declType,
+        PrimitiveType declType,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {
         this.name = name;
         this.functionName = functionName;
         this.args = args;
-        this.declType = declType;
+        this.declType = new ArrayType<PrimitiveType>(declType);
     }
 
     public override void accept(ASTVisitorVoid visitor) {

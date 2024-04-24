@@ -252,6 +252,7 @@ public sealed class Parser {
 
         List<ExprAST> initialValues = parseOptionalMultipleValues_Or_FunctionCall();
 
+        // A single expression that is a function call indicates a MultiVarDeclCall.
         if (initialValues.Count == 1 && initialValues[0].GetType() == typeof(FunctionCallAST)) {
             FunctionCallAST functionCall = (FunctionCallAST) initialValues[0];
             return new MultiVarDeclCallAST(
@@ -387,7 +388,9 @@ public sealed class Parser {
     }
 
     /*  ⟨singleOrMulti Array Expr ⟩ ::= ‘=’ ⟨arrayInitial ⟩ ‘;’
+     *  | ‘=’ <ProcedureCall>
      *  | ‘[’ ‘]’ ‘=’ ‘{’ ⟨multiDimArrayInitial ⟩ ‘}’ ‘;’
+     *  | ‘[’ ‘]’ ‘=’ <ProcedureCall>
      */
     private DeclAST parse_SingleOrMulti_Array_Expr(
         Token identifierToken, PrimitiveType primitiveType
@@ -395,54 +398,110 @@ public sealed class Parser {
         switch(tokenQueue.Peek().type) {
             case TokenType.assign:
                 consume(TokenType.assign);
-                ExprAST[] exprs = parseArrayInitial();
-                consume(TokenType.semicolon);
+                // Indicating the start of a single dim array declared with initial values
+                if (tokenQueue.Peek().type == TokenType.startCurly) {
+                    ExprAST[] exprs = parseArrayInitial();
+                    consume(TokenType.semicolon);
 
-                ArrayDeclAST arrayDecl = new ArrayDeclAST(
-                    identifierToken.lexeme,
-                    new IntLiteralAST(
-                        exprs.Length,
+                    ArrayDeclAST arrayDecl = new ArrayDeclAST(
+                        identifierToken.lexeme,
+                        new IntLiteralAST(
+                            exprs.Length,
+                            identifierToken.line,
+                            identifierToken.column
+                        ),
+                        primitiveType,
+                        exprs,
                         identifierToken.line,
                         identifierToken.column
-                    ),
-                    primitiveType,
-                    exprs,
-                    identifierToken.line,
-                    identifierToken.column
-                );
-                return arrayDecl;
+                    );
+                    return arrayDecl;
+                } // Indicating the start of a single dim array declared with a function call
+                else if (tokenQueue.Peek().type == TokenType.identifier) {
+                    Token procedureIdentifier = consume(TokenType.identifier);
+                    ProcedureCallAST procedureCall = parseProcedureCall(procedureIdentifier);
+
+                    ArrayDeclCallAST arrayCall = new ArrayDeclCallAST(
+                        identifierToken.lexeme,
+                        procedureCall.procedureName,
+                        procedureCall.args,
+                        primitiveType,
+                        identifierToken.line,
+                        identifierToken.column
+                    );
+
+                    return arrayCall;
+                } else {
+                    throw new Exception(
+                        String.Format(
+                            "{0}:{1} ParseError: Expected { or <identifier>, not {2}", 
+                            tokenQueue.Peek().line.ToString(), 
+                            tokenQueue.Peek().column.ToString(),
+                            tokenQueue.Peek().lexeme
+                        )
+                    );
+                }
+                
             case TokenType.startBracket:
                 consume(TokenType.startBracket);
                 consume(TokenType.endBracket);
                 consume(TokenType.assign);
-                consume(TokenType.startCurly);
-                List<ExprAST[]> arrayOfExprs = parseMultiDimArrayInitial();
-                verifyMultiDimArrayColumnSize(arrayOfExprs);
-                consume(TokenType.endCurly);
-                consume(TokenType.semicolon);
 
-                MultiDimArrayDeclAST multiDimArrayDecl = new MultiDimArrayDeclAST(
-                    identifierToken.lexeme,
-                    new IntLiteralAST(
-                        arrayOfExprs.Count,
+                // Indicating the start of a multi dim array declared with initial values
+                if (tokenQueue.Peek().type == TokenType.startCurly) {
+                    consume(TokenType.startCurly);
+                    List<ExprAST[]> arrayOfExprs = parseMultiDimArrayInitial();
+                    verifyMultiDimArrayColumnSize(arrayOfExprs);
+                    consume(TokenType.endCurly);
+                    consume(TokenType.semicolon);
+
+                    MultiDimArrayDeclAST multiDimArrayDecl = new MultiDimArrayDeclAST(
+                        identifierToken.lexeme,
+                        new IntLiteralAST(
+                            arrayOfExprs.Count,
+                            identifierToken.line,
+                            identifierToken.column
+                        ),
+                        new IntLiteralAST(
+                            arrayOfExprs[0].Length,
+                            identifierToken.line,
+                            identifierToken.column
+                        ),
+                        primitiveType,
+                        arrayOfExprs.ToArray(),
                         identifierToken.line,
                         identifierToken.column
-                    ),
-                    new IntLiteralAST(
-                        arrayOfExprs[0].Length,
+                    );
+                    return multiDimArrayDecl;
+                } // Indicating the start of a multi dim array declared with a function call.
+                else if (tokenQueue.Peek().type == TokenType.identifier) {
+                    Token procedureIdentifier = consume(TokenType.identifier);
+                    ProcedureCallAST procedureCall = parseProcedureCall(procedureIdentifier);
+
+                    MultiDimArrayDeclCallAST multiDimArrayDeclCall = new MultiDimArrayDeclCallAST(
+                        identifierToken.lexeme,
+                        procedureIdentifier.lexeme,
+                        procedureCall.args,
+                        primitiveType,
                         identifierToken.line,
                         identifierToken.column
-                    ),
-                    primitiveType,
-                    arrayOfExprs.ToArray(),
-                    identifierToken.line,
-                    identifierToken.column
-                );
-                return multiDimArrayDecl;
+                    );
+
+                    return multiDimArrayDeclCall;
+                } else {
+                    throw new Exception(
+                        String.Format(
+                            "{0}:{1} ParseError: Expected { or <identifier>, not {2}", 
+                            tokenQueue.Peek().line.ToString(), 
+                            tokenQueue.Peek().column.ToString(),
+                            tokenQueue.Peek().lexeme
+                        )
+                    );
+                }
             default:
                 throw new Exception(
                     String.Format(
-                        "{0}:{1} ParseError: Expected = or [, not {2}", 
+                        "{0}:{1} ParseError: Expected [ or =, not {2}", 
                         tokenQueue.Peek().line.ToString(), 
                         tokenQueue.Peek().column.ToString(),
                         tokenQueue.Peek().lexeme

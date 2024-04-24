@@ -1,8 +1,8 @@
 // Silently assumes compatible sizes
 matMult(A: int[][], B: int[][]): int[][] {
-    rowsA: int = length(A);
-    colsA: int = length(A[0]); // aka rowsB
-    colsB: int = length(B[0]);
+    rowsA: int = lengthInt(A);
+    colsA: int = lengthInt(A[0]); // aka rowsB
+    colsB: int = lengthInt(B[0]);
 
     out: int[rowsA][colsB];
 
