@@ -267,4 +267,94 @@ public class ParserTests_TopLvl_Lifting {
 
         Assert.IsTrue(matchingTraversalRecord(expectedRecord, actualRecord));
     }
+
+    [Test]
+    public void arrayDeclCall_Test() {
+        string programFilePath = "../../../ParserTesting/TopLvlFiles/arrayDeclCall.prgm";
+
+        Queue<string> expectedRecord = new Queue<string>();
+        expectedRecord.Enqueue("initializeA");
+        expectedRecord.Enqueue("int[]");
+
+        expectedRecord.Enqueue("A: int[]");
+        expectedRecord.Enqueue("A[EXPR]");
+        expectedRecord.Enqueue("EXPR");
+        expectedRecord.Enqueue("A[EXPR]");
+        expectedRecord.Enqueue("EXPR");
+        expectedRecord.Enqueue("A[EXPR]");
+        expectedRecord.Enqueue("EXPR");
+        expectedRecord.Enqueue("A[EXPR]");
+        expectedRecord.Enqueue("EXPR");
+        expectedRecord.Enqueue("A[EXPR]");
+        expectedRecord.Enqueue("EXPR");
+        expectedRecord.Enqueue("return");
+        expectedRecord.Enqueue("EXPR");
+
+        expectedRecord.Enqueue("initializeB");
+        expectedRecord.Enqueue("bool[]");
+
+        expectedRecord.Enqueue("B: bool[]");
+        expectedRecord.Enqueue("ArrayEXPRS");
+        expectedRecord.Enqueue("return");
+        expectedRecord.Enqueue("EXPR");
+
+        expectedRecord.Enqueue("main");
+        expectedRecord.Enqueue("A: int[]");
+        expectedRecord.Enqueue("initializeA");
+        expectedRecord.Enqueue("B: bool[]");
+        expectedRecord.Enqueue("initializeB");
+
+        Queue<string> actualRecord = getActualTraversalRecord(programFilePath);
+
+        Assert.IsTrue(matchingTraversalRecord(expectedRecord, actualRecord));
+    }
+
+    [Test]
+    public void multiDimArrayDeclCall_Test() {
+        string programFilePath = "../../../ParserTesting/TopLvlFiles/multiDimArrayDeclCall.prgm";
+
+        Queue<string> expectedRecord = new Queue<string>();
+        expectedRecord.Enqueue("initializeA");
+        expectedRecord.Enqueue("int[][]");
+        expectedRecord.Enqueue("A: int[][]");
+        expectedRecord.Enqueue("A[EXPR][EXPR]");
+        expectedRecord.Enqueue("EXPR");
+        expectedRecord.Enqueue("A[EXPR][EXPR]");
+        expectedRecord.Enqueue("EXPR");
+        expectedRecord.Enqueue("A[EXPR][EXPR]");
+        expectedRecord.Enqueue("EXPR");
+        expectedRecord.Enqueue("A[EXPR][EXPR]");
+        expectedRecord.Enqueue("EXPR");
+        expectedRecord.Enqueue("A[EXPR][EXPR]");
+        expectedRecord.Enqueue("EXPR");
+        expectedRecord.Enqueue("A[EXPR][EXPR]");
+        expectedRecord.Enqueue("EXPR");
+        expectedRecord.Enqueue("A[EXPR][EXPR]");
+        expectedRecord.Enqueue("EXPR");
+        expectedRecord.Enqueue("A[EXPR][EXPR]");
+        expectedRecord.Enqueue("EXPR");
+        expectedRecord.Enqueue("A[EXPR][EXPR]");
+        expectedRecord.Enqueue("EXPR");
+        expectedRecord.Enqueue("return");
+        expectedRecord.Enqueue("EXPR");
+
+
+        expectedRecord.Enqueue("initializeB");
+        expectedRecord.Enqueue("int[][]");
+        expectedRecord.Enqueue("B: int[][]");
+        expectedRecord.Enqueue("MultiDimEXPRS");
+        expectedRecord.Enqueue("return");
+        expectedRecord.Enqueue("EXPR");
+
+
+        expectedRecord.Enqueue("main");
+        expectedRecord.Enqueue("A: int[][]");
+        expectedRecord.Enqueue("initializeA");
+        expectedRecord.Enqueue("B: int[][]");
+        expectedRecord.Enqueue("initializeB");
+
+        Queue<string> actualRecord = getActualTraversalRecord(programFilePath);
+
+        Assert.IsTrue(matchingTraversalRecord(expectedRecord, actualRecord));
+    }
 }

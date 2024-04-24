@@ -14,12 +14,14 @@ internal class TopLvlVisitor : ASTVisitorVoid {
 
     public void visit(ProgramAST program) { 
         foreach (DeclAST decl in program.declarations) {
-            switch(decl) {
-                case VarDeclAST varDecl: visit(varDecl); break;
-                case MultiVarDeclAST multiVarDecl: visit(multiVarDecl); break;
-                case ArrayDeclAST arrayDecl: visit(arrayDecl); break;
-                case MultiDimArrayDeclAST multiDimArrayDecl: visit(multiDimArrayDecl); break;
-            }
+            // switch(decl) {
+            //     case VarDeclAST varDecl: visit(varDecl); break;
+            //     case MultiVarDeclAST multiVarDecl: visit(multiVarDecl); break;
+            //     case ArrayDeclAST arrayDecl: visit(arrayDecl); break;
+            //     case MultiDimArrayDeclAST multiDimArrayDecl: visit(multiDimArrayDecl); break;
+            // }
+
+            decl.accept(this);
         }
 
         foreach (var funcDecl in program.functions) {
@@ -83,11 +85,27 @@ internal class TopLvlVisitor : ASTVisitorVoid {
     }
 
     public void visit(ArrayDeclCallAST arrayCall) {
+        traversalRecord.Enqueue(
+            String.Format("{0}: {1}",
+            arrayCall.name, SimpleTypeToString(arrayCall.declType))
+        );
 
+        traversalRecord.Enqueue(arrayCall.functionName);
+        foreach(ExprAST arg in arrayCall.args) {
+            traversalRecord.Enqueue("EXPR");
+        }
     }
 
     public void visit(MultiDimArrayDeclCallAST multiDimArrayCall) {
+        traversalRecord.Enqueue(
+            String.Format("{0}: {1}",
+            multiDimArrayCall.name, SimpleTypeToString(multiDimArrayCall.declType))
+        );
 
+        traversalRecord.Enqueue(multiDimArrayCall.functionName);
+        foreach(ExprAST arg in multiDimArrayCall.args) {
+            traversalRecord.Enqueue("EXPR");
+        }
     }
 
     public void visit(FunctionAST function) { 
@@ -111,23 +129,25 @@ internal class TopLvlVisitor : ASTVisitorVoid {
     public void visit(BlockAST block) { 
 
         foreach(StmtAST Stmt in block.statements) {
-            switch(Stmt) {
-                case VarDeclAST varDecl: visit(varDecl); break;
-                case MultiVarDeclAST multiVarDecl: visit(multiVarDecl); break;
-                case ArrayDeclAST arrayDecl: visit(arrayDecl); break;
-                case MultiDimArrayDeclAST multiDimArrayDecl: visit(multiDimArrayDecl); break;
-                case AssignAST assign: assign.accept(this); break;
-                case MultiAssignAST multiAssign: multiAssign.accept(this); break;
-                case MultiAssignCallAST multiAssignCall: multiAssignCall.accept(this); break;
-                case ArrayAssignAST arrayAssign: arrayAssign.accept(this); break;
-                case MultiDimArrayAssignAST multiDimArrayAssign: multiDimArrayAssign.accept(this); break;
-                case ConditionalAST conditional: conditional.accept(this); break;
-                case WhileLoopAST whileLoop: whileLoop.accept(this); break;
-                case ReturnAST returnStmt: returnStmt.accept(this); break;
-                case ProcedureCallAST procedureCall: procedureCall.accept(this); break;
-                default:
-                    break;
-            }
+            // switch(Stmt) {
+            //     case VarDeclAST varDecl: visit(varDecl); break;
+            //     case MultiVarDeclAST multiVarDecl: visit(multiVarDecl); break;
+            //     case ArrayDeclAST arrayDecl: visit(arrayDecl); break;
+            //     case MultiDimArrayDeclAST multiDimArrayDecl: visit(multiDimArrayDecl); break;
+            //     case AssignAST assign: assign.accept(this); break;
+            //     case MultiAssignAST multiAssign: multiAssign.accept(this); break;
+            //     case MultiAssignCallAST multiAssignCall: multiAssignCall.accept(this); break;
+            //     case ArrayAssignAST arrayAssign: arrayAssign.accept(this); break;
+            //     case MultiDimArrayAssignAST multiDimArrayAssign: multiDimArrayAssign.accept(this); break;
+            //     case ConditionalAST conditional: conditional.accept(this); break;
+            //     case WhileLoopAST whileLoop: whileLoop.accept(this); break;
+            //     case ReturnAST returnStmt: returnStmt.accept(this); break;
+            //     case ProcedureCallAST procedureCall: procedureCall.accept(this); break;
+            //     case 
+            //     default:
+            //         break;
+            // }
+            Stmt.accept(this);
         }
     }
 
