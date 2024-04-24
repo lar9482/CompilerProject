@@ -1,4 +1,4 @@
 ﻿using CompilerProj;
 
-string filePath = "./ProgressTests/IRGenerationTests/test1.prgm";
+string filePath = "./ProgressTests/EndToEndTests/sort.prgm";
 Compiler.compileFile(filePath);
