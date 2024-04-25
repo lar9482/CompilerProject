@@ -519,7 +519,6 @@ public sealed class IRGenerator : ASTVisitorGeneric {
      * NOTE: Since arrays will be stored on the heap, this is all it takes. Passing the starting address. 
      * NICE!
      */
-    //TODO: Implement these
     public T visit<T>(ArrayDeclCallAST arrayCall) {
         
         IRCall irFunctionCall = arrayCall.function.accept<IRCall>(this);
