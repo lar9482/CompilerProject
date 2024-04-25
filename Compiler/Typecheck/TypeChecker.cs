@@ -392,15 +392,9 @@ public abstract class TypeChecker : ASTVisitorVoid {
     }
 
     protected void checkArrayDeclCall(ArrayDeclCallAST arrayDeclCall) {
-        FunctionCallAST functionCall = new FunctionCallAST(
-            arrayDeclCall.functionName,
-            arrayDeclCall.args,
-            arrayDeclCall.lineNumber,
-            arrayDeclCall.columnNumber
-        );
-        functionCall.accept(this);
+        arrayDeclCall.function.accept(this);
 
-        SimpleType functionCallType = functionCall.type;
+        SimpleType functionCallType = arrayDeclCall.function.type;
         SimpleType arrayDeclType = arrayDeclCall.declType;
         if (!sameTypes(arrayDeclType, functionCallType)) {
             errorMsgs.Add(
@@ -409,7 +403,7 @@ public abstract class TypeChecker : ASTVisitorVoid {
                     arrayDeclCall.lineNumber,
                     arrayDeclCall.columnNumber,
                     simpleTypeToString(arrayDeclType),
-                    arrayDeclCall.functionName,
+                    arrayDeclCall.function.functionName,
                     simpleTypeToString(functionCallType)
                 )
             );
@@ -438,12 +432,7 @@ public abstract class TypeChecker : ASTVisitorVoid {
     }
 
     protected void checkMultiDimArrayDeclCall(MultiDimArrayDeclCallAST multiDimArrayDeclCall) {
-        FunctionCallAST functionCall = new FunctionCallAST(
-            multiDimArrayDeclCall.functionName,
-            multiDimArrayDeclCall.args,
-            multiDimArrayDeclCall.lineNumber,
-            multiDimArrayDeclCall.columnNumber
-        );
+        FunctionCallAST functionCall = multiDimArrayDeclCall.function;
         functionCall.accept(this);
 
         SimpleType functionCallType = functionCall.type;
@@ -455,7 +444,7 @@ public abstract class TypeChecker : ASTVisitorVoid {
                     multiDimArrayDeclCall.lineNumber,
                     multiDimArrayDeclCall.columnNumber,
                     simpleTypeToString(arrayDeclType),
-                    multiDimArrayDeclCall.functionName,
+                    functionCall.functionName,
                     simpleTypeToString(functionCallType)
                 )
             );
