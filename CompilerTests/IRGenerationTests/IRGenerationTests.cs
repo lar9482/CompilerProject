@@ -220,4 +220,15 @@ public class IRGenerationTests {
         int retVal = simulator.call("main", args);
         Assert.That(retVal, Is.EqualTo(10));
     }
+
+    [Test]
+    public void multiDimArrayDeclCallAST() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/multiDimArrayDeclCall.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+
+        IRSimulator simulator = new IRSimulator(IR);
+        int retVal = simulator.call("main", args);
+        Assert.That(retVal, Is.EqualTo(45));
+    }
 }
