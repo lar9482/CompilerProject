@@ -512,9 +512,22 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return new IRSeq(allMoves);
     }
 
+    /*
+     * S[x: t[] = functionCall(p1,...,pn)] = 
+     *   IRMOVE(TEMP(x), E[functionCall(p1,...,pn)])
+     *
+     */
     //TODO: Implement these
     public T visit<T>(ArrayDeclCallAST arrayCall) {
-        throw new NotImplementedException();
+        
+        IRCall irFunctionCall = arrayCall.function.accept<IRCall>(this);
+        IRTemp arrayReg = new IRTemp(arrayCall.name);
+        return matchThenReturn<T, IRMove>(
+            new IRMove(
+                arrayReg,
+                irFunctionCall
+            )
+        );
     }
 
     public T visit<T>(MultiDimArrayDeclCallAST multiDimArrayCall) {
@@ -522,7 +535,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     }
 
     /*
-     * f(x1: t1,...,xn:tn): p1,...,pn Body = SEQ(
+     * S[f(x1: t1,...,xn:tn): p1,...,pn Body] = SEQ(
      *   LABEL(f)
      *   S[p1]
      *   .

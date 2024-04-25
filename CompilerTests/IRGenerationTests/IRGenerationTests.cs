@@ -122,6 +122,18 @@ public class IRGenerationTests {
     }
 
     [Test]
+    public void arrayDeclCall() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDeclCall.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+
+        int[] args = new int[] { };
+
+        IRSimulator simulator = new IRSimulator(IR);
+        int retVal = simulator.call("main", args);
+        Assert.That(retVal, Is.EqualTo(15));
+    }
+
+    [Test]
     public void whileLoop_10Iterations() {
         string filePath = "../../../IRGenerationTests/ProgramFiles/whileLoop_10Iterations.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
