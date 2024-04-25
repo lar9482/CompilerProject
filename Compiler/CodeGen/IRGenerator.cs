@@ -676,7 +676,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     }
 
     /*
-     * S[x1, x2,...,xn] = function(e1, e2,...,en)] = SEQ(
+     * S[x1, x2,...,xn = function(e1, e2,...,en)] = SEQ(
      *   CALLStmt(NAME(function), E[e1], E[e2],...,E[en]),
      *   MOVE(TEMP(x1), RET1),
      *   MOVE(TEMP(x2), RET2),
@@ -1245,7 +1245,9 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     }
 
     /*
-     * E[e1 OP e2] = BinOP(OP, E[e1], E[e2])
+     * E[function(p1,...,pn)] = CALL(
+     *    NAME(function), E[p1],...,E[pn]
+     * )
      */
     public T visit<T>(FunctionCallAST functionCall) { 
         List<IRExpr> irFuncArgs = new List<IRExpr>();
