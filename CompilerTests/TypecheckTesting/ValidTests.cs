@@ -8,12 +8,15 @@ public class ValidTypecheckTests {
     }
 
     private void ensureNoTypecheckErrors(string filePath) {
+        List<string> errorMsgs;
         try {
             Tuple<ProgramAST, List<string>> ASTWithErrors = Compiler.typecheck(filePath);
-            List<string> errorMsgs = ASTWithErrors.Item2;
+            errorMsgs = ASTWithErrors.Item2;
             Assert.That(errorMsgs.Count, Is.EqualTo(0));
-        } catch (Exception e) {
-            Assert.Fail(e.Message);
+        } catch {
+            Tuple<ProgramAST, List<string>> ASTWithErrors = Compiler.typecheck(filePath);
+            errorMsgs = ASTWithErrors.Item2;
+            Assert.Fail(string.Join("\n", errorMsgs));
         }
     }
 
@@ -62,6 +65,18 @@ public class ValidTypecheckTests {
     [Test]
     public void validTest8() {
         string filePath = "../../../TypecheckTesting/ValidTests/test8.prgm";
+        ensureNoTypecheckErrors(filePath);
+    }
+
+    [Test]
+    public void arrayDeclCallTest() {
+        string filePath = "../../../TypecheckTesting/ValidTests/arrayDeclCall.prgm";
+        ensureNoTypecheckErrors(filePath);
+    }
+
+    [Test]
+    public void multiDimArrayDeclCallTest() {
+        string filePath = "../../../TypecheckTesting/ValidTests/multiDimArrayDeclCall.prgm";
         ensureNoTypecheckErrors(filePath);
     }
 

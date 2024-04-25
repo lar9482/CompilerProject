@@ -26,8 +26,6 @@ public abstract class TypeChecker : ASTVisitorVoid {
     public abstract void visit(MultiVarDeclCallAST multiVarDeclCallAST);
     public abstract void visit(ArrayDeclAST array);
     public abstract void visit(MultiDimArrayDeclAST multiDimArray);
-    
-    //TODO: Implement 'initialize' and 'check' routine for these two nodes.
     public abstract void visit(ArrayDeclCallAST arrayCall);
     public abstract void visit(MultiDimArrayDeclCallAST multiDimArrayCall);
 
@@ -369,6 +367,99 @@ public abstract class TypeChecker : ASTVisitorVoid {
                     );
                 }
             }
+        }
+    }
+
+    //TODO: Implement 'initialize' and 'check' routine for these two nodes.
+    protected void initializeArrayDeclCall(ArrayDeclCallAST arrayDeclCall) {
+        if (context.lookup<SymbolVariable>(arrayDeclCall.name) != null) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: {2} exists already.",
+                    arrayDeclCall.lineNumber,
+                    arrayDeclCall.columnNumber,
+                    arrayDeclCall.name
+                )
+            );
+            return;
+        }
+
+        SymbolVariable symbolVar = new SymbolVariable(
+            arrayDeclCall.name,
+            arrayDeclCall.declType
+        );
+
+        context.put(arrayDeclCall.name, symbolVar);
+    }
+
+    protected void checkArrayDeclCall(ArrayDeclCallAST arrayDeclCall) {
+        FunctionCallAST functionCall = new FunctionCallAST(
+            arrayDeclCall.functionName,
+            arrayDeclCall.args,
+            arrayDeclCall.lineNumber,
+            arrayDeclCall.columnNumber
+        );
+        functionCall.accept(this);
+
+        SimpleType functionCallType = functionCall.type;
+        SimpleType arrayDeclType = arrayDeclCall.declType;
+        if (!sameTypes(arrayDeclType, functionCallType)) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The array decl type, {2}, doesn't match the {3}'s type, {4}",
+                    arrayDeclCall.lineNumber,
+                    arrayDeclCall.columnNumber,
+                    simpleTypeToString(arrayDeclType),
+                    arrayDeclCall.functionName,
+                    simpleTypeToString(functionCallType)
+                )
+            );
+        }
+    }
+
+    protected void initializeMultiDimArrayDeclCall(MultiDimArrayDeclCallAST multiDimArrayDeclCall) {
+        if (context.lookup<SymbolVariable>(multiDimArrayDeclCall.name) != null) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: {2} exists already.",
+                    multiDimArrayDeclCall.lineNumber,
+                    multiDimArrayDeclCall.columnNumber,
+                    multiDimArrayDeclCall.name
+                )
+            );
+            return;
+        }
+
+        SymbolVariable symbolVar = new SymbolVariable(
+            multiDimArrayDeclCall.name,
+            multiDimArrayDeclCall.declType
+        );
+
+        context.put(multiDimArrayDeclCall.name, symbolVar);
+    }
+
+    protected void checkMultiDimArrayDeclCall(MultiDimArrayDeclCallAST multiDimArrayDeclCall) {
+        FunctionCallAST functionCall = new FunctionCallAST(
+            multiDimArrayDeclCall.functionName,
+            multiDimArrayDeclCall.args,
+            multiDimArrayDeclCall.lineNumber,
+            multiDimArrayDeclCall.columnNumber
+        );
+        functionCall.accept(this);
+
+        SimpleType functionCallType = functionCall.type;
+        SimpleType arrayDeclType = multiDimArrayDeclCall.declType;
+        if (!sameTypes(arrayDeclType, functionCallType)) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The multi dim array decl type, {2}, doesn't match the {3}'s type, {4}",
+                    multiDimArrayDeclCall.lineNumber,
+                    multiDimArrayDeclCall.columnNumber,
+                    simpleTypeToString(arrayDeclType),
+                    multiDimArrayDeclCall.functionName,
+                    simpleTypeToString(functionCallType)
+                )
+            );
         }
     }
 
