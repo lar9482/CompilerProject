@@ -53,7 +53,6 @@ public sealed class TypecheckerP3 : TypeChecker {
         checkMultiDimArrayDecl(multiDimArray);
     }   
 
-    //TODO: Implement these
     public override void visit(ArrayDeclCallAST arrayCall) {
         initializeArrayDeclCall(arrayCall);
         checkArrayDeclCall(arrayCall);
