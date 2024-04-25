@@ -78,6 +78,15 @@ public sealed class TypecheckerP3 : TypeChecker {
         function.block.accept(this);
 
         StmtType blockType = function.block.type;
+        if (blockType.TypeTag == "uninitialized" && symbolReturn.returnTypes.Length > 0) {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: Not all code paths in {2} will return something.",
+                    function.lineNumber, function.columnNumber, function.name
+                )
+            );
+        }
+
         if (blockType.TypeTag == "unit" && symbolReturn.returnTypes.Length > 0) {
             errorMsgs.Add(
                 String.Format(
@@ -95,6 +104,8 @@ public sealed class TypecheckerP3 : TypeChecker {
                 )
             );
         }
+
+        
         function.scope = context.pop();
     }
 }

@@ -21,5 +21,5 @@ public sealed class TerminateType : StmtType {
  * Unintialized stmt types refer to statements that have not had their types inferred yet.
  */
 public sealed class UninitializedStmtType: StmtType {
-    public override string TypeTag => "uninitalized";
+    public override string TypeTag => "uninitialized";
 }
