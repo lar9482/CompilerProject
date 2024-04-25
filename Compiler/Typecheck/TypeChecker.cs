@@ -370,7 +370,6 @@ public abstract class TypeChecker : ASTVisitorVoid {
         }
     }
 
-    //TODO: Implement 'initialize' and 'check' routine for these two nodes.
     protected void initializeArrayDeclCall(ArrayDeclCallAST arrayDeclCall) {
         if (context.lookup<SymbolVariable>(arrayDeclCall.name) != null) {
             errorMsgs.Add(
