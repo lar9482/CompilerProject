@@ -133,4 +133,10 @@ public class ValidTypecheckTests {
         string filePath = "../../../TypecheckTesting/ValidTests/simplesearch.prgm";
         ensureNoTypecheckErrors(filePath);
     }
+
+    [Test]
+    public void test_sort() {
+        string filePath = "../../../TypecheckTesting/ValidTests/sort.prgm";
+        ensureNoTypecheckErrors(filePath);
+    }
 }
