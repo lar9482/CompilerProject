@@ -20,7 +20,11 @@ main(): int {
     B: bool[] = initializeB();
 
     if (B[0] == true) {
-        return A[0] + A[1] + A[2] + A[3] + A[4];
+        if (B[1] == false) {
+            return A[0] + A[1] + A[2] + A[3] + A[4];
+        } else {
+            return -1;
+        }
     } else {
         return -1;
     }
