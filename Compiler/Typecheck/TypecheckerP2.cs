@@ -59,7 +59,6 @@ public sealed class TypecheckerP2 : TypeChecker {
         checkMultiDimArrayDecl(multiDimArray);
     }
 
-    //TODO: Implement these.
     public override void visit(ArrayDeclCallAST arrayCall) {
         arrayCall.type = new UnitType();
 
