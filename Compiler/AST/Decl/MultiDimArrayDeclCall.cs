@@ -4,21 +4,18 @@ using CompilerProj.Visitors;
 
 public sealed class MultiDimArrayDeclCallAST : DeclAST {
     public readonly string name;
-    public readonly string functionName;
-    public readonly List<ExprAST> args;
+    public readonly FunctionCallAST function;
     public readonly MultiDimArrayType<PrimitiveType> declType;
 
     public MultiDimArrayDeclCallAST(
         string name,
-        string functionName,
-        List<ExprAST> args,
+        FunctionCallAST function,
         PrimitiveType declType,
         int lineNumber, int columnNumber
     ) : base(lineNumber, columnNumber) {
         
         this.name = name;
-        this.functionName = functionName;
-        this.args = args;
+        this.function = function;
         this.declType = new MultiDimArrayType<PrimitiveType>(declType);
     }
 

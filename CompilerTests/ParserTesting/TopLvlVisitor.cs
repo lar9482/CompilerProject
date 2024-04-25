@@ -83,10 +83,7 @@ internal class TopLvlVisitor : ASTVisitorVoid {
             arrayCall.name, SimpleTypeToString(arrayCall.declType))
         );
 
-        traversalRecord.Enqueue(arrayCall.functionName);
-        foreach(ExprAST arg in arrayCall.args) {
-            traversalRecord.Enqueue("EXPR");
-        }
+        arrayCall.function.accept(this);
     }
 
     public void visit(MultiDimArrayDeclCallAST multiDimArrayCall) {
@@ -94,11 +91,7 @@ internal class TopLvlVisitor : ASTVisitorVoid {
             String.Format("{0}: {1}",
             multiDimArrayCall.name, SimpleTypeToString(multiDimArrayCall.declType))
         );
-
-        traversalRecord.Enqueue(multiDimArrayCall.functionName);
-        foreach(ExprAST arg in multiDimArrayCall.args) {
-            traversalRecord.Enqueue("EXPR");
-        }
+        multiDimArrayCall.function.accept(this);
     }
 
     public void visit(FunctionAST function) { 

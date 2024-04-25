@@ -423,8 +423,12 @@ public sealed class Parser {
 
                     ArrayDeclCallAST arrayCall = new ArrayDeclCallAST(
                         identifierToken.lexeme,
-                        procedureCall.procedureName,
-                        procedureCall.args,
+                        new FunctionCallAST(
+                            procedureCall.procedureName,
+                            procedureCall.args,
+                            procedureCall.lineNumber,
+                            procedureCall.columnNumber
+                        ),
                         primitiveType,
                         identifierToken.line,
                         identifierToken.column
@@ -480,8 +484,12 @@ public sealed class Parser {
 
                     MultiDimArrayDeclCallAST multiDimArrayDeclCall = new MultiDimArrayDeclCallAST(
                         identifierToken.lexeme,
-                        procedureIdentifier.lexeme,
-                        procedureCall.args,
+                        new FunctionCallAST(
+                            procedureCall.procedureName,
+                            procedureCall.args,
+                            procedureCall.lineNumber,
+                            procedureCall.columnNumber
+                        ),
                         primitiveType,
                         identifierToken.line,
                         identifierToken.column
