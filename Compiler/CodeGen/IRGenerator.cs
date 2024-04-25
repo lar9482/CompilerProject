@@ -336,6 +336,25 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         );
     }
 
+    /*
+     * S[x: t[] = functionCall(p1,...,pn)] = 
+     *   IRMOVE(TEMP(x), E[functionCall(p1,...,pn)])
+     * 
+     * NOTE: Since arrays will be stored on the heap, this is all it takes. Passing the starting address. 
+     * NICE!
+     */
+    public T visit<T>(ArrayDeclCallAST arrayCall) {
+        
+        IRCall irFunctionCall = arrayCall.function.accept<IRCall>(this);
+        IRTemp arrayReg = new IRTemp(arrayCall.name);
+        return matchThenReturn<T, IRMove>(
+            new IRMove(
+                arrayReg,
+                irFunctionCall
+            )
+        );
+    }
+
     public T visit<T>(MultiDimArrayDeclAST multiDimArray) { 
         if (multiDimArray.initialValues == null) {
             return matchThenReturn<T, IRSeq>(
@@ -513,26 +532,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     }
 
     /*
-     * S[x: t[] = functionCall(p1,...,pn)] = 
-     *   IRMOVE(TEMP(x), E[functionCall(p1,...,pn)])
-     * 
-     * NOTE: Since arrays will be stored on the heap, this is all it takes. Passing the starting address. 
-     * NICE!
-     */
-    public T visit<T>(ArrayDeclCallAST arrayCall) {
-        
-        IRCall irFunctionCall = arrayCall.function.accept<IRCall>(this);
-        IRTemp arrayReg = new IRTemp(arrayCall.name);
-        return matchThenReturn<T, IRMove>(
-            new IRMove(
-                arrayReg,
-                irFunctionCall
-            )
-        );
-    }
-
-    /*
-     * S[x: t[] = functionCall(p1,...,pn)] = 
+     * S[x: t[][] = functionCall(p1,...,pn)] = 
      *   IRMOVE(TEMP(x), E[functionCall(p1,...,pn)])
      *
      * NOTE: Since arrays will be stored on the heap, this is all it takes. Passing the starting address. 
