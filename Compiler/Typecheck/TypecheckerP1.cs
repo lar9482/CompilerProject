@@ -53,11 +53,11 @@ public sealed class TypecheckerP1 : TypeChecker {
 
     //TODO: Implement this later.
     public override void visit(ArrayDeclCallAST arrayCall) {
-        throw new NotImplementedException();
+        initializeArrayDeclCall(arrayCall);
     }
 
     public override void visit(MultiDimArrayDeclCallAST multiDimArrayCall) {
-        throw new NotImplementedException();
+        initializeMultiDimArrayDeclCall(multiDimArrayCall);
     }
 
     public override void visit(FunctionAST function) { 

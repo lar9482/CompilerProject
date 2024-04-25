@@ -29,42 +29,39 @@ public sealed class TypecheckerP3 : TypeChecker {
     }
 
     public override void visit(VarDeclAST varDecl) { 
-        varDecl.type = new UnitType();
         initializeVarDecl(varDecl);
         checkVarDecl(varDecl);
     }
 
     public override void visit(MultiVarDeclAST multiVarDecl) { 
-        multiVarDecl.type = new UnitType();
         initializeMultiVarDecl(multiVarDecl);
         checkMultiVarDecl(multiVarDecl);
     }
 
     public override void visit(MultiVarDeclCallAST multiVarDeclCall) { 
-        multiVarDeclCall.type = new UnitType();
         initializeMultiVarDeclCall(multiVarDeclCall);
         checkMultiVarDeclCall(multiVarDeclCall);
     }
 
     public override void visit(ArrayDeclAST array) { 
-        array.type = new UnitType();
         initializeArrayDecl(array);
         checkArrayDecl(array);
     }
 
     public override void visit(MultiDimArrayDeclAST multiDimArray) { 
-        multiDimArray.type = new UnitType();
         initializeMultiDimArrayDecl(multiDimArray);
         checkMultiDimArrayDecl(multiDimArray);
     }   
 
     //TODO: Implement these
     public override void visit(ArrayDeclCallAST arrayCall) {
-        throw new NotImplementedException();
+        initializeArrayDeclCall(arrayCall);
+        checkArrayDeclCall(arrayCall);
     }
 
     public override void visit(MultiDimArrayDeclCallAST multiDimArrayCall) {
-        throw new NotImplementedException();
+        initializeMultiDimArrayDeclCall(multiDimArrayCall);
+        checkMultiDimArrayDeclCall(multiDimArrayCall);
     }
 
     public override void visit(FunctionAST function) { 
