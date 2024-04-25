@@ -80,6 +80,13 @@ public class ValidTypecheckTests {
         ensureNoTypecheckErrors(filePath);
     }
 
+
+    //TODO: Enable this test later.
+    public void array_multiArray_Assigns_Test() {
+        string filePath = "../../../TypecheckTesting/ValidTests/array_multiArray_Assigns.prgm";
+        ensureNoTypecheckErrors(filePath);
+    }
+
     [Test]
     public void test_3np1() {
         string filePath = "../../../TypecheckTesting/ValidTests/3np1.prgm";
