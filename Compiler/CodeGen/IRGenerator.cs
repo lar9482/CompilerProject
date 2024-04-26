@@ -6,6 +6,7 @@ using CompilerProj.Visitors;
  * This is where the fun begins.
  * This visitor will emit the middle level intermediate representation.
  */
+ //TODO: Global variables will be on the backlog for the time being. My runtime doesn't support global data yet.
 public sealed class IRGenerator : ASTVisitorGeneric {
     private Context context;
     private int labelCounter;

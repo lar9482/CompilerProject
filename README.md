@@ -15,3 +15,6 @@ Side node:
 - [ ] IR generation
 - [ ] Converting IR to assembly language in the runtime
 - [ ] Optimization somewhere?
+
+# BACKLOG(TODO features for later)
+1. Implement support for global variables.
