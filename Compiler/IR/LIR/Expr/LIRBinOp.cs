@@ -9,6 +9,14 @@ public sealed class LIRBinOp : LIRExpr {
         this.left = left;
         this.right = right;
     }
+
+    public override void accept(LIRVisitorVoid visitor) {
+        visitor.visit(this);
+    }
+
+    public override T accept<T>(LIRVisitorGeneric visitor) {
+        return visitor.visit<T>(this);
+    }
 }
 
 public enum LBinOpType {

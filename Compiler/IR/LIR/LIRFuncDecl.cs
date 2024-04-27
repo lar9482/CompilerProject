@@ -1,10 +1,14 @@
+using CompilerProj.Visitors;
+using CompilerProj.IR;
 
-/** A lowered intermediate representation for a labeled address in memory **/
-public sealed class LIRName : LIRExpr {
+/** An lowered IR function declaration */
+public sealed class LIRFuncDecl : LIRNode {
     public string name;
+    public List<LIRStmt> body;
 
-    public LIRName(string name) {
+    public LIRFuncDecl(string name, List<LIRStmt> body) {
         this.name = name;
+        this.body = body;
     }
 
     public override void accept(LIRVisitorVoid visitor) {

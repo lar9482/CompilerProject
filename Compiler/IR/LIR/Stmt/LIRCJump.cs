@@ -10,4 +10,12 @@ public sealed class LIRCJump : LIRStmt {
         this.trueLabel = trueLabel;
         this.falseLabel = falseLabel;
     }
+
+    public override void accept(LIRVisitorVoid visitor) {
+        visitor.visit(this);
+    }
+
+    public override T accept<T>(LIRVisitorGeneric visitor) {
+        return visitor.visit<T>(this);
+    }
 }

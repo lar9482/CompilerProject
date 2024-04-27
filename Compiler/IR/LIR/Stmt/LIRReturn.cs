@@ -7,4 +7,12 @@ public sealed class LIRReturn : LIRStmt {
     public LIRReturn(List<LIRExpr> returns) {
         this.returns = returns;
     }
+
+    public override void accept(LIRVisitorVoid visitor) {
+        visitor.visit(this);
+    }
+
+    public override T accept<T>(LIRVisitorGeneric visitor) {
+        return visitor.visit<T>(this);
+    }
 }

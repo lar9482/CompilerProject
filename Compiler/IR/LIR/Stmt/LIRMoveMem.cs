@@ -10,4 +10,12 @@ public sealed class LIRMoveMem : LIRStmt {
         this.source = source;
         this.dest = dest;
     }
+
+    public override void accept(LIRVisitorVoid visitor) {
+        visitor.visit(this);
+    }
+
+    public override T accept<T>(LIRVisitorGeneric visitor) {
+        return visitor.visit<T>(this);
+    }
 }

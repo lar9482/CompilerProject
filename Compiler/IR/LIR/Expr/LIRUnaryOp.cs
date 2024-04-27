@@ -7,6 +7,14 @@ public sealed class LIRUnaryOp : LIRExpr {
     public LIRUnaryOp(LIRExpr operand) {
         this.operand = operand;
     }
+
+    public override void accept(LIRVisitorVoid visitor) {
+        visitor.visit(this);
+    }
+
+    public override T accept<T>(LIRVisitorGeneric visitor) {
+        return visitor.visit<T>(this);
+    }
 }
 
 public enum LUnaryOpType {
