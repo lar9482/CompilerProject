@@ -15,4 +15,12 @@ public sealed class LIRCallM : LIRStmt {
         this.args = args;
         this.nReturns = nReturns;
     }
+
+    public override void accept(LIRVisitorVoid visitor) {
+        visitor.visit(this);
+    }
+
+    public override T accept<T>(LIRVisitorGeneric visitor) {
+        return visitor.visit<T>(this);
+    }
 }

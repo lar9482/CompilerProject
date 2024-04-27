@@ -6,4 +6,12 @@ public sealed class LIRTemp : LIRExpr {
     public LIRTemp(string name) {
         this.name = name;
     }
+
+    public override void accept(LIRVisitorVoid visitor) {
+        visitor.visit(this);
+    }
+
+    public override T accept<T>(LIRVisitorGeneric visitor) {
+        return visitor.visit<T>(this);
+    }
 }
