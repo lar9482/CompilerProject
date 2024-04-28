@@ -85,7 +85,7 @@ public sealed class IRSimulator {
         List<int> dummyData = new List<int>() { 5, 6, 7, 8, 9, 10};
         int dataSize = dummyData.Count;
 
-        int startAddress = calloc(IRConfiguration.wordSize * dataSize);
+        int startAddress = malloc(IRConfiguration.wordSize * dataSize);
         for (int i = 0; i < dataSize; i++) {
             store(getMemoryAddress(startAddress, i), dummyData[i]);
         }
@@ -126,21 +126,6 @@ public sealed class IRSimulator {
             mem.Add((byte) r.Next(0, 255));
         }
 
-        return retAddress;
-    }
-
-    /**
-     * Allocate a specified amount of bytes on the heap and initialize them to 0.
-     *
-     * @param size the number of bytes to be allocated
-     * @return the starting address of the allocated region on the heap
-     */
-    public int calloc(int size) {
-        int retAddress = malloc(size);
-
-        for (int i = retAddress; i < retAddress + size; i++) {
-            mem[i] = 0;
-        }
         return retAddress;
     }
 
@@ -275,7 +260,7 @@ public sealed class IRSimulator {
                     }
                     break;
                 case "malloc":
-                    ret.Add(calloc(args[0]));
+                    ret.Add(malloc(args[0]));
                     break;
                 case IRConfiguration.OUT_OF_BOUNDS_FLAG:
                     throw new Exception("Out of bounds!");
