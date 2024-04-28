@@ -264,6 +264,11 @@ public sealed class IRSimulator {
                     break;
                 case IRConfiguration.OUT_OF_BOUNDS_FLAG:
                     throw new Exception("Out of bounds!");
+                case "assert":
+                    if (args[0] != 1) {
+                        throw new Exception("Assertation failure");
+                    }
+                    break;
                 default:
                     throw new Exception("Unrecognized library call.");
             }
