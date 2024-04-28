@@ -265,4 +265,28 @@ public class IRGenerationTests {
         string actualConsoleOutput = simulator.consoleOutputCapture.ToString();
         Assert.That(actualConsoleOutput, Is.EqualTo(expectedConsoleOutput));
     }
+
+    [Test]
+    public void assertPass() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/assertPass.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+
+        IRSimulator simulator = new IRSimulator(IR);
+        simulator.call("main", args);
+    }
+
+    [Test]
+    public void assertFail() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/assertFail.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+
+        IRSimulator simulator = new IRSimulator(IR);
+        try {
+            simulator.call("main", args);
+            Assert.Fail("The assertation passed. Not expected");
+        } catch {
+        }
+    }
 }
