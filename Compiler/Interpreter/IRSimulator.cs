@@ -13,6 +13,8 @@ using CompilerProj.IRInterpreter.ExprStack;
  * Memory leaks go brrrrrrrrrrrrrr!
  */
 public sealed class IRSimulator {
+    public StringWriter consoleOutputCapture;
+
     private Random r = new Random();
     private IRCompUnit compUnit;
 
@@ -73,6 +75,10 @@ public sealed class IRSimulator {
         nameToAddress = addressBuilder.nameToAddress;
 
         malloc(IRConfiguration.wordSize); // Waste first 4 bytes, to preserve an untouched space for null pointer.    
+
+        // Redirecting console output to consoleOutputCapture
+        consoleOutputCapture = new StringWriter();
+        Console.SetOut(consoleOutputCapture);
     }
 
     private void storeAndReadExample() {
@@ -203,8 +209,6 @@ public sealed class IRSimulator {
     public int call(string name, int[] args) {
         ExecutionFrame frame = new ExecutionFrame(-1);
         int retVal = call(frame, name, args);
-
-        Console.WriteLine();
         return retVal;
     }
 
@@ -254,6 +258,22 @@ public sealed class IRSimulator {
 
         try {
             switch(name) {
+                case "print":
+                case "println":
+                    int startAddr = args[0];
+                    int size = read(startAddr - IRConfiguration.wordSize);
+                    for (int i = 0; i < size; i++) {
+                        char charToPrint = (char) read(
+                            getMemoryAddress(startAddr, i)
+                        );
+                        
+                        if (name == "print") {
+                            Console.Write(charToPrint);
+                        } else {
+                            Console.WriteLine(charToPrint);
+                        }
+                    }
+                    break;
                 case "malloc":
                     ret.Add(calloc(args[0]));
                     break;

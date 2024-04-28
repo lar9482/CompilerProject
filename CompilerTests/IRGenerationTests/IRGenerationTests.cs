@@ -231,4 +231,38 @@ public class IRGenerationTests {
         int retVal = simulator.call("main", args);
         Assert.That(retVal, Is.EqualTo(45));
     }
+
+    [Test]
+    public void printlnHelloWorld() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/printlnHelloWorld.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+
+        IRSimulator simulator = new IRSimulator(IR);
+        simulator.call("main", args);
+
+        string helloWorld = "Hello World";
+        string expectedConsoleOutput = "";
+
+        foreach(char c in helloWorld) {
+            expectedConsoleOutput += String.Format("{0}\r\n", c);
+        }
+
+        string actualConsoleOutput = simulator.consoleOutputCapture.ToString();
+        Assert.That(actualConsoleOutput, Is.EqualTo(expectedConsoleOutput));
+    }
+
+    [Test]
+    public void printHelloWorld() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/printHelloWorld.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+
+        IRSimulator simulator = new IRSimulator(IR);
+        simulator.call("main", args);
+
+        string expectedConsoleOutput = "Hello World";
+        string actualConsoleOutput = simulator.consoleOutputCapture.ToString();
+        Assert.That(actualConsoleOutput, Is.EqualTo(expectedConsoleOutput));
+    }
 }
