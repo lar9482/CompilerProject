@@ -246,8 +246,8 @@ public sealed class IRSimulator {
                 case "print":
                 case "println":
                     int startAddr_print = args[0];
-                    int size = read(startAddr_print - IRConfiguration.wordSize);
-                    for (int i = 0; i < size; i++) {
+                    int printSize = read(startAddr_print - IRConfiguration.wordSize);
+                    for (int i = 0; i < printSize; i++) {
                         char charToPrint = (char) read(
                             getMemoryAddress(startAddr_print, i)
                         );
@@ -260,6 +260,22 @@ public sealed class IRSimulator {
                     }
                     break;
                 case "parseInt":
+                    int startAddr_parseInt = args[0];
+                    int parseIntSize = read(startAddr_parseInt - IRConfiguration.wordSize);
+                    string intString = "";
+                    for (int i = 0; i < parseIntSize; i++) {
+                        intString += (char) read(getMemoryAddress(startAddr_parseInt, i));
+                    }
+
+                    int result = 0;
+                    int success = 1;
+                    try {
+                        result = int.Parse(intString);
+                    } catch {
+                        success = 0;
+                    }
+                    ret.Add(result);
+                    ret.Add(success);
                     break;
                 case "unparseInt":
                     string argNumString = args[0].ToString();
