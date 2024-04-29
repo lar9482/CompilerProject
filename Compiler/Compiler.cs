@@ -13,7 +13,6 @@ public class Compiler {
 
         return programText;
     }
-
     public static Queue<Token> lex(string filePath) {
         string programText = readFile(filePath);        
         Lexer lexer = new Lexer();
