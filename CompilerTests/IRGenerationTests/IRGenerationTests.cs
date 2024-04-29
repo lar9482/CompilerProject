@@ -289,4 +289,25 @@ public class IRGenerationTests {
         } catch {
         }
     }
+
+    [Test]
+    public void unparseInt() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/unparseInt.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+        IRSimulator simulator = new IRSimulator(IR);
+        simulator.call("main", args);
+
+        int[] expectedNums = {1, 100, -100};
+
+        string expectedConsoleOutput = "";
+        foreach(int expectedNum in expectedNums) {
+            string expectedNumString = expectedNum.ToString();
+            for (int i = 0; i < expectedNumString.Length; i++) {
+                expectedConsoleOutput += String.Format("{0}\r\n", expectedNumString[i]);
+            }
+        }
+        string actualConsoleOutput = simulator.consoleOutputCapture.ToString();
+        Assert.That(actualConsoleOutput, Is.EqualTo(expectedConsoleOutput));
+    }
 }

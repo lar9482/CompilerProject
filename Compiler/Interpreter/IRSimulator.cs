@@ -245,11 +245,11 @@ public sealed class IRSimulator {
             switch(name) {
                 case "print":
                 case "println":
-                    int startAddr = args[0];
-                    int size = read(startAddr - IRConfiguration.wordSize);
+                    int startAddr_print = args[0];
+                    int size = read(startAddr_print - IRConfiguration.wordSize);
                     for (int i = 0; i < size; i++) {
                         char charToPrint = (char) read(
-                            getMemoryAddress(startAddr, i)
+                            getMemoryAddress(startAddr_print, i)
                         );
                         
                         if (name == "print") {
@@ -258,6 +258,20 @@ public sealed class IRSimulator {
                             Console.WriteLine(charToPrint);
                         }
                     }
+                    break;
+                case "parseInt":
+                    break;
+                case "unparseInt":
+                    string argNumString = args[0].ToString();
+                    int numDigits = argNumString.Length; 
+
+                    int startAddr_unparseInt = malloc((numDigits+1) * IRConfiguration.wordSize);
+                    store(startAddr_unparseInt, numDigits);
+                    for (int i = 0; i < numDigits; i++) {
+                        store(getMemoryAddress(startAddr_unparseInt, i+1), argNumString[i]);
+                    }
+
+                    ret.Add(startAddr_unparseInt + IRConfiguration.wordSize);
                     break;
                 case "malloc":
                     ret.Add(malloc(args[0]));
