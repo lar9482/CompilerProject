@@ -1,8 +1,8 @@
 
 // A simple program that calculates the length of the collatz sequence.
-main(args: int[][]) {
+main() {
     limit: int = 260000000;
-    n: int = 48394839;
+    n: int = 100;
 
     s: int = 0;
 	first: int = 0;
@@ -13,11 +13,11 @@ main(args: int[][]) {
             n = 3 * n + 1;
         }
             
-        s = s + 1;
+        s = s+1;
 		if (n == 1 && first == 0) {
             first = s;
         }
     }
-    print(unparseInt(first));
-    print(unparseInt(n));
+    println(unparseInt(first));
+    println(unparseInt(n));
 }
