@@ -310,4 +310,13 @@ public class IRGenerationTests {
         string actualConsoleOutput = simulator.consoleOutputCapture.ToString();
         Assert.That(actualConsoleOutput, Is.EqualTo(expectedConsoleOutput));
     }
+
+    [Test]
+    public void parseIntAndUnparseInt() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/parseIntAndUnparseInt.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+        IRSimulator simulator = new IRSimulator(IR);
+        simulator.call("main", args);
+    }
 }
