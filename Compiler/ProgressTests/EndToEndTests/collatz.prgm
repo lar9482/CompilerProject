@@ -1,23 +1,20 @@
 
 // A simple program that calculates the length of the collatz sequence.
 main() {
-    limit: int = 260000000;
-    n: int = 100;
+    n: int = 5;
 
-    s: int = 0;
-	first: int = 0;
-    while (s < limit) {
+    collatzLength: int = 0;
+    while (n > 1) {
+        println(unparseInt(n));
         if (n % 2 == 0) {
-            n = n / 2;
+            println(unparseInt(1));
+            n = (n / 2);
         } else {
-            n = 3 * n + 1;
+            println(unparseInt(0));
+            n = (3*n) + 1;
         }
             
-        s = s+1;
-		if (n == 1 && first == 0) {
-            first = s;
-        }
+        collatzLength = collatzLength+1;
     }
-    println(unparseInt(first));
-    println(unparseInt(n));
+    print(unparseInt(collatzLength));
 }

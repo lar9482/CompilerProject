@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.Versioning;
 using CompilerProj.IR;
 using CompilerProj.IRInterpreter.ExprStack;
@@ -243,20 +244,27 @@ public sealed class IRSimulator {
 
         try {
             switch(name) {
+                case "lengthInt":
+                case "lengthBool":
+                    ret.Add(
+                        read(args[0] - IRConfiguration.wordSize)
+                    );
+                    break;
                 case "print":
                 case "println":
                     int startAddr_print = args[0];
                     int printSize = read(startAddr_print - IRConfiguration.wordSize);
+                    string print = "";
                     for (int i = 0; i < printSize; i++) {
-                        char charToPrint = (char) read(
+                        print += (char) read(
                             getMemoryAddress(startAddr_print, i)
                         );
-                        
-                        if (name == "print") {
-                            Console.Write(charToPrint);
-                        } else {
-                            Console.WriteLine(charToPrint);
-                        }
+                    }
+
+                    if (name == "print") {
+                        Debug.Write(print);
+                    } else {
+                        Debug.WriteLine(print);
                     }
                     break;
                 case "parseInt":
@@ -300,7 +308,7 @@ public sealed class IRSimulator {
                     }
                     break;
                 default:
-                    throw new Exception("Unrecognized library call.");
+                    throw new Exception(String.Format("Unrecognized library call: {0}", name));
             }
             return ret;
         } catch (IOException e) {

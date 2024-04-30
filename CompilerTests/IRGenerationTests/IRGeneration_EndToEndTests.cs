@@ -21,4 +21,32 @@ public class IRGeneration_EndToEndTests {
         Assert.That(nonTailRetVal, Is.EqualTo(120));
         Assert.That(tailRetVal, Is.EqualTo(120));
     }
+
+    [Test]
+    public void IRGen_binsearch() {
+        string filePath = "../../../IRGenerationTests/EndToEndTests/binsearch.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] {};
+        IRSimulator simulator = new IRSimulator(IR);
+        simulator.call("main", args);
+
+        string expectedConsoleOutput = "1";
+        string actualConsoleOutput = simulator.consoleOutputCapture.ToString();
+
+        Assert.That(actualConsoleOutput, Is.EqualTo(expectedConsoleOutput));
+    }
+
+    [Test] 
+    public void IRGen_collatz() {
+        string filePath = "../../../IRGenerationTests/EndToEndTests/collatz.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] {};
+        IRSimulator simulator = new IRSimulator(IR);
+        simulator.call("main", args);
+
+
+        string expectedConsoleOutput = "1";
+        string actualConsoleOutput = simulator.consoleOutputCapture.ToString();
+        Assert.That(actualConsoleOutput, Is.EqualTo(expectedConsoleOutput));
+    }  
 }
