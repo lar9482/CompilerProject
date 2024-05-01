@@ -853,6 +853,14 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IRSeq>(seqStmts);
     }
 
+    /*
+     * S[if (e1) s] = SEQ(
+     *   C[e1, t, f],
+     *   LABEL(t),
+     *   S[s],
+     *   LABEL(f)
+     * )
+     */
     private IRSeq generateIfStmt(ExprAST ifCondition, BlockAST ifBlock) {
         IRLabel trueLabel = createNewLabel();
         IRLabel falseLabel = createNewLabel();
@@ -870,6 +878,17 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         });
     }
 
+    /*
+     * S[if(e1) s1 else s2] = SEQ(
+     *    C[e1, s1StartLabel, s2StartLabel],
+     *    LABEL(s1StartLabel),
+     *    S[s1],
+     *    JUMP(endLabel),
+     *    LABEL(s2StartLabel),
+     *    S[s2],
+     *    LABEL(endLabel)
+     * )
+     */
     private IRSeq generateIfElseStmt(ExprAST ifCondition, BlockAST ifBlock, BlockAST elseBlock) {
         List<IRStmt> seq = new List<IRStmt>();
 
@@ -894,12 +913,39 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return new IRSeq(seq);
     }
 
+    /*
+     * S[if (e1) {s1} else if (e2) {s2} ... else if (en) {sn}] = SEQ(
+        C[e1, e1TrueLabel, e1FalseLabel],
+        LABEL(e1TrueLabel),
+        E[s1],
+        JUMP(endLabel),
+        LABEL(e1FalseLabel),
+
+        C[e2, e2TrueLabel, e2FalseLabel],
+        LABEL(e2TrueLabel),
+        E[s2],
+        JUMP(endLabel),
+        LABEL(e2FalseLabel)
+        .
+        .
+        .
+        C[en, enTrueLabel, enFalseLabel],
+        LABEL(enTrueLabel),
+        E[sn],
+        JUMP(endLabel),
+        LABEL(enFalseLabel)
+
+        LABEL(endLabel)
+     )
+     */
     private IRSeq generateIf_ElseIf_Stmt(
         ExprAST ifCondition, BlockAST ifBlock, 
         Dictionary<ExprAST, BlockAST> elseIfConditionalBlocks
     ) {
+        
         IRLabel ifTrueLabel = createNewLabel();
         IRLabel ifFalseLabel = createNewLabel();
+        IRLabel endLabel = createNewLabel();
 
         List<IRStmt> stmts = new List<IRStmt>();
 
@@ -910,6 +956,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         stmts.Add(irIfCondition);
         stmts.Add(ifTrueLabel);
         stmts.Add(irIfBlock);
+        stmts.Add(new IRJump(new IRName(endLabel.name)));
         stmts.Add(ifFalseLabel);
 
         foreach(KeyValuePair<ExprAST, BlockAST> elseIfCondBlock in elseIfConditionalBlocks) {
@@ -925,12 +972,22 @@ public sealed class IRGenerator : ASTVisitorGeneric {
             stmts.Add(irElseIfCond);
             stmts.Add(elseIfTrueLabel);
             stmts.Add(irElseIfBlock);
+            stmts.Add(new IRJump(new IRName(endLabel.name)));
             stmts.Add(elseIfFalseLabel);
         }
 
+        stmts.Add(endLabel);
         return new IRSeq(stmts);
     }
 
+    /*
+     * S[if (e_1) {s_1} else if (e_2) {s_2} ... else if (e_n-1) {sn-1} else sn]
+     * = SEQ (
+     *    S[if (e_1) {s_1} else if (e_2) {s_2} ... else if (e_n-1) {sn-1}],
+     *    S[sn]
+     *    LABEL(endLabel)
+     * )
+     */
     private IRSeq generateIf_ElseIf_ElseStmt(
         ExprAST ifCondition, BlockAST ifBlock, 
         Dictionary<ExprAST, BlockAST> elseIfConditionalBlocks,
@@ -942,8 +999,13 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         );
 
         List<IRStmt> irStmts = irIf_ElseIf_Stmts.statements;
+        IRLabel endLabel = (IRLabel) irStmts[irStmts.Count-1];
+        irStmts.Remove(endLabel);
+        
         IRSeq irElseBlock = elseBlock.accept<IRSeq>(this);
+
         irStmts.Add(irElseBlock);
+        irStmts.Add(endLabel);
 
         return new IRSeq(irStmts);
     }
