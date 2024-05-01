@@ -66,6 +66,18 @@ public class IRGenerationTests {
     }
 
     [Test]
+    public void exprBool() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/exprBool.prgm";
+
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+
+        IRSimulator simulator = new IRSimulator(IR);
+        int retVal = simulator.call("main", args);
+        Assert.That(retVal, Is.EqualTo(1));
+    }
+
+    [Test]
     public void arrayDecl_noInitialValues() {
         string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDecl_noInitialValues.prgm";
 

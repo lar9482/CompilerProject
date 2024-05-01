@@ -1,0 +1,11 @@
+main(): bool {
+
+    // true (1)
+    x: bool = true || false; 
+
+    // y, z = false, true (0, 1)
+    y: bool, z: bool = false, (x && true);
+
+    // true (1)
+    return y || z;
+}
