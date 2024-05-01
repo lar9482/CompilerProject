@@ -10,13 +10,14 @@ binary_search(a: int[], x: int): int {
         m:int = (l+r)/2;
         if (a[m] < x) {
             l = m+1;
-        }
-        else {
-            r = m;
+        } else if (a[m] > x){
+            r = m-1;
+        } else {
+            return m;
         }
     }
     
-    return l;
+    return -1;
 }
 
 main() {
