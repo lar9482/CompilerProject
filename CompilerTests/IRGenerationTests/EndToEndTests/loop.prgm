@@ -9,10 +9,9 @@ sum(a: int):int {
 }
 
 main() {
-    x:int = sum(500000000);
-    y:int = 500000001 * 250000000;
+    x:int = sum(500);
+    y:int = 501 * 250;
 
-    println(x);
-    println(y);
+    assert(x == y);
 }
 

@@ -61,4 +61,13 @@ public class IRGeneration_EndToEndTests {
         string actualConsoleOutput = simulator.consoleOutputCapture.ToString();
         Assert.That(actualConsoleOutput, Is.EqualTo(expectedConsoleOutput));
     }
+
+    [Test]
+    public void IRGen_simpleLoop() {
+        string filePath = "../../../IRGenerationTests/EndToEndTests/loop.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] {};
+        IRSimulator simulator = new IRSimulator(IR);
+        simulator.call("main", args);
+    }
 }
