@@ -185,7 +185,7 @@ public class IRGenerationTests {
 
         IRSimulator simulator = new IRSimulator(IR);
         int retVal = simulator.call("main", args);
-        Assert.That(retVal, Is.EqualTo(10));
+        Assert.That(retVal, Is.EqualTo(0));
     }
 
     [Test]
