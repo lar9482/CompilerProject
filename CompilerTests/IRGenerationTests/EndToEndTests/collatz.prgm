@@ -1,7 +1,7 @@
 
 // A simple program that calculates the length of the collatz sequence.
 main() {
-    n: int = 5;
+    n: int = 100;
 
     collatzLength: int = 0;
     while (n > 1) {

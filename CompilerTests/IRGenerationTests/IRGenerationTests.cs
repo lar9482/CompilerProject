@@ -241,13 +241,7 @@ public class IRGenerationTests {
         IRSimulator simulator = new IRSimulator(IR);
         simulator.call("main", args);
 
-        string helloWorld = "Hello World";
-        string expectedConsoleOutput = "";
-
-        foreach(char c in helloWorld) {
-            expectedConsoleOutput += String.Format("{0}\r\n", c);
-        }
-
+        string expectedConsoleOutput = "Hello World\r\n";
         string actualConsoleOutput = simulator.consoleOutputCapture.ToString();
         Assert.That(actualConsoleOutput, Is.EqualTo(expectedConsoleOutput));
     }
@@ -303,9 +297,7 @@ public class IRGenerationTests {
         string expectedConsoleOutput = "";
         foreach(int expectedNum in expectedNums) {
             string expectedNumString = expectedNum.ToString();
-            for (int i = 0; i < expectedNumString.Length; i++) {
-                expectedConsoleOutput += String.Format("{0}\r\n", expectedNumString[i]);
-            }
+            expectedConsoleOutput += expectedNumString + "\r\n";
         }
         string actualConsoleOutput = simulator.consoleOutputCapture.ToString();
         Assert.That(actualConsoleOutput, Is.EqualTo(expectedConsoleOutput));

@@ -44,8 +44,7 @@ public class IRGeneration_EndToEndTests {
         IRSimulator simulator = new IRSimulator(IR);
         simulator.call("main", args);
 
-
-        string expectedConsoleOutput = "1";
+        string expectedConsoleOutput = "25";
         string actualConsoleOutput = simulator.consoleOutputCapture.ToString();
         Assert.That(actualConsoleOutput, Is.EqualTo(expectedConsoleOutput));
     }  

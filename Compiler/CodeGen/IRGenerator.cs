@@ -871,13 +871,27 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     }
 
     private IRSeq generateIfElseStmt(ExprAST ifCondition, BlockAST ifBlock, BlockAST elseBlock) {
-        IRSeq irIfStmt = generateIfStmt(ifCondition, ifBlock);
-        List<IRStmt> stmts = irIfStmt.statements;
+        List<IRStmt> seq = new List<IRStmt>();
 
+        IRLabel ifConditionTrueLabel = createNewLabel();
+        IRLabel elseLabel = createNewLabel();
+        IRLabel endConditionalLabel = createNewLabel();
+
+        IRStmt irIfCondition = translateBoolExprByCF(
+            ifCondition, ifConditionTrueLabel, elseLabel
+        );
+        IRSeq irIfBlock = ifBlock.accept<IRSeq>(this);
         IRSeq irElseBlock = elseBlock.accept<IRSeq>(this);
-        stmts.Add(irElseBlock);
 
-        return new IRSeq(stmts);
+        seq.Add(irIfCondition);
+        seq.Add(ifConditionTrueLabel);
+        seq.Add(irIfBlock);
+        seq.Add(new IRJump(new IRName(endConditionalLabel.name)));
+        seq.Add(elseLabel);
+        seq.Add(irElseBlock);
+        seq.Add(endConditionalLabel);
+        
+        return new IRSeq(seq);
     }
 
     private IRSeq generateIf_ElseIf_Stmt(

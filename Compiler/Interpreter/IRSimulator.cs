@@ -266,6 +266,12 @@ public sealed class IRSimulator {
                     } else {
                         Debug.WriteLine(print);
                     }
+
+                    if (name == "print") {
+                        Console.Write(print);
+                    } else {
+                        Console.WriteLine(print);
+                    }
                     break;
                 case "parseInt":
                     int startAddr_parseInt = args[0];
