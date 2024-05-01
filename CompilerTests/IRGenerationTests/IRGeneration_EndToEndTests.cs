@@ -48,4 +48,17 @@ public class IRGeneration_EndToEndTests {
         string actualConsoleOutput = simulator.consoleOutputCapture.ToString();
         Assert.That(actualConsoleOutput, Is.EqualTo(expectedConsoleOutput));
     }  
+
+    [Test]
+    public void IRGen_sort() {
+        string filePath = "../../../IRGenerationTests/EndToEndTests/sort.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] {};
+        IRSimulator simulator = new IRSimulator(IR);
+        simulator.call("main", args);
+
+        string expectedConsoleOutput = "12345678910";
+        string actualConsoleOutput = simulator.consoleOutputCapture.ToString();
+        Assert.That(actualConsoleOutput, Is.EqualTo(expectedConsoleOutput));
+    }
 }

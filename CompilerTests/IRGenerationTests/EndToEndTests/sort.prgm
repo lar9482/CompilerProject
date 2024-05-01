@@ -24,6 +24,15 @@ assertEquals(a:int[], b:int[]) {
     }
 }
 
+printArr(a:int[]) {
+    i:int = 0;
+    n:int = lengthInt(a);
+    while (i < n) {
+        print(unparseInt(a[i]));
+        i = i + 1;
+    }
+}
+
 getArr(sorted:bool, numOfElements: int): int[] {
     i:int = 0;
     tosort: int[numOfElements];
@@ -39,8 +48,12 @@ getArr(sorted:bool, numOfElements: int): int[] {
 }
 
 main() {
-    max:int = 20000;
-    arr:int[] = getArr(max, false);
-    assert(max == 20000);
+    max:int = 10;
+    
+    arr:int[] = getArr(false, max);
+    expectedArrOrder: int[] = getArr(true, max);
+
     sort(arr);
+    assertEquals(arr, expectedArrOrder);
+    printArr(arr);
 }
