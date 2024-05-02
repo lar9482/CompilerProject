@@ -3,6 +3,7 @@ using CompilerProj.Types;
 using CompilerProj.Visitors;
 using CompilerProj.Context;
 
+/** <functionName>(<Param1>, ... ,<ParamN>): <SimpleType1>, ...,<SimpleTypeN> <Block> **/
 public sealed class FunctionAST : NodeAST {
     public readonly string name;
     public readonly List<ParameterAST> parameters;

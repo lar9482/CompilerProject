@@ -1,5 +1,6 @@
 using CompilerProj.Visitors;
 
+/** <variableName> = <Expr> **/
 public sealed class AssignAST : StmtAST{
     public readonly VarAccessAST variable;
     public readonly ExprAST value;

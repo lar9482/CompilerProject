@@ -2,6 +2,7 @@ using CompilerProj.AST;
 using CompilerProj.Types;
 using CompilerProj.Visitors;
 
+/** <identifier> : <SimpleType> **/
 public sealed class ParameterAST : NodeAST {
     public readonly string name;
     public SimpleType type;

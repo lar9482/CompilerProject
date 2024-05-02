@@ -5,6 +5,8 @@ using CompilerProj.Types;
 
 namespace CompilerProj.Parse;
 
+
+//TODO: Use a parser generator sometime, or refactor the grammar? This is the most spaghetti module project.
 /*
  * A recursive descent parser for building out the Abstract Syntax Tree
  * 
@@ -238,7 +240,7 @@ public sealed class Parser {
     }
 
     /*
-     * ⟨multiVarDecl Or multiVarDeclCall⟩ ::= ‘,’ ⟨identifierDeclList ⟩ ⟨optional multiple value⟩
+     * ⟨multiVarDecl Or multiVarDeclCall⟩ ::= ‘,’ ⟨identifierDeclList ⟩ ⟨optionalMultipleValues_Or_FunctionCall⟩
      */
     private DeclAST parseMultiVarDecls_Or_MultiVarDeclCall(Token firstIdentifierToken, PrimitiveType firstType) {
         consume(TokenType.comma);
@@ -800,7 +802,7 @@ public sealed class Parser {
     }
 
     /*
-     * ⟨statements⟩ ::= ⟨DeclarationOrAssignment⟩
+     * ⟨statements⟩ ::= ⟨DeclarationOrAssignmentOrProcedureCall⟩
      * | ⟨Conditional ⟩
      * | ⟨WhileLoop⟩
      * | <Return >
@@ -844,7 +846,7 @@ public sealed class Parser {
         );
     }
     /*
-     * <Declaration_Assignment_ProcedureCall> ::= <identifier> ‘:’ <primitiveType> <declaration>
+     * <DeclarationOrAssignmentOrProcedureCall> ::= <identifier> ‘:’ <primitiveType> <declaration>
      * | <identifier> <assignment>
      * | <identifier> <procedureCall>
      */
@@ -885,6 +887,7 @@ public sealed class Parser {
     /*
      * ⟨assignment⟩ ::= ⟨assign⟩
      * | ⟨multiAssign⟩
+     * | ⟨multiCallAssign⟩
      * | ⟨arrayAssign⟩
      * | ⟨multiDimArrayAssign⟩
      */

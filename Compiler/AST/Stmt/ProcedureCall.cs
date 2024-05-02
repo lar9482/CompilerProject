@@ -2,6 +2,8 @@ using CompilerProj.Visitors;
 
 /*
  * A function that will not return anything.
+ *
+ * <procedureName>(<param1>, ... , <paramN>)
  */
 public sealed class ProcedureCallAST : StmtAST {
     public readonly string procedureName;

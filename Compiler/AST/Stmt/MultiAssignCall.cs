@@ -1,5 +1,6 @@
 using CompilerProj.Visitors;
 
+/** <variable1>, <variable2>, ... ,<variableN> = <procedureName>(<param1>, ... , <paramN>) **/
 public sealed class MultiAssignCallAST : StmtAST {
     public readonly List<VarAccessAST> variableNames;
     public readonly string functionName;

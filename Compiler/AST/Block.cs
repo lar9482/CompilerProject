@@ -3,6 +3,7 @@ using CompilerProj.Visitors;
 using CompilerProj.Context;
 using CompilerProj.Types;
 
+/** { <StmtList> } **/
 public sealed class BlockAST : NodeAST {
     public readonly List<StmtAST> statements;
 

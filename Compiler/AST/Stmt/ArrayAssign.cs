@@ -1,5 +1,7 @@
 using CompilerProj.Visitors;
 
+
+/** <arrayName> [ <Expr> ] = <Expr> **/
 public sealed class ArrayAssignAST : StmtAST{
     public readonly ArrayAccessAST arrayAccess;
     public readonly ExprAST value;

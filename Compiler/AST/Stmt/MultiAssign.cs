@@ -1,5 +1,6 @@
 using CompilerProj.Visitors;
 
+/** <variable1>, <variable2>, ... ,<variableN> = <Expr1>, <Expr2>, ... , <ExprN> **/
 public sealed class MultiAssignAST : StmtAST{
 
     public readonly Dictionary<VarAccessAST, ExprAST> assignments;

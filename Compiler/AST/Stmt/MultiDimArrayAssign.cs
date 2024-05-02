@@ -1,5 +1,7 @@
 using CompilerProj.Visitors;
 
+
+/** <arrayName> [ <Expr> ] [ <Expr> ]= <Expr> **/
 public sealed class MultiDimArrayAssignAST : StmtAST{
     public readonly MultiDimArrayAccessAST arrayAccess;
     public readonly ExprAST value;

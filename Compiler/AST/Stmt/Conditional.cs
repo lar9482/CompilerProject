@@ -1,6 +1,13 @@
 using CompilerProj.AST;
 using CompilerProj.Visitors;
 
+/*
+ * The following constructs:
+ * if (<Expr>) <block>
+ * if (<Expr>) <block> <else> <block>
+ * if (<Expr>) <block> else if (<Expr>) <block> ... else if (<Expr>) <block>
+ * if (<Expr>) <block> else if (<Expr>) <block> ... else if (<Expr>) <block> else <block>
+ */
 public sealed class ConditionalAST : StmtAST {
     public readonly ExprAST ifCondition;
     public readonly BlockAST ifBlock;
