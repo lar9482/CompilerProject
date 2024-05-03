@@ -108,7 +108,7 @@ public sealed class Parser {
     }
 
     /*
-     * ⟨global declaration⟩ ::= ‘:global’ ⟨identifierDecl⟩ ⟨declaration⟩
+     * ⟨global declaration⟩ ::= ‘:global’ ⟨identifierDecl⟩ ⟨declaration⟩ ‘;’ 
      */
     private void parseGlobalDeclaration() {
         consume(TokenType.global);
@@ -119,6 +119,8 @@ public sealed class Parser {
                 identifierAndType.Item2
             )
         );
+
+        consume(TokenType.semicolon);
     }
 
     /*
@@ -201,15 +203,14 @@ public sealed class Parser {
     }
 
     /*
-     *  ⟨varDecl ⟩ ::= ‘=’ ⟨Expr ⟩ ‘;’
-     *   | ‘;’
+     *  ⟨varDecl ⟩ ::= ‘=’ ⟨Expr ⟩
+     *   | EPSILON
      */
     private VarDeclAST parseVarDecl(Token identifierToken, PrimitiveType primitiveType) {
         switch(tokenQueue.Peek().type) {
             case TokenType.assign:
                 consume(TokenType.assign);
                 ExprAST expression = parseExpr();
-                consume(TokenType.semicolon);
 
                 return new VarDeclAST(
                     identifierToken.lexeme,
@@ -218,23 +219,13 @@ public sealed class Parser {
                     identifierToken.line,
                     identifierToken.column
                 );
-            case TokenType.semicolon:
-                consume(TokenType.semicolon);
+            default:
                 return new VarDeclAST(
                     identifierToken.lexeme,
                     null,
                     primitiveType,
                     identifierToken.line,
                     identifierToken.column
-                );
-            default:
-                throw new Exception(
-                    String.Format(
-                        "{0}:{1} ParseError: Expected a ; or =, not {2}", 
-                        tokenQueue.Peek().line.ToString(), 
-                        tokenQueue.Peek().column.ToString(),
-                        tokenQueue.Peek().lexeme
-                    )
                 );
         }
     }
@@ -311,8 +302,8 @@ public sealed class Parser {
 
     /**
      *  ⟨optional multiple values or function call⟩ ::= ‘=’ ⟨Expr ⟩ <multipleValues>
-     *   | ‘=’ <FunctionCallAST> ‘;’
-     *   | ‘;’
+     *   | ‘=’ <FunctionCallAST>
+     *   | EPSILON
      */
     private List<ExprAST> parseOptionalMultipleValues_Or_FunctionCall() {
         List<ExprAST> initialValues = new List<ExprAST>();
@@ -324,33 +315,21 @@ public sealed class Parser {
 
                 if (firstExpr.GetType() == typeof(FunctionCallAST) 
                 && tokenQueue.Peek().type==TokenType.semicolon) {
-
                     initialValues.Add(firstExpr);
-                    consume(TokenType.semicolon);
 
                 } else if (tokenQueue.Peek().type==TokenType.comma) {
                     initialValues = parseMultipleValues(firstExpr);
                 }
                 break;
-            case TokenType.semicolon:
-                consume(TokenType.semicolon);
-                break;
             default:
-                throw new Exception(
-                    String.Format(
-                        "{0}:{1} ParseError: Expected a ; or =, not {2}", 
-                        tokenQueue.Peek().line.ToString(), 
-                        tokenQueue.Peek().column.ToString(),
-                        tokenQueue.Peek().lexeme
-                    )
-                );
+                break;
         }
 
         return initialValues;
     }
 
     /*
-     * <multipleValues> ::= ‘,’ ⟨exprList⟩ ‘;’
+     * <multipleValues> ::= ‘,’ ⟨exprList⟩
      */
     private List<ExprAST> parseMultipleValues(ExprAST firstExpr) {
         List<ExprAST> initialValues = new List<ExprAST>();
@@ -360,8 +339,6 @@ public sealed class Parser {
                 
         List<ExprAST> nextExprs = parseExprList();
         initialValues = initialValues.Concat<ExprAST>(nextExprs).ToList<ExprAST>();
-
-        consume(TokenType.semicolon);
 
         return initialValues;
     }
@@ -389,9 +366,9 @@ public sealed class Parser {
         }
     }
 
-    /*  ⟨singleOrMulti Array Expr ⟩ ::= ‘=’ ⟨arrayInitial ⟩ ‘;’
+    /*  ⟨singleOrMulti Array Expr ⟩ ::= ‘=’ ⟨arrayInitial ⟩
      *  | ‘=’ <ProcedureCall>
-     *  | ‘[’ ‘]’ ‘=’ ‘{’ ⟨multiDimArrayInitial ⟩ ‘}’ ‘;’
+     *  | ‘[’ ‘]’ ‘=’ ‘{’ ⟨multiDimArrayInitial ⟩ ‘}’
      *  | ‘[’ ‘]’ ‘=’ <ProcedureCall>
      */
     private DeclAST parse_SingleOrMulti_Array_Expr(
@@ -403,7 +380,6 @@ public sealed class Parser {
                 // Indicating the start of a single dim array declared with initial values
                 if (tokenQueue.Peek().type == TokenType.startCurly) {
                     ExprAST[] exprs = parseArrayInitial();
-                    consume(TokenType.semicolon);
 
                     ArrayDeclAST arrayDecl = new ArrayDeclAST(
                         identifierToken.lexeme,
@@ -459,7 +435,6 @@ public sealed class Parser {
                     List<ExprAST[]> arrayOfExprs = parseMultiDimArrayInitial();
                     verifyMultiDimArrayColumnSize(arrayOfExprs);
                     consume(TokenType.endCurly);
-                    consume(TokenType.semicolon);
 
                     MultiDimArrayDeclAST multiDimArrayDecl = new MultiDimArrayDeclAST(
                         identifierToken.lexeme,
@@ -537,30 +512,17 @@ public sealed class Parser {
         }
     }
     /*
-     * ⟨singleOrMulti Array Static⟩ ::= ‘;’
-     * | ‘[’ ⟨Expr ⟩ ‘]’ ‘;’
+     * ⟨singleOrMulti Array Static⟩ ::= ‘[’ ⟨Expr ⟩ ‘]’
+     * | EPSILON
      */
     private DeclAST parse_SingleOrMulti_Array_Static(
         Token identifierToken, PrimitiveType primitiveType, ExprAST firstExpr
     ) {
         switch(tokenQueue.Peek().type) {
-            case TokenType.semicolon:
-                consume(TokenType.semicolon);
-
-                ArrayDeclAST arrayDecl = new ArrayDeclAST(
-                    identifierToken.lexeme,
-                    firstExpr,
-                    primitiveType,
-                    null,
-                    identifierToken.line,
-                    identifierToken.column
-                );
-                return arrayDecl;
             case TokenType.startBracket:
                 consume(TokenType.startBracket);
                 ExprAST secondExpr = parseExpr();
                 consume(TokenType.endBracket);
-                consume(TokenType.semicolon);
 
                 MultiDimArrayDeclAST multiDimArrayDecl = new MultiDimArrayDeclAST(
                     identifierToken.lexeme,
@@ -574,14 +536,15 @@ public sealed class Parser {
 
                 return multiDimArrayDecl;
             default:
-                throw new Exception(
-                    String.Format(
-                        "{0}:{1} ParseError: Expected a ; or [, not {2}", 
-                        tokenQueue.Peek().line.ToString(), 
-                        tokenQueue.Peek().column.ToString(),
-                        tokenQueue.Peek().lexeme
-                    )
+                ArrayDeclAST arrayDecl = new ArrayDeclAST(
+                    identifierToken.lexeme,
+                    firstExpr,
+                    primitiveType,
+                    null,
+                    identifierToken.line,
+                    identifierToken.column
                 );
+                return arrayDecl;
         }
     }
 
@@ -802,19 +765,20 @@ public sealed class Parser {
     }
 
     /*
-     * ⟨statements⟩ ::= ⟨DeclarationOrAssignmentOrProcedureCall⟩
+     * ⟨statements⟩ ::= ⟨DeclarationOrAssignmentOrProcedureCall⟩ ‘;’
      * | ⟨Conditional ⟩
      * | ⟨WhileLoop⟩
-     * | <Return >
+     * | <Return > ‘;’
      */
     private void parseStatement(
         List<StmtAST> statements
     ) {
         switch(tokenQueue.Peek().type) {
             case TokenType.identifier:
-                parseDeclarationOrAssignment(
+                parseDeclarationOrAssignmentOrProcedureCall(
                     statements
                 );
+                consume(TokenType.semicolon);
                 break;
             case TokenType.reserved_if:
                 ConditionalAST conditional = parseConditional();
@@ -827,6 +791,7 @@ public sealed class Parser {
             case TokenType.reserved_return:
                 ReturnAST returnStmt = parseReturn();
                 statements.Add(returnStmt);
+                consume(TokenType.semicolon);
                 break;
             case TokenType.endCurly:
                 return;
@@ -850,7 +815,7 @@ public sealed class Parser {
      * | <identifier> <assignment>
      * | <identifier> <procedureCall>
      */
-    private void parseDeclarationOrAssignment(
+    private void parseDeclarationOrAssignmentOrProcedureCall(
         List<StmtAST> blockStmts
     ) {
         Token firstIdentifer = consume(TokenType.identifier);
@@ -919,12 +884,11 @@ public sealed class Parser {
     }
 
     /*
-     * ⟨assign⟩ ::= ‘=’ ⟨Expr ⟩ `;'
+     * ⟨assign⟩ ::= ‘=’ ⟨Expr ⟩
      */
     private AssignAST parseAssign(Token identifier) {
         consume(TokenType.assign);
         ExprAST expr = parseExpr();
-        consume(TokenType.semicolon);
 
         return new AssignAST(
             new VarAccessAST(identifier.lexeme, identifier.line, identifier.column),
@@ -935,8 +899,8 @@ public sealed class Parser {
     }
 
     /*
-     * <multiAssign_Or_MultiCallAssign> ::= ‘,’ ⟨identifierList⟩ ‘=’ ⟨Expr ⟩ ‘,’ ⟨ExprList⟩ ‘;’
-     * | ‘,’ ⟨identifierList⟩ ‘=’ <FunctionCall> ‘;’
+     * <multiAssign_Or_MultiCallAssign> ::= ‘,’ ⟨identifierList⟩ ‘=’ ⟨Expr ⟩ ‘,’ ⟨ExprList⟩
+     * | ‘,’ ⟨identifierList⟩ ‘=’ <FunctionCall>
      */
     private StmtAST parseMultiAssign_Or_MultiCallAssign(Token firstIdentifier) {
         List<Token> variableNames = new List<Token>();
@@ -952,8 +916,6 @@ public sealed class Parser {
         if (tokenQueue.Peek().type == TokenType.comma) {
             return parseMultiAssign(variableNames, firstExpr);
         } else if (firstExpr.GetType() == typeof(FunctionCallAST)) {
-
-            consume(TokenType.semicolon);
             List<VarAccessAST> variableAssigns = new List<VarAccessAST>();
             foreach (Token variableName in variableNames) {
                 variableAssigns.Add(
@@ -985,7 +947,7 @@ public sealed class Parser {
     }
 
     /*
-    <multiAssign> ::= ‘,’ ⟨identifierList⟩ ‘=’ ⟨Expr ⟩ ‘,’ ⟨ExprList⟩ ‘;’
+    <multiAssign> ::= ‘,’ ⟨identifierList⟩ ‘=’ ⟨Expr ⟩ ‘,’ ⟨ExprList⟩
     */
     private MultiAssignAST parseMultiAssign(List<Token> variableNames, ExprAST firstExpr) {
         List<ExprAST> exprs = new List<ExprAST>();
@@ -993,8 +955,6 @@ public sealed class Parser {
 
         consume(TokenType.comma);
         exprs = exprs.Concat(parseExprList()).ToList<ExprAST>();
-
-        consume(TokenType.semicolon);
 
         Dictionary<VarAccessAST, ExprAST> assignments = new Dictionary<VarAccessAST, ExprAST>();
         for (int index = 0; index < variableNames.Count; index++) {
@@ -1034,7 +994,7 @@ public sealed class Parser {
     }
 
     /*
-     * <ProcedureCall > ::= <identifier> ‘(’ ⟨ExprList⟩? ‘)’ `;'
+     * <ProcedureCall > ::= <identifier> ‘(’ ⟨ExprList⟩? ‘)’
      */
     private ProcedureCallAST parseProcedureCall(Token identifier) {
         consume(TokenType.startParen);
@@ -1049,7 +1009,6 @@ public sealed class Parser {
         }
 
         consume(TokenType.endParen);
-        consume(TokenType.semicolon);
 
         return new ProcedureCallAST(
             identifier.lexeme,
@@ -1079,13 +1038,12 @@ public sealed class Parser {
     }
 
     /*
-     * ⟨arrayAssign⟩ ::= ‘[’ ⟨Expr ⟩ ‘]’ ‘=’ ⟨Expr ⟩ ‘;’
+     * ⟨arrayAssign⟩ ::= ‘[’ ⟨Expr ⟩ ‘]’ ‘=’ ⟨Expr ⟩
      */
     private ArrayAssignAST parseArrayAssign(Token identifier, ExprAST access) {
 
         consume(TokenType.assign);
         ExprAST value = parseExpr();
-        consume(TokenType.semicolon);
 
         return new ArrayAssignAST(
             new ArrayAccessAST(
@@ -1101,7 +1059,7 @@ public sealed class Parser {
     }
 
     /*
-     * ⟨multiDimArrayAssign⟩ ::= ‘[’ ⟨Expr ⟩ ‘]’ ‘[’ ⟨Expr ⟩ ‘]’ ‘=’ ⟨Expr ⟩ ‘;’
+     * ⟨multiDimArrayAssign⟩ ::= ‘[’ ⟨Expr ⟩ ‘]’ ‘[’ ⟨Expr ⟩ ‘]’ ‘=’ ⟨Expr ⟩
      */
     private MultiDimArrayAssignAST parseMultiDimArrayAssign(Token identifier, ExprAST firstAccess) {
         consume(TokenType.startBracket);
@@ -1109,7 +1067,6 @@ public sealed class Parser {
         consume(TokenType.endBracket);
         consume(TokenType.assign);
         ExprAST value = parseExpr();
-        consume(TokenType.semicolon);
 
         return new MultiDimArrayAssignAST(
             new MultiDimArrayAccessAST(
@@ -1231,7 +1188,7 @@ public sealed class Parser {
     }
 
     /*
-     * ⟨return⟩ ::= ‘return’ ⟨ExprList⟩? ‘;’
+     * ⟨return⟩ ::= ‘return’ ⟨ExprList⟩?
      */
     private ReturnAST parseReturn() {
         Token returnToken = consume(TokenType.reserved_return);
@@ -1249,8 +1206,6 @@ public sealed class Parser {
                 returnValues = parseExprList();
                 break;
         }
-
-        consume(TokenType.semicolon);
 
         return new ReturnAST(
             returnValues,
