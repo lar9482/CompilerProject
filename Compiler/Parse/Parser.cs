@@ -6,7 +6,7 @@ using CompilerProj.Types;
 namespace CompilerProj.Parse;
 
 
-//TODO: Use a parser generator sometime, or refactor the grammar? This is the most spaghetti module project.
+//TODO: Use a parser generator sometime, or refactor the grammar? This is easily the most spaghetti module of this project.
 /*
  * A recursive descent parser for building out the Abstract Syntax Tree
  * 
