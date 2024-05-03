@@ -663,9 +663,9 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     /*
      * S[x = e] = MOVE(TEMP(x), E(e))
      */
-    public T visit<T>(AssignAST assign) { 
-        IRExpr irSrc = assign.value.accept<IRExpr>(this);
-        IRTemp irDest = assign.variable.accept<IRTemp>(this);
+    public T visit<T>(VarAssignAST varAssign) { 
+        IRExpr irSrc = varAssign.value.accept<IRExpr>(this);
+        IRTemp irDest = varAssign.variable.accept<IRTemp>(this);
 
         IRMove irAssign = new IRMove(
             irDest, irSrc

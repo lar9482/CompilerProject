@@ -32,7 +32,7 @@ public class ASTVisitorGenericImplemented : ASTVisitorGeneric {
     public T visit<T>(BlockAST block) { throw new NotImplementedException(); }
 
     // Stmt nodes
-    public T visit<T>(AssignAST assign) { throw new NotImplementedException(); }
+    public T visit<T>(VarAssignAST assign) { throw new NotImplementedException(); }
     public T visit<T>(MultiAssignAST multiAssign) { throw new NotImplementedException(); }
     public T visit<T>(MultiAssignCallAST multiAssignCall) { throw new NotImplementedException(); }
     public T visit<T>(ArrayAssignAST arrayAssign) { throw new NotImplementedException(); }

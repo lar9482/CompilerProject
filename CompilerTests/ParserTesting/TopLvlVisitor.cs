@@ -119,8 +119,8 @@ internal class TopLvlVisitor : ASTVisitorVoid {
         }
     }
 
-    public void visit(AssignAST assign) { 
-        assign.variable.accept(this);
+    public void visit(VarAssignAST varAssign) { 
+        varAssign.variable.accept(this);
         traversalRecord.Enqueue("EXPR");
     }
 

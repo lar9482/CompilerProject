@@ -13,7 +13,7 @@ public sealed class ASTVisitorImplemented : ASTVisitorVoid {
     public void visit(FunctionAST function) { }
     public void visit(ParameterAST parameter) { }
     public void visit(BlockAST block) { }
-    public void visit(AssignAST assign) { }
+    public void visit(VarAssignAST assign) { }
     public void visit(MultiAssignAST multiAssign) { }
     public void visit(MultiAssignCallAST multiAssignCall) { }
     public void visit(ArrayAssignAST arrayAssign) { }

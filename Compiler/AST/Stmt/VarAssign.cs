@@ -1,11 +1,11 @@
 using CompilerProj.Visitors;
 
 /** <variableName> = <Expr> **/
-public sealed class AssignAST : StmtAST{
+public sealed class VarAssignAST : StmtAST{
     public readonly VarAccessAST variable;
     public readonly ExprAST value;
 
-    public AssignAST (
+    public VarAssignAST (
         VarAccessAST variable,
         ExprAST value,
         int lineNumber, int columnNumber

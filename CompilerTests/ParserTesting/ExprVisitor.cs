@@ -113,7 +113,7 @@ internal class ExprVisitor : ASTVisitorVoid {
     public void visit(FunctionAST function) { throw new NotImplementedException("This visit is not implemented here."); }
     public void visit(ParameterAST parameter) { throw new NotImplementedException("This visit is not implemented here."); }
     public void visit(BlockAST block) { throw new NotImplementedException("This visit is not implemented here."); }
-    public void visit(AssignAST assign) { throw new NotImplementedException("This visit is not implemented here."); }
+    public void visit(VarAssignAST assign) { throw new NotImplementedException("This visit is not implemented here."); }
     public void visit(MultiAssignAST multiAssign) { throw new NotImplementedException("This visit is not implemented here."); }
     public void visit(MultiAssignCallAST multiAssignCall) { throw new NotImplementedException("This visit is not implemented here."); }
     public void visit(ArrayAssignAST arrayAssign) { throw new NotImplementedException("This visit is not implemented here."); }

@@ -17,7 +17,7 @@ public interface ASTVisitorGeneric {
     public T visit<T>(BlockAST block);
 
     // Stmt nodes
-    public T visit<T>(AssignAST assign);
+    public T visit<T>(VarAssignAST assign);
     public T visit<T>(MultiAssignAST multiAssign);
     public T visit<T>(MultiAssignCallAST multiAssignCall);
     public T visit<T>(ArrayAssignAST arrayAssign);

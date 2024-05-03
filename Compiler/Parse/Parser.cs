@@ -850,7 +850,7 @@ public sealed class Parser {
     }
 
     /*
-     * ⟨assignment⟩ ::= ⟨assign⟩
+     * ⟨assignment⟩ ::= ⟨varAssign⟩
      * | ⟨multiAssign⟩
      * | ⟨multiCallAssign⟩
      * | ⟨arrayAssign⟩
@@ -859,7 +859,7 @@ public sealed class Parser {
     private StmtAST parseAssignment(Token firstIdentifier) {
         switch(tokenQueue.Peek().type) {
             case TokenType.assign:
-                return parseAssign(firstIdentifier);
+                return parseVarAssign(firstIdentifier);
             case TokenType.comma:
                 return parseMultiAssign_Or_MultiCallAssign(firstIdentifier);
             case TokenType.startBracket:
@@ -886,11 +886,11 @@ public sealed class Parser {
     /*
      * ⟨assign⟩ ::= ‘=’ ⟨Expr ⟩
      */
-    private AssignAST parseAssign(Token identifier) {
+    private VarAssignAST parseVarAssign(Token identifier) {
         consume(TokenType.assign);
         ExprAST expr = parseExpr();
 
-        return new AssignAST(
+        return new VarAssignAST(
             new VarAccessAST(identifier.lexeme, identifier.line, identifier.column),
             expr,
             identifier.line, 

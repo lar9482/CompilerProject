@@ -18,7 +18,7 @@ public interface ASTVisitorVoid {
     public void visit(BlockAST block);
 
     // Stmt nodes
-    public void visit(AssignAST assign);
+    public void visit(VarAssignAST assign);
     public void visit(MultiAssignAST multiAssign);
     public void visit(MultiAssignCallAST multiAssignCall);
     public void visit(ArrayAssignAST arrayAssign);
