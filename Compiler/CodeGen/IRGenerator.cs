@@ -674,6 +674,11 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IRMove>(irAssign);
     }
 
+    //TODO: Implement IR gen for varMutate
+    public T visit<T>(VarMutateAST varMutate) {
+        throw new NotFiniteNumberException("Not implemented yet");
+    }
+
     /*
      * S[x1, x2,...,xn = e1, e2,...,en] = SEQ(
      *    MOVE(TEMP(x1), E(e1)),
@@ -785,6 +790,11 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IRSeq>(compute_Deref_ThenAssign);
     }
 
+    //TODO: Implement IR gen for arrayMutate
+    public T visit<T>(ArrayMutateAST arrayMutate) {
+        throw new NotFiniteNumberException();
+    }
+
     /*
      * S[array[e1][e2] = e3] = SEQ(
      *   S[array[e1][e2]],
@@ -818,6 +828,11 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         );
 
         return matchThenReturn<T, IRSeq>(compute_Deref_ThenAssign);
+    }
+
+    //TODO: Implement IR gen for multiDimArrayMutate
+    public T visit<T>(MultiDimArrayMutateAST multiDimArrayMutate) {
+        throw new NotFiniteNumberException();
     }
 
     public T visit<T>(ConditionalAST conditional) { 

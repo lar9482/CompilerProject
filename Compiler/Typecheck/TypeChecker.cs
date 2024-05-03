@@ -699,6 +699,11 @@ public abstract class TypeChecker : ASTVisitorVoid {
         varAssign.type = new UnitType();
     }
 
+    //TODO: Implement typechecking for varMutate
+    public void visit(VarMutateAST varMutate) {
+        throw new NotFiniteNumberException("Not implemented yet.");
+    }
+
     public void visit(MultiAssignAST multiAssign) { 
         foreach(KeyValuePair<VarAccessAST, ExprAST> varAccessExpr in multiAssign.assignments) {
             VarAccessAST varAccess = varAccessExpr.Key;
@@ -817,6 +822,11 @@ public abstract class TypeChecker : ASTVisitorVoid {
         arrayAssign.type = new UnitType();
     }
 
+    //TODO: Implement typechecking for arrayMutate
+    public void visit(ArrayMutateAST arrayMutate) {
+        throw new NotFiniteNumberException();
+    }
+
     public void visit(MultiDimArrayAssignAST multiDimArrayAssign) { 
         multiDimArrayAssign.arrayAccess.accept(this);
         multiDimArrayAssign.value.accept(this);
@@ -838,6 +848,11 @@ public abstract class TypeChecker : ASTVisitorVoid {
         }
 
         multiDimArrayAssign.type = new UnitType();
+    }
+
+    //TODO: Implement typechecking for multiiDimArrayMutate
+    public void visit(MultiDimArrayMutateAST multiDimArrayMutate) {
+        throw new NotFiniteNumberException();
     }
 
     public void visit(ReturnAST returnStmt) { 

@@ -124,6 +124,11 @@ internal class TopLvlVisitor : ASTVisitorVoid {
         traversalRecord.Enqueue("EXPR");
     }
 
+    //TODO: Implement code lift testing for this.
+    public void visit(VarMutateAST varMutate) {
+        throw new NotImplementedException();
+    }
+
     public void visit(MultiAssignAST multiAssign) { 
         foreach (KeyValuePair<VarAccessAST, ExprAST> pair in multiAssign.assignments) {
             pair.Key.accept(this);
@@ -147,9 +152,19 @@ internal class TopLvlVisitor : ASTVisitorVoid {
         traversalRecord.Enqueue("EXPR");
     }
 
+    //TODO: Implement code lift testing for this.
+    public void visit(ArrayMutateAST arrayMutate) {
+        throw new NotImplementedException();
+    }
+
     public void visit(MultiDimArrayAssignAST multiDimArrayAssign) { 
         multiDimArrayAssign.arrayAccess.accept(this);
         traversalRecord.Enqueue("EXPR");
+    }
+
+    //TODO: Implement code lift testing for this.
+    public void visit(MultiDimArrayMutateAST multiDimArrayMutate) {
+        throw new NotImplementedException();
     }
 
     public void visit(ConditionalAST conditional) { 

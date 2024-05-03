@@ -13,10 +13,12 @@ public sealed class ASTVisitorImplemented : ASTVisitorVoid {
     public void visit(FunctionAST function) { }
     public void visit(ParameterAST parameter) { }
     public void visit(BlockAST block) { }
-    public void visit(VarAssignAST assign) { }
+    public void visit(VarAssignAST varAssign) { }
+    public void visit(VarMutateAST varMutate) { }
     public void visit(MultiAssignAST multiAssign) { }
     public void visit(MultiAssignCallAST multiAssignCall) { }
     public void visit(ArrayAssignAST arrayAssign) { }
+    public void visit(ArrayMutateAST arrayMutate) { }
     public void visit(MultiDimArrayAssignAST multiDimArrayAssign) { }
     public void visit(ConditionalAST conditional) { }
     public void visit(WhileLoopAST whileLoop) { }
@@ -28,6 +30,7 @@ public sealed class ASTVisitorImplemented : ASTVisitorVoid {
     public void visit(VarAccessAST varAccess) { }
     public void visit(ArrayAccessAST arrayAccess) { }
     public void visit(MultiDimArrayAccessAST multiDimArrayAccess) { }
+    public void visit(MultiDimArrayMutateAST multiDimArrayMutate) { }
     public void visit(FunctionCallAST functionCall) { }
     public void visit(IntLiteralAST intLiteral) { }
     public void visit(BoolLiteralAST boolLiteral) { }

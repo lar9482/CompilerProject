@@ -32,10 +32,12 @@ public class ASTVisitorGenericImplemented : ASTVisitorGeneric {
     public T visit<T>(BlockAST block) { throw new NotImplementedException(); }
 
     // Stmt nodes
-    public T visit<T>(VarAssignAST assign) { throw new NotImplementedException(); }
+    public T visit<T>(VarAssignAST varAssign) { throw new NotImplementedException(); }
+    public T visit<T>(VarMutateAST varMutate) { throw new NotImplementedException(); }
     public T visit<T>(MultiAssignAST multiAssign) { throw new NotImplementedException(); }
     public T visit<T>(MultiAssignCallAST multiAssignCall) { throw new NotImplementedException(); }
     public T visit<T>(ArrayAssignAST arrayAssign) { throw new NotImplementedException(); }
+    public T visit<T>(ArrayMutateAST arrayMutate) { throw new NotImplementedException(); }
     public T visit<T>(MultiDimArrayAssignAST multiDimArrayAssign) { throw new NotImplementedException(); }
     public T visit<T>(ConditionalAST conditional) { throw new NotImplementedException(); }
     public T visit<T>(WhileLoopAST whileLoop) { throw new NotImplementedException(); }
@@ -49,6 +51,7 @@ public class ASTVisitorGenericImplemented : ASTVisitorGeneric {
     public T visit<T>(VarAccessAST varAccess) { throw new NotImplementedException(); }
     public T visit<T>(ArrayAccessAST arrayAccess) { throw new NotImplementedException(); }
     public T visit<T>(MultiDimArrayAccessAST multiDimArrayAccess) { throw new NotImplementedException(); }
+    public T visit<T>(MultiDimArrayMutateAST multiDimArrayMutate) { throw new NotFiniteNumberException(); }
     public T visit<T>(FunctionCallAST functionCall) { throw new NotImplementedException(); }
     public T visit<T>(IntLiteralAST intLiteral) { throw new NotImplementedException(); }
     public T visit<T>(BoolLiteralAST boolLiteral) { throw new NotImplementedException(); }

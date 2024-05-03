@@ -17,11 +17,14 @@ public interface ASTVisitorGeneric {
     public T visit<T>(BlockAST block);
 
     // Stmt nodes
-    public T visit<T>(VarAssignAST assign);
+    public T visit<T>(VarAssignAST varAssign);
+    public T visit<T>(VarMutateAST varMutate);
     public T visit<T>(MultiAssignAST multiAssign);
     public T visit<T>(MultiAssignCallAST multiAssignCall);
     public T visit<T>(ArrayAssignAST arrayAssign);
+    public T visit<T>(ArrayMutateAST arrayMutate);
     public T visit<T>(MultiDimArrayAssignAST multiDimArrayAssign);
+    public T visit<T>(MultiDimArrayMutateAST multiDimArrayMutate);
     public T visit<T>(ConditionalAST conditional);
     public T visit<T>(WhileLoopAST whileLoop);
     public T visit<T>(ReturnAST returnStmt);

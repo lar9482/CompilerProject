@@ -18,11 +18,14 @@ public interface ASTVisitorVoid {
     public void visit(BlockAST block);
 
     // Stmt nodes
-    public void visit(VarAssignAST assign);
+    public void visit(VarAssignAST varAssign);
+    public void visit(VarMutateAST varMutate);
     public void visit(MultiAssignAST multiAssign);
     public void visit(MultiAssignCallAST multiAssignCall);
     public void visit(ArrayAssignAST arrayAssign);
+    public void visit(ArrayMutateAST arrayMutate);
     public void visit(MultiDimArrayAssignAST multiDimArrayAssign);
+    public void visit(MultiDimArrayMutateAST multiDimArrayMutate);
     public void visit(ConditionalAST conditional);
     public void visit(WhileLoopAST whileLoop);
     public void visit(ReturnAST returnStmt);
