@@ -832,6 +832,10 @@ public sealed class Parser {
                 break;
             case TokenType.assign:
             case TokenType.startBracket:
+            case TokenType.plus:
+            case TokenType.minus:
+            case TokenType.minusNegation:
+            case TokenType.minusSubtraction:
                 blockStmts.Add(parseIdent_AssignOrMutation(firstIdentifier));
                 break;
             case TokenType.comma:
