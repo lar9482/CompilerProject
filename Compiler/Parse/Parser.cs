@@ -1192,30 +1192,6 @@ public sealed class Parser {
 
         return exprs.Concat(nextExprs).ToList<ExprAST>();
     }
-
-    // /*
-    //  * ⟨multiDimArrayAssign⟩ ::= ‘[’ ⟨Expr ⟩ ‘]’ ‘[’ ⟨Expr ⟩ ‘]’ ‘=’ ⟨Expr ⟩
-    //  */
-    // private MultiDimArrayAssignAST parseMultiDimArrayAssign(Token identifier, ExprAST firstAccess) {
-    //     consume(TokenType.startBracket);
-    //     ExprAST secondAccess = parseExpr();
-    //     consume(TokenType.endBracket);
-    //     consume(TokenType.assign);
-    //     ExprAST value = parseExpr();
-
-    //     return new MultiDimArrayAssignAST(
-    //         new MultiDimArrayAccessAST(
-    //             identifier.lexeme,
-    //             firstAccess,
-    //             secondAccess,
-    //             identifier.line,
-    //             identifier.column
-    //         ),
-    //         value,
-    //         identifier.line,
-    //         identifier.column
-    //     );
-    // }
     
     /*
      * ⟨Conditional ⟩ ::= ‘if’ ‘(’ ⟨Expr ⟩ ‘)’ ⟨block ⟩ ⟨elseIfConditional ⟩ ⟨elseConditional ⟩
