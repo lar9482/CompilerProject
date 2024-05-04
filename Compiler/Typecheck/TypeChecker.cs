@@ -699,9 +699,22 @@ public abstract class TypeChecker : ASTVisitorVoid {
         varAssign.type = new UnitType();
     }
 
-    //TODO: Implement typechecking for varMutate
     public void visit(VarMutateAST varMutate) {
-        throw new NotFiniteNumberException("Not implemented yet.");
+        varMutate.variable.accept(this);
+        SimpleType variableType = varMutate.variable.type;
+        if (simpleTypeToString(variableType) != "int") {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: For mutations, {2} must be an integer type, not a {3}",
+                    varMutate.lineNumber,
+                    varMutate.columnNumber,
+                    varMutate.variable.variableName,
+                    simpleTypeToString(variableType)
+                )
+            );
+        }
+
+        varMutate.type = new UnitType();
     }
 
     public void visit(MultiAssignAST multiAssign) { 
@@ -822,9 +835,23 @@ public abstract class TypeChecker : ASTVisitorVoid {
         arrayAssign.type = new UnitType();
     }
 
-    //TODO: Implement typechecking for arrayMutate
     public void visit(ArrayMutateAST arrayMutate) {
-        throw new NotFiniteNumberException();
+        arrayMutate.arrayAccess.accept(this);
+        SimpleType arrayType = arrayMutate.arrayAccess.type;
+
+        if (simpleTypeToString(arrayType) != "int") {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: For mutations, {2} must be an integer type, not a {3} type",
+                    arrayMutate.lineNumber,
+                    arrayMutate.columnNumber,
+                    arrayMutate.arrayAccess.arrayName,
+                    simpleTypeToString(arrayType)
+                )
+            );
+        }
+
+        arrayMutate.type = new UnitType();
     }
 
     public void visit(MultiDimArrayAssignAST multiDimArrayAssign) { 
@@ -850,9 +877,23 @@ public abstract class TypeChecker : ASTVisitorVoid {
         multiDimArrayAssign.type = new UnitType();
     }
 
-    //TODO: Implement typechecking for multiiDimArrayMutate
     public void visit(MultiDimArrayMutateAST multiDimArrayMutate) {
-        throw new NotFiniteNumberException();
+        multiDimArrayMutate.arrayAccess.accept(this);
+        SimpleType multiDimArrayType = multiDimArrayMutate.arrayAccess.type;
+
+        if (simpleTypeToString(multiDimArrayType) != "int") {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: For mutations, {2} must be an integer type, not a {3} type",
+                    multiDimArrayMutate.lineNumber,
+                    multiDimArrayMutate.columnNumber,
+                    multiDimArrayMutate.arrayAccess.arrayName,
+                    simpleTypeToString(multiDimArrayType)
+                )
+            );
+        }
+
+        multiDimArrayMutate.type = new UnitType();
     }
 
     public void visit(ReturnAST returnStmt) { 
