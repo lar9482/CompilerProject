@@ -775,8 +775,8 @@ public sealed class Parser {
     ) {
         switch(tokenQueue.Peek().type) {
             case TokenType.identifier:
-                parseIdentifierStmt_All(
-                    statements
+                statements.Add(
+                    parseIdentifierStmt_All()
                 );
                 consume(TokenType.semicolon);
                 break;
@@ -816,34 +816,34 @@ public sealed class Parser {
      * | <identifier> <procedureCall>
      * | <identifier> <multiAssign_Or_MultiCallAssign>
      */
-    private void parseIdentifierStmt_All(
-        List<StmtAST> blockStmts
-    ) {
+    private StmtAST parseIdentifierStmt_All() {
         Token firstIdentifier = consume(TokenType.identifier);
         switch(tokenQueue.Peek().type) {
             case TokenType.colon:
                 PrimitiveType firstType = parseIdentifierType();
-                blockStmts.Add(
+                return (
                     parseDeclaration(
                         firstIdentifier,
                         firstType
                     )
                 );
-                break;
             case TokenType.assign:
             case TokenType.startBracket:
             case TokenType.plus:
             case TokenType.minus:
             case TokenType.minusNegation:
             case TokenType.minusSubtraction:
-                blockStmts.Add(parseIdent_AssignOrMutation(firstIdentifier));
-                break;
+                return (
+                    parseIdent_AssignOrMutation(firstIdentifier)
+                );
             case TokenType.comma:
-                blockStmts.Add(parseMultiAssign_Or_MultiCallAssign(firstIdentifier));
-                break;
+                return (
+                    parseMultiAssign_Or_MultiCallAssign(firstIdentifier)
+                );
             case TokenType.startParen:
-                blockStmts.Add(parseProcedureCall(firstIdentifier));
-                break;
+                return (
+                    parseProcedureCall(firstIdentifier)
+                );
             default:
                 throw new Exception(
                     String.Format(
