@@ -765,7 +765,7 @@ public sealed class Parser {
     }
 
     /*
-     * ⟨statements⟩ ::= ⟨DeclarationOrAssignmentOrProcedureCall⟩ ‘;’
+     * ⟨statements⟩ ::= ⟨IdentifierStmt_All⟩ ‘;’
      * | ⟨Conditional ⟩
      * | ⟨WhileLoop⟩
      * | <Return > ‘;’
@@ -775,7 +775,7 @@ public sealed class Parser {
     ) {
         switch(tokenQueue.Peek().type) {
             case TokenType.identifier:
-                parseDeclarationOrAssignmentOrProcedureCall(
+                parseIdentifierStmt_All(
                     statements
                 );
                 consume(TokenType.semicolon);
@@ -811,31 +811,34 @@ public sealed class Parser {
         );
     }
     /*
-     * <DeclarationOrAssignmentOrProcedureCall> ::= <identifier> ‘:’ <primitiveType> <declaration>
-     * | <identifier> <assignment>
+     * <IdentifierStmt_All> ::= <identifier> ‘:’ <primitiveType> <declaration>
+     * | <identifier> <assignOrMutate>
      * | <identifier> <procedureCall>
+     * | <identifier> <multiAssign_Or_MultiCallAssign>
      */
-    private void parseDeclarationOrAssignmentOrProcedureCall(
+    private void parseIdentifierStmt_All(
         List<StmtAST> blockStmts
     ) {
-        Token firstIdentifer = consume(TokenType.identifier);
+        Token firstIdentifier = consume(TokenType.identifier);
         switch(tokenQueue.Peek().type) {
             case TokenType.colon:
                 PrimitiveType firstType = parseIdentifierType();
                 blockStmts.Add(
                     parseDeclaration(
-                        firstIdentifer,
+                        firstIdentifier,
                         firstType
                     )
                 );
                 break;
             case TokenType.assign:
-            case TokenType.comma:
             case TokenType.startBracket:
-                blockStmts.Add(parseAssignment(firstIdentifer));
+                blockStmts.Add(parseIdent_AssignOrMutation(firstIdentifier));
+                break;
+            case TokenType.comma:
+                blockStmts.Add(parseMultiAssign_Or_MultiCallAssign(firstIdentifier));
                 break;
             case TokenType.startParen:
-                blockStmts.Add(parseProcedureCall(firstIdentifer));
+                blockStmts.Add(parseProcedureCall(firstIdentifier));
                 break;
             default:
                 throw new Exception(
@@ -850,31 +853,50 @@ public sealed class Parser {
     }
 
     /*
-     * ⟨assignment⟩ ::= ⟨varAssign⟩
-     * | ⟨multiAssign⟩
-     * | ⟨multiCallAssign⟩
-     * | ⟨arrayAssign⟩
-     * | ⟨multiDimArrayAssign⟩
+     * <ident_AssignOrMutation> ::= ⟨assign⟩ //Returns VarAssignAST
+     * | ⟨mutate⟩ // Returns VarMutationAST
+     * | ‘[’ ⟨Expr ⟩ ‘]’ ⟨arrayAssignOrMutation⟩
      */
-    private StmtAST parseAssignment(Token firstIdentifier) {
+    private StmtAST parseIdent_AssignOrMutation(Token firstIdentifier) {
         switch(tokenQueue.Peek().type) {
             case TokenType.assign:
-                return parseVarAssign(firstIdentifier);
-            case TokenType.comma:
-                return parseMultiAssign_Or_MultiCallAssign(firstIdentifier);
+                ExprAST initialVal = parseAssignExpr();
+                return new VarAssignAST(
+                    new VarAccessAST(
+                        firstIdentifier.lexeme,
+                        firstIdentifier.line,
+                        firstIdentifier.column
+                    ),
+                    initialVal,
+                    firstIdentifier.line,
+                    firstIdentifier.column
+                );
+            case TokenType.plus:
+            case TokenType.minus:
+            case TokenType.minusNegation:
+            case TokenType.minusSubtraction:
+                bool increment = parseMutation();
+                return new VarMutateAST(
+                    new VarAccessAST(
+                        firstIdentifier.lexeme,
+                        firstIdentifier.line,
+                        firstIdentifier.column
+                    ),
+                    increment,
+                    firstIdentifier.line,
+                    firstIdentifier.column
+                );
             case TokenType.startBracket:
                 consume(TokenType.startBracket);
-                ExprAST firstAccess = parseExpr();
+                ExprAST firstIndex = parseExpr();
                 consume(TokenType.endBracket);
-                if (tokenQueue.Peek().type != TokenType.startBracket) {
-                    return parseArrayAssign(firstIdentifier, firstAccess);
-                } else {
-                    return parseMultiDimArrayAssign(firstIdentifier, firstAccess);
-                }
+                return parseArray_AssignOrMutation(
+                    firstIdentifier, firstIndex
+                );
             default:
                 throw new Exception(
                     String.Format(
-                        "{0}:{1} ParseError: Expected = , [ but not {2}", 
+                        "{0}:{1} ParseError: Expected = + - [, not {2}", 
                         tokenQueue.Peek().line.ToString(), 
                         tokenQueue.Peek().column.ToString(),
                         tokenQueue.Peek().lexeme
@@ -884,18 +906,152 @@ public sealed class Parser {
     }
 
     /*
-     * ⟨assign⟩ ::= ‘=’ ⟨Expr ⟩
+     * <Array_AssignOrMutation> ::= ⟨assign⟩ //Returns ArrayAssignAST
+     * | ⟨mutate⟩ // Returns ArrayMutationAST
+     * | ‘[’ ⟨Expr ⟩ ‘]’ ⟨multiDimArray_AssignOrMutation⟩
      */
-    private VarAssignAST parseVarAssign(Token identifier) {
+    private StmtAST parseArray_AssignOrMutation(Token firstIdentifier, ExprAST firstIndex) {
+        switch(tokenQueue.Peek().type) {
+            case TokenType.assign:
+                ExprAST initialVal = parseAssignExpr();
+                return new ArrayAssignAST(
+                    new ArrayAccessAST(
+                        firstIdentifier.lexeme,
+                        firstIndex,
+                        firstIdentifier.line,
+                        firstIdentifier.column
+                    ),
+                    initialVal,
+                    firstIdentifier.line,
+                    firstIdentifier.column
+                );
+            case TokenType.plus:
+            case TokenType.minus:
+            case TokenType.minusNegation:
+            case TokenType.minusSubtraction:
+                bool increment = parseMutation();
+                return new ArrayMutateAST(
+                    new ArrayAccessAST(
+                        firstIdentifier.lexeme,
+                        firstIndex,
+                        firstIdentifier.line,
+                        firstIdentifier.column
+                    ),
+                    increment,
+                    firstIdentifier.line,
+                    firstIdentifier.column
+                );
+            case TokenType.startBracket:
+                consume(TokenType.startBracket);
+                ExprAST secondIndex = parseExpr();
+                consume(TokenType.endBracket);
+                return parseMultiDimArray_AssignOrMutation(
+                    firstIdentifier, firstIndex, secondIndex
+                );
+            default:
+                throw new Exception(
+                    String.Format(
+                        "{0}:{1} ParseError: Expected = + - [, not {2}", 
+                        tokenQueue.Peek().line.ToString(), 
+                        tokenQueue.Peek().column.ToString(),
+                        tokenQueue.Peek().lexeme
+                    )
+                );
+        }
+    }
+
+    /*
+     * <MultiDimArray_AssignOrMutation> ::= ⟨assign⟩ //Returns MultiDimArrayAssignAST
+     * | ⟨mutate⟩ // Returns MultiDimArrayMutationAST
+     */
+    private StmtAST parseMultiDimArray_AssignOrMutation(
+        Token firstIdentifier, ExprAST firstIndex, ExprAST secondIndex
+    ) {
+        switch(tokenQueue.Peek().type) {
+            case TokenType.assign:
+                ExprAST initialVal = parseAssignExpr();
+                return new MultiDimArrayAssignAST(
+                    new MultiDimArrayAccessAST(
+                        firstIdentifier.lexeme,
+                        firstIndex,
+                        secondIndex,
+                        firstIdentifier.line,
+                        firstIdentifier.column
+                    ),
+                    initialVal,
+                    firstIdentifier.line,
+                    firstIdentifier.column
+                );
+            case TokenType.plus:
+            case TokenType.minus:
+            case TokenType.minusNegation:
+            case TokenType.minusSubtraction:
+                bool increment = parseMutation();
+                return new MultiDimArrayMutateAST(
+                    new MultiDimArrayAccessAST(
+                        firstIdentifier.lexeme,
+                        firstIndex,
+                        secondIndex,
+                        firstIdentifier.line,
+                        firstIdentifier.column
+                    ),
+                    increment,
+                    firstIdentifier.line,
+                    firstIdentifier.column
+                );
+            default:
+                throw new Exception(
+                    String.Format(
+                        "{0}:{1} ParseError: Expected = + -, not {2}", 
+                        tokenQueue.Peek().line.ToString(), 
+                        tokenQueue.Peek().column.ToString(),
+                        tokenQueue.Peek().lexeme
+                    )
+                );
+        }
+    }
+    /*
+     * <AssignExpr> ::= ‘=’ ⟨Expr ⟩
+     */
+    private ExprAST parseAssignExpr() {
         consume(TokenType.assign);
         ExprAST expr = parseExpr();
 
-        return new VarAssignAST(
-            new VarAccessAST(identifier.lexeme, identifier.line, identifier.column),
-            expr,
-            identifier.line, 
-            identifier.column
-        );
+        return expr;
+    }
+
+    /*
+     * <mutation> ::= ++
+     * | --
+     */
+    private bool parseMutation() {
+        switch(tokenQueue.Peek().type) {
+            case TokenType.plus:
+                consume(TokenType.plus);
+                consume(TokenType.plus);
+                return true;
+            case TokenType.minus:
+                consume(TokenType.minus);
+                consume(TokenType.minus);
+                return false;
+            case TokenType.minusNegation:
+                consume(TokenType.minusNegation);
+                consume(TokenType.minusNegation);
+                return false;
+            case TokenType.minusSubtraction:
+                consume(TokenType.minusSubtraction);
+                consume(TokenType.minusSubtraction);
+                return false;
+            default:
+                throw new Exception(
+                    String.Format(
+                        "{0}:{1} ParseError: Expected + or -, not {2}", 
+                        tokenQueue.Peek().line.ToString(), 
+                        tokenQueue.Peek().column.ToString(),
+                        tokenQueue.Peek().lexeme
+                    )
+                );
+        }
     }
 
     /*
@@ -1037,50 +1193,29 @@ public sealed class Parser {
         return exprs.Concat(nextExprs).ToList<ExprAST>();
     }
 
-    /*
-     * ⟨arrayAssign⟩ ::= ‘[’ ⟨Expr ⟩ ‘]’ ‘=’ ⟨Expr ⟩
-     */
-    private ArrayAssignAST parseArrayAssign(Token identifier, ExprAST access) {
+    // /*
+    //  * ⟨multiDimArrayAssign⟩ ::= ‘[’ ⟨Expr ⟩ ‘]’ ‘[’ ⟨Expr ⟩ ‘]’ ‘=’ ⟨Expr ⟩
+    //  */
+    // private MultiDimArrayAssignAST parseMultiDimArrayAssign(Token identifier, ExprAST firstAccess) {
+    //     consume(TokenType.startBracket);
+    //     ExprAST secondAccess = parseExpr();
+    //     consume(TokenType.endBracket);
+    //     consume(TokenType.assign);
+    //     ExprAST value = parseExpr();
 
-        consume(TokenType.assign);
-        ExprAST value = parseExpr();
-
-        return new ArrayAssignAST(
-            new ArrayAccessAST(
-                identifier.lexeme, 
-                access,
-                identifier.line,
-                identifier.column
-            ),
-            value,
-            identifier.line,
-            identifier.column
-        );
-    }
-
-    /*
-     * ⟨multiDimArrayAssign⟩ ::= ‘[’ ⟨Expr ⟩ ‘]’ ‘[’ ⟨Expr ⟩ ‘]’ ‘=’ ⟨Expr ⟩
-     */
-    private MultiDimArrayAssignAST parseMultiDimArrayAssign(Token identifier, ExprAST firstAccess) {
-        consume(TokenType.startBracket);
-        ExprAST secondAccess = parseExpr();
-        consume(TokenType.endBracket);
-        consume(TokenType.assign);
-        ExprAST value = parseExpr();
-
-        return new MultiDimArrayAssignAST(
-            new MultiDimArrayAccessAST(
-                identifier.lexeme,
-                firstAccess,
-                secondAccess,
-                identifier.line,
-                identifier.column
-            ),
-            value,
-            identifier.line,
-            identifier.column
-        );
-    }
+    //     return new MultiDimArrayAssignAST(
+    //         new MultiDimArrayAccessAST(
+    //             identifier.lexeme,
+    //             firstAccess,
+    //             secondAccess,
+    //             identifier.line,
+    //             identifier.column
+    //         ),
+    //         value,
+    //         identifier.line,
+    //         identifier.column
+    //     );
+    // }
     
     /*
      * ⟨Conditional ⟩ ::= ‘if’ ‘(’ ⟨Expr ⟩ ‘)’ ⟨block ⟩ ⟨elseIfConditional ⟩ ⟨elseConditional ⟩
