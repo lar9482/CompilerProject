@@ -27,6 +27,7 @@ public interface ASTVisitorGeneric {
     public T visit<T>(MultiDimArrayMutateAST multiDimArrayMutate);
     public T visit<T>(ConditionalAST conditional);
     public T visit<T>(WhileLoopAST whileLoop);
+    public T visit<T>(ForLoopAST forLoop);
     public T visit<T>(ReturnAST returnStmt);
     public T visit<T>(ProcedureCallAST procedureCall);
     

@@ -123,6 +123,7 @@ internal class ExprVisitor : ASTVisitorVoid {
     public void visit(MultiDimArrayMutateAST multiDimArrayMutate) { throw new NotImplementedException("This visit is not implemented here."); }
     public void visit(ConditionalAST conditional) { throw new NotImplementedException("This visit is not implemented here."); }
     public void visit(WhileLoopAST whileLoop) { throw new NotImplementedException("This visit is not implemented here."); }
+    public void visit(ForLoopAST forLoop) { throw new NotImplementedException("This visit is not implemented here."); }
     public void visit(ReturnAST returnStmt) { throw new NotImplementedException("This visit is not implemented here."); }
     public void visit(ProcedureCallAST procedureCall) { throw new NotImplementedException("This visit is not implemented here."); }
 }

@@ -28,6 +28,7 @@ public interface ASTVisitorVoid {
     public void visit(MultiDimArrayMutateAST multiDimArrayMutate);
     public void visit(ConditionalAST conditional);
     public void visit(WhileLoopAST whileLoop);
+    public void visit(ForLoopAST forLoop);
     public void visit(ReturnAST returnStmt);
     public void visit(ProcedureCallAST procedureCall);
     

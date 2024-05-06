@@ -187,6 +187,11 @@ internal class TopLvlVisitor : ASTVisitorVoid {
         whileLoop.body.accept(this);
     }
 
+    //TODO: Implement later
+    public void visit(ForLoopAST forLoop) {
+        throw new NotImplementedException();
+    }
+
     public void visit(ReturnAST returnStmt) { 
         traversalRecord.Enqueue("return");
         if (returnStmt.returnValues == null)

@@ -1172,6 +1172,11 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         }));
     }
 
+    //TODO: Implement later
+    public T visit<T>(ForLoopAST forLoop) {
+        throw new NotImplementedException();
+    }
+
     /*
      * S[return(e1,...,en)] = Return(E[e1],...,E[en])
      */

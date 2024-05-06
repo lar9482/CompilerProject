@@ -22,6 +22,7 @@ public sealed class ASTVisitorImplemented : ASTVisitorVoid {
     public void visit(MultiDimArrayAssignAST multiDimArrayAssign) { }
     public void visit(ConditionalAST conditional) { }
     public void visit(WhileLoopAST whileLoop) { }
+    public void visit(ForLoopAST forLoop) { }
     public void visit(ReturnAST returnStmt) { }
     public void visit(ProcedureCallAST procedureCall) { }
     

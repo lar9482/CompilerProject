@@ -41,6 +41,7 @@ public class ASTVisitorGenericImplemented : ASTVisitorGeneric {
     public T visit<T>(MultiDimArrayAssignAST multiDimArrayAssign) { throw new NotImplementedException(); }
     public T visit<T>(ConditionalAST conditional) { throw new NotImplementedException(); }
     public T visit<T>(WhileLoopAST whileLoop) { throw new NotImplementedException(); }
+    public T visit<T>(ForLoopAST forLoop) { throw new NotFiniteNumberException(); }
     public T visit<T>(ReturnAST returnStmt) { throw new NotImplementedException(); }
     public T visit<T>(ProcedureCallAST procedureCall) { throw new NotImplementedException(); }
     
