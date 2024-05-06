@@ -1198,13 +1198,11 @@ public sealed class Parser {
     }
     
     /*
-     * ⟨Conditional ⟩ ::= ‘if’ ‘(’ ⟨Expr ⟩ ‘)’ ⟨block ⟩ ⟨elseIfConditional ⟩ ⟨elseConditional ⟩
+     * ⟨Conditional ⟩ ::= ‘if’ ‘(’ ⟨Expr ⟩ ‘)’ ⟨block ⟩ ⟨elseIfConditional ⟩? ⟨elseConditional ⟩?
      */
     private ConditionalAST parseConditional() {
         ExprAST ifCondition;
         BlockAST ifBlock;
-        Dictionary<ExprAST, BlockAST>? elseIfConditionalBlocks = null;
-        BlockAST? elseBlock = null;
 
         Token ifToken = consume(TokenType.reserved_if);
         consume(TokenType.startParen);
@@ -1216,14 +1214,15 @@ public sealed class Parser {
             return new ConditionalAST(
                 ifCondition,
                 ifBlock,
-                elseIfConditionalBlocks,
-                elseBlock,
+                null,
+                null,
                 ifToken.line,
                 ifToken.column
             );
         }
 
-        elseIfConditionalBlocks = new Dictionary<ExprAST, BlockAST>();
+        Dictionary<ExprAST, BlockAST> elseIfConditionalBlocks = new Dictionary<ExprAST, BlockAST>();
+        BlockAST? elseBlock = null;
         bool seenElseBlock = false;
 
         while (tokenQueue.Peek().type == TokenType.reserved_else) {
