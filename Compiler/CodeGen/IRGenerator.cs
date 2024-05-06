@@ -674,9 +674,36 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IRMove>(irAssign);
     }
 
-    //TODO: Implement IR gen for varMutate
+    /*
+     * S[x++] = MOVE(TEMP(x), ADD(TEMP(x), 1))
+     * S[x--] = MOVE(TEMP(x), SUB(TEMP(x), 1))
+     */
     public T visit<T>(VarMutateAST varMutate) {
-        throw new NotFiniteNumberException("Not implemented yet");
+        IRTemp varReg = varMutate.variable.accept<IRTemp>(this);
+        bool incrementOrNot = varMutate.increment;
+        if (incrementOrNot) {
+            return matchThenReturn<T, IRMove>(
+                new IRMove(
+                    varReg, 
+                    new IRBinOp(
+                        BinOpType.ADD,
+                        varReg,
+                        new IRConst(1)
+                    )
+                )
+            );
+        } else {
+            return matchThenReturn<T, IRMove>(
+                new IRMove(
+                    varReg, 
+                    new IRBinOp(
+                        BinOpType.SUB,
+                        varReg,
+                        new IRConst(1)
+                    )
+                )
+            );
+        }
     }
 
     /*
@@ -764,11 +791,11 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     public T visit<T>(ArrayAssignAST arrayAssign) { 
         IR_Eseq computeThenDeref_accessAddr = arrayAssign.arrayAccess.accept<IR_Eseq>(this);
         if (computeThenDeref_accessAddr.stmt.GetType() != typeof(IRSeq)) {
-            throw new Exception("Computation of the access access was expected to be an IRSeq");
+            throw new Exception("Computation of the array access was expected to be an IRSeq");
         }
 
         if (computeThenDeref_accessAddr.expr.GetType() != typeof(IRMem)) {
-            throw new Exception("Dereference of the access access was expected to be an IRMem");
+            throw new Exception("Dereference of the array access was expected to be an IRMem");
         }
 
         IRSeq computeAccessAddr = (IRSeq) computeThenDeref_accessAddr.stmt;
@@ -790,9 +817,54 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IRSeq>(compute_Deref_ThenAssign);
     }
 
-    //TODO: Implement IR gen for arrayMutate
+    /*
+     * S[array[e1]++] = SEQ(
+     *    S[array[e1]],
+     *    MOVE(MEM(tA + wordSize*tI), MEM(tA + wordSize*tI) + 1)
+     * )
+     * S[array[e1]--] = SEQ(
+     *   S[array[e1]],
+     *   MOVE(MEM(tA + wordSize*tI), MEM(tA + wordSize*tI) - 1)
+     * )
+     */
     public T visit<T>(ArrayMutateAST arrayMutate) {
-        throw new NotFiniteNumberException();
+        IR_Eseq irAccess = arrayMutate.arrayAccess.accept<IR_Eseq>(this);
+        if (irAccess.stmt.GetType() != typeof(IRSeq)) {
+            throw new Exception("Computation of the array access was expected to be an IRSeq");
+        }
+
+        if (irAccess.expr.GetType() != typeof(IRMem)) {
+            throw new Exception("Dereference of the access access was expected to be an IRMem");
+        }
+
+        IRMem arrayAccess = (IRMem) irAccess.expr;
+        IRSeq seq = (IRSeq)irAccess.stmt;
+        List<IRStmt> allStmts = seq.statements;
+
+        if (arrayMutate.increment) {
+            IRMove incrementArray = new IRMove(
+                arrayAccess,
+                new IRBinOp(
+                    BinOpType.ADD,
+                    arrayAccess,
+                    new IRConst(1)
+                )
+            );
+            allStmts.Add(incrementArray);
+
+            return matchThenReturn<T, IRSeq>(seq);
+        } else {
+            IRMove decrementArray = new IRMove(
+                arrayAccess,
+                new IRBinOp(
+                    BinOpType.SUB,
+                    arrayAccess,
+                    new IRConst(1)
+                )
+            );
+            allStmts.Add(decrementArray);
+            return matchThenReturn<T, IRSeq>(seq);
+        }
     }
 
     /*
@@ -830,9 +902,53 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         return matchThenReturn<T, IRSeq>(compute_Deref_ThenAssign);
     }
 
-    //TODO: Implement IR gen for multiDimArrayMutate
+    /*
+     * S[array[e1][e2]++] = SEQ(
+     *    S[array[e1][e2]],
+     *    MOVE(MEM(tA + wordSize*tE2), MEM(tA + wordSize*tE2) + 1)
+     * )
+     * S[array[e1][e2]--] = SEQ(
+     *   S[array[e1][e2]],
+     *   MOVE(MEM(tA + wordSize*tE2), MEM(tA + wordSize*tE2) - 1)
+     * )
+     */
     public T visit<T>(MultiDimArrayMutateAST multiDimArrayMutate) {
-        throw new NotFiniteNumberException();
+        IR_Eseq irAccess = multiDimArrayMutate.arrayAccess.accept<IR_Eseq>(this);
+        if (irAccess.stmt.GetType() != typeof(IRSeq)) {
+            throw new Exception("Computation of the array access was expected to be an IRSeq");
+        }
+
+        if (irAccess.expr.GetType() != typeof(IRMem)) {
+            throw new Exception("Dereference of the access access was expected to be an IRMem");
+        }
+
+        IRMem arrayAccess = (IRMem) irAccess.expr;
+        IRSeq seq = (IRSeq)irAccess.stmt;
+        List<IRStmt> allStmts = seq.statements;
+
+        if (multiDimArrayMutate.increment) {
+            IRMove incrementArrayAccess = new IRMove(
+                arrayAccess,
+                new IRBinOp(
+                    BinOpType.ADD,
+                    arrayAccess,
+                    new IRConst(1)
+                )
+            );
+            allStmts.Add(incrementArrayAccess);
+            return matchThenReturn<T, IRSeq>(seq);
+        } else {
+            IRMove decrementArrayAccess = new IRMove(
+                arrayAccess,
+                new IRBinOp(
+                    BinOpType.SUB,
+                    arrayAccess,
+                    new IRConst(1)
+                )
+            );
+            allStmts.Add(decrementArrayAccess);
+            return matchThenReturn<T, IRSeq>(seq);
+        }
     }
 
     public T visit<T>(ConditionalAST conditional) { 
@@ -1172,7 +1288,6 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     /*
      * E[array[e2]] = ESEQ(
      *   SEQ(
-     *       MOVE(tArray, TEMP(array)),
      *       MOVE(tI, E[e2])
      *       CJUMP(ULT (tI, MEM(tArray - wordSize)), trueLabel, outOfBoundsLabel),
      *       Label(trueLabel)

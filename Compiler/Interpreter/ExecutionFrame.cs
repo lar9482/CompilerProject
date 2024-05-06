@@ -6,7 +6,7 @@ public sealed class ExecutionFrame {
     private Random r;
 
     /** instruction pointer */
-    private int IP;
+    public int IP;
 
     /** return values from this frame. Only used if IRReturn in this function has children*/
     public List<int> rets;

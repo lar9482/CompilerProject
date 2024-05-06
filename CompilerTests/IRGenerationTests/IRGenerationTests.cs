@@ -323,4 +323,15 @@ public class IRGenerationTests {
         IRSimulator simulator = new IRSimulator(IR);
         simulator.call("main", args);
     }
+
+    [Test]
+    public void mutation() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/mutation.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+        IRSimulator simulator = new IRSimulator(IR);
+        int retVal = simulator.call("main", args);
+
+        Assert.That(retVal, Is.EqualTo(6));
+    }
 }
