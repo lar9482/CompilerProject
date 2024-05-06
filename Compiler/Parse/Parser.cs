@@ -788,6 +788,10 @@ public sealed class Parser {
                 WhileLoopAST whileLoop = parseWhileLoop();
                 statements.Add(whileLoop);
                 break;
+            case TokenType.reserved_for:
+                ForLoopAST forLoop = parseForLoop();
+                statements.Add(forLoop);
+                break;
             case TokenType.reserved_return:
                 ReturnAST returnStmt = parseReturn();
                 statements.Add(returnStmt);
@@ -812,7 +816,7 @@ public sealed class Parser {
     }
     /*
      * <IdentifierStmt_All> ::= <identifier> ‘:’ <primitiveType> <declaration>
-     * | <identifier> <assignOrMutate>
+     * | <identifier> <ident_AssignOrMutation>
      * | <identifier> <procedureCall>
      * | <identifier> <multiAssign_Or_MultiCallAssign>
      */
@@ -831,29 +835,61 @@ public sealed class Parser {
             case TokenType.startBracket:
             case TokenType.plus:
             case TokenType.minus:
-            case TokenType.minusNegation:
-            case TokenType.minusSubtraction:
                 return (
                     parseIdent_AssignOrMutation(firstIdentifier)
-                );
-            case TokenType.comma:
-                return (
-                    parseMultiAssign_Or_MultiCallAssign(firstIdentifier)
                 );
             case TokenType.startParen:
                 return (
                     parseProcedureCall(firstIdentifier)
                 );
+            case TokenType.comma:
+                return (
+                    parseMultiAssign_Or_MultiCallAssign(firstIdentifier)
+                );
             default:
                 throw new Exception(
                     String.Format(
-                        "{0}:{1} ParseError: Expected : = , [ (, not {2}", 
+                        "{0}:{1} ParseError: Expected : = [ + - ',' not {2}", 
                         tokenQueue.Peek().line.ToString(), 
                         tokenQueue.Peek().column.ToString(),
                         tokenQueue.Peek().lexeme
                     )
                 );
         } 
+    }
+
+    /*
+     * ⟨identifierStmt_DeclAssignMutate⟩ ::= ⟨identifier ⟩ ‘:’ ⟨primitiveType⟩ ⟨declaration⟩
+     * | ⟨identifier ⟩ ⟨assignOrMutate⟩
+     */
+    private StmtAST parseIdentifierStmt_DeclAssignMutate() {
+        Token firstIdentifier = consume(TokenType.identifier);
+        switch(tokenQueue.Peek().type) {
+            case TokenType.colon:
+                PrimitiveType firstType = parseIdentifierType();
+                return (
+                    parseDeclaration(
+                        firstIdentifier,
+                        firstType
+                    )
+                );
+            case TokenType.assign:
+            case TokenType.startBracket:
+            case TokenType.plus:
+            case TokenType.minus:
+                return (
+                    parseIdent_AssignOrMutation(firstIdentifier)
+                );
+            default:
+                throw new Exception(
+                    String.Format(
+                        "{0}:{1} ParseError: Expected : = [ + - not {2}", 
+                        tokenQueue.Peek().line.ToString(), 
+                        tokenQueue.Peek().column.ToString(),
+                        tokenQueue.Peek().lexeme
+                    )
+                );
+        }
     }
 
     /*
@@ -877,8 +913,6 @@ public sealed class Parser {
                 );
             case TokenType.plus:
             case TokenType.minus:
-            case TokenType.minusNegation:
-            case TokenType.minusSubtraction:
                 bool increment = parseMutation();
                 return new VarMutateAST(
                     new VarAccessAST(
@@ -931,8 +965,6 @@ public sealed class Parser {
                 );
             case TokenType.plus:
             case TokenType.minus:
-            case TokenType.minusNegation:
-            case TokenType.minusSubtraction:
                 bool increment = parseMutation();
                 return new ArrayMutateAST(
                     new ArrayAccessAST(
@@ -988,8 +1020,6 @@ public sealed class Parser {
                 );
             case TokenType.plus:
             case TokenType.minus:
-            case TokenType.minusNegation:
-            case TokenType.minusSubtraction:
                 bool increment = parseMutation();
                 return new MultiDimArrayMutateAST(
                     new MultiDimArrayAccessAST(
@@ -1037,14 +1067,6 @@ public sealed class Parser {
             case TokenType.minus:
                 consume(TokenType.minus);
                 consume(TokenType.minus);
-                return false;
-            case TokenType.minusNegation:
-                consume(TokenType.minusNegation);
-                consume(TokenType.minusNegation);
-                return false;
-            case TokenType.minusSubtraction:
-                consume(TokenType.minusSubtraction);
-                consume(TokenType.minusSubtraction);
                 return false;
             default:
                 throw new Exception(
@@ -1298,6 +1320,34 @@ public sealed class Parser {
             whileBlock,
             whileToken.line,
             whileToken.column
+        );
+    }
+
+    /*
+     * <forLoop> ::= ‘for’ ‘(’ ⟨identifierStmt_DeclAssignMutate⟩ ‘;’ ⟨Expr ⟩ ‘;’ ⟨identifier ⟩
+     * ⟨assignOrMutate⟩ ‘)’ ⟨block ⟩
+     */
+    private ForLoopAST parseForLoop() {
+        Token forToken = consume(TokenType.reserved_for);
+        consume(TokenType.startParen);
+
+        StmtAST initialize = parseIdentifierStmt_DeclAssignMutate();
+        consume(TokenType.semicolon);
+        ExprAST condition = parseExpr();
+        consume(TokenType.semicolon);
+        Token assignMutateIdentifier = consume(TokenType.identifier);
+        StmtAST iterate = parseIdent_AssignOrMutation(assignMutateIdentifier);
+
+        consume(TokenType.endParen);
+
+        BlockAST block = parseBlock();
+
+        return new ForLoopAST(
+            initialize, 
+            condition,
+            iterate,
+            block,
+            forToken.line, forToken.column
         );
     }
 

@@ -80,6 +80,11 @@ public class ValidTypecheckTests {
         ensureNoTypecheckErrors(filePath);
     }
 
+    [Test]
+    public void forLoopTest() {
+        string filePath = "../../../TypecheckTesting/ValidTests/forLoop.prgm";
+        ensureNoTypecheckErrors(filePath);
+    }
 
     //TODO: Enable this test later.
     public void array_multiArray_Assigns_Test() {
