@@ -1,4 +1,5 @@
 using CompilerProj.Visitors;
+using CompilerProj.Context;
 
 public sealed class ForLoopAST : StmtAST {
     public readonly StmtAST initialize;
@@ -6,6 +7,8 @@ public sealed class ForLoopAST : StmtAST {
     public readonly StmtAST iterate;
 
     public readonly BlockAST block; 
+
+    public SymbolTable? scope;
 
     public ForLoopAST(
         StmtAST initialize,

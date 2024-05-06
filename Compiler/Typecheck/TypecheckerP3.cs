@@ -29,36 +29,50 @@ public sealed class TypecheckerP3 : TypeChecker {
     }
 
     public override void visit(VarDeclAST varDecl) { 
+        varDecl.type = new UnitType();
+
         initializeVarDecl(varDecl);
         checkVarDecl(varDecl);
     }
 
     public override void visit(MultiVarDeclAST multiVarDecl) { 
+        multiVarDecl.type = new UnitType();
+
         initializeMultiVarDecl(multiVarDecl);
         checkMultiVarDecl(multiVarDecl);
     }
 
     public override void visit(MultiVarDeclCallAST multiVarDeclCall) { 
+        multiVarDeclCall.type = new UnitType();
+
         initializeMultiVarDeclCall(multiVarDeclCall);
         checkMultiVarDeclCall(multiVarDeclCall);
     }
 
     public override void visit(ArrayDeclAST array) { 
+        array.type = new UnitType();
+
         initializeArrayDecl(array);
         checkArrayDecl(array);
     }
 
     public override void visit(MultiDimArrayDeclAST multiDimArray) { 
+        multiDimArray.type = new UnitType();
+
         initializeMultiDimArrayDecl(multiDimArray);
         checkMultiDimArrayDecl(multiDimArray);
     }   
 
     public override void visit(ArrayDeclCallAST arrayCall) {
+        arrayCall.type = new UnitType();
+
         initializeArrayDeclCall(arrayCall);
         checkArrayDeclCall(arrayCall);
     }
 
     public override void visit(MultiDimArrayDeclCallAST multiDimArrayCall) {
+        multiDimArrayCall.type = new UnitType();
+        
         initializeMultiDimArrayDeclCall(multiDimArrayCall);
         checkMultiDimArrayDeclCall(multiDimArrayCall);
     }

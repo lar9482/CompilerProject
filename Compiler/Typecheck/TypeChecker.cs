@@ -679,7 +679,49 @@ public abstract class TypeChecker : ASTVisitorVoid {
 
     //TODO: Implement later
     public void visit(ForLoopAST forLoop) {
-        throw new NotImplementedException();
+        context.push();
+
+        forLoop.initialize.accept(this);
+        forLoop.condition.accept(this);
+        forLoop.iterate.accept(this);
+
+        StmtType initializeType = forLoop.initialize.type;
+        SimpleType conditionType = forLoop.condition.type;
+        StmtType iterateType = forLoop.iterate.type;
+        if (initializeType.TypeTag != "unit") {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The initialization statement at {2}:{3} cannot terminate the function",
+                    forLoop.lineNumber, forLoop.columnNumber,
+                    forLoop.initialize.lineNumber, forLoop.initialize.columnNumber
+                )
+            );
+        }
+
+        if (iterateType.TypeTag != "unit") {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The iteration statement at {2}:{3} cannot terminate the function",
+                    forLoop.lineNumber, forLoop.columnNumber,
+                    forLoop.iterate.lineNumber, forLoop.iterate.columnNumber
+                )
+            );
+        }
+
+        if (conditionType.TypeTag != "bool") {
+            errorMsgs.Add(
+                String.Format(
+                    "{0}:{1} SemanticError: The condition statement at {2}:{3} cannot terminate the function",
+                    forLoop.lineNumber, forLoop.columnNumber,
+                    forLoop.condition.lineNumber, forLoop.condition.columnNumber
+                )
+            );
+        }
+
+        forLoop.block.accept(this);
+        forLoop.type = new UnitType();
+
+        forLoop.scope = context.pop();
     }
 
     public void visit(VarAssignAST varAssign) { 

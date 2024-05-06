@@ -1,5 +1,5 @@
 
-function(): int {
+function(): int, int, int, int, int {
     a: int, b: int, c: int, d: int, e: int = 0, 0, 0, 0, 0;
     for(i: int = 0; i < 10; i=i+1) {
         a++;
@@ -17,7 +17,7 @@ function(): int {
         e++;
     }
 
-    return a+b+c+d+e;
+    return a, b, c, d, e;
 }
 
 main(): int {
@@ -43,6 +43,5 @@ main(): int {
     if (a+b+c+d+e != 50) {
         return -1;
     }
-
     return A+B+C+D+E;
 }
