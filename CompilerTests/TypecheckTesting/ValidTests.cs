@@ -81,8 +81,14 @@ public class ValidTypecheckTests {
     }
 
     [Test]
-    public void forLoopTest() {
-        string filePath = "../../../TypecheckTesting/ValidTests/forLoop.prgm";
+    public void forLoop_DeclsInit_Test() {
+        string filePath = "../../../TypecheckTesting/ValidTests/forLoop_DeclsInit.prgm";
+        ensureNoTypecheckErrors(filePath);
+    }
+
+    [Test]
+    public void forLoop_NonDeclsInit_Test() {
+        string filePath = "../../../TypecheckTesting/ValidTests/forLoop_NonDeclsInit.prgm";
         ensureNoTypecheckErrors(filePath);
     }
 
