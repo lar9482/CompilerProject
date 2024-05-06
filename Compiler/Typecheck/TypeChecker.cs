@@ -677,7 +677,6 @@ public abstract class TypeChecker : ASTVisitorVoid {
         whileLoop.type = new UnitType();
     }
 
-    //TODO: Implement later
     public void visit(ForLoopAST forLoop) {
         context.push();
 
