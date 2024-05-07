@@ -1171,10 +1171,27 @@ public sealed class IRGenerator : ASTVisitorGeneric {
             falseLabel
         }));
     }
-
+    
     //TODO: Implement later
     public T visit<T>(ForLoopAST forLoop) {
-        throw new NotImplementedException();
+        IRStmt irInit = forLoop.initialize.accept<IRStmt>(this);
+        BlockAST loopBlock = forLoop.block;
+        loopBlock.statements.Add(forLoop.iterate);
+
+        WhileLoopAST whileLoopFormat = new WhileLoopAST(
+            forLoop.condition,
+            loopBlock,
+            forLoop.lineNumber, 
+            forLoop.columnNumber
+        );
+        IRSeq irLoop = whileLoopFormat.accept<IRSeq>(this);
+
+        return matchThenReturn<T, IRSeq>(new IRSeq(
+            new List<IRStmt>() {
+                irInit,
+                irLoop
+            }
+        ));
     }
 
     /*
