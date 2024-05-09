@@ -77,9 +77,20 @@ public class IRGenerationTests {
         Assert.That(retVal, Is.EqualTo(1));
     }
 
-    [Test]
     public void arrayDecl_noInitialValues() {
         string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDecl_noInitialValues.prgm";
+
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+
+        IRSimulator simulator = new IRSimulator(IR);
+        int retVal = simulator.call("main", args);
+        Assert.That(retVal, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void arrayDecl_noInitialValues_thenAssigned() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDecl_noInitialValues_thenAssigned.prgm";
 
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
@@ -178,6 +189,16 @@ public class IRGenerationTests {
         string expectedConsoleOutput = "10";
         string actualConsoleOutput = simulator.consoleOutputCapture.ToString();
         Assert.That(actualConsoleOutput, Is.EqualTo(expectedConsoleOutput));
+    }
+
+    public void forLoop_DeclsInit() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/forLoop_DeclsInit.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+        IRSimulator simulator = new IRSimulator(IR);
+        int retVal = simulator.call("main", args);
+
+        Assert.That(retVal, Is.EqualTo(50));
     }
 
     [Test]

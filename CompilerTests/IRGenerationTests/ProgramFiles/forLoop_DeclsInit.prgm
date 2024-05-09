@@ -1,0 +1,58 @@
+
+function(): int, int, int, int, int {
+    a: int, b: int, c: int, d: int, e: int = 0, 0, 0, 0, 0;
+    for(i: int = 0; i < 10; i=i+1) {
+        a++;
+        println(unparseInt(a));
+    }
+    for (i: int[] = {0}; i[0] < 10; i[0] = i[0]+1) {
+        b++;
+        println(unparseInt(b));
+    }
+    for (i: int[1]; i[0] < 10; i[0] = i[0]+1) {
+        // println(unparseInt(c));
+        println(unparseInt(i[0]));
+        c++;
+    }
+    for (i: int[][] = {{0}}; i[0][0] < 10; i[0][0] = i[0][0]+1) {
+        d++;
+        println(unparseInt(d));
+    }
+    for (i: int[1][1]; i[0][0] < 10; i[0][0] = i[0][0]+1) {
+        e++;
+        println(unparseInt(e));
+    }
+
+    return a, b, c, d, e;
+}
+
+main(): int {
+    a: int, b: int, c: int, d: int, e: int = function();
+    A: int, B: int, C: int, D: int, E: int = 0, 0, 0, 0, 0;
+
+    for(i: int = 0; i < 10; i++) {
+        A++;
+        println(unparseInt(A));
+    }
+    for (i: int[] = {0}; i[0] < 10; i[0]++) {
+        B++;
+        println(unparseInt(B));
+    }
+    for (i: int[1]; i[0] < 10; i[0]++) {
+        C++;
+        println(unparseInt(C));
+    }
+    for (i: int[][] = {{0}}; i[0][0] < 10; i[0][0]++) {
+        D++;
+        println(unparseInt(D));
+    }
+    for (i: int[1][1]; i[0][0] < 10; i[0][0]++) {
+        E++;
+        println(unparseInt(E));
+    }
+
+    if (a+b+c+d+e != 50) {
+        return -1;
+    }
+    return A+B+C+D+E;
+}
