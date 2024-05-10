@@ -65,7 +65,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         }
 
         IRMove irMove = new IRMove(
-            new IRTemp(varDecl.name),
+            getVariableTemp(varDecl.name),
             srcExpr
         );
 
@@ -86,7 +86,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         List<IRStmt> irStmts = new List<IRStmt>();
 
         foreach(KeyValuePair<string, ExprAST?> varWithInitVal in multiVarDecl.initialValues) {
-            string varDecl = varWithInitVal.Key;
+            string varDeclName = varWithInitVal.Key;
             ExprAST? initialVal = varWithInitVal.Value;
             IRExpr irInitial;
 
@@ -97,7 +97,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
             }
 
             IRMove irMove = new IRMove(
-                new IRTemp(varDecl),
+                getVariableTemp(varDeclName),
                 irInitial
             );
             irStmts.Add(irMove);
@@ -143,7 +143,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         for (int i = 0; i < multiVarDeclCall.names.Count; i++) {
             string variableName = multiVarDeclCall.names[i];
             IRExpr irSrc = new IRTemp(IRConfiguration.ABSTRACT_RET_PREFIX + (i+1));
-            IRTemp irDest = new IRTemp(variableName);
+            IRTemp irDest = getVariableTemp(variableName);
 
             IRMove irAssign = new IRMove(irDest, irSrc);
             irStmts.Add(irAssign);
@@ -200,7 +200,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         IRTemp tArrayAddr = createNewTemp();
 
         /** Register that holds the starting address for indexing the array **/
-        IRTemp tArray = new IRTemp(arrayName);
+        IRTemp tArray = getVariableTemp(arrayName);
 
         // Step1: Computing size of the array, then moving it into "tSize"
         IRExpr irSize = arraySize.accept<IRExpr>(this);
@@ -276,7 +276,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
      */
     private Tuple<List<IRTemp>, IR_Eseq> allocateArrayDecl_WithExpr(string arrayName, ExprAST[] initialValues) {
         IRTemp tArrayAddr = createNewTemp();
-        IRTemp tArray = new IRTemp(arrayName);
+        IRTemp tArray = getVariableTemp(arrayName);
 
         IRBinOp bytesToAllocate = new IRBinOp(
             BinOpType.ADD,
@@ -349,7 +349,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     public T visit<T>(ArrayDeclCallAST arrayCall) {
         
         IRCall irFunctionCall = arrayCall.function.accept<IRCall>(this);
-        IRTemp arrayReg = new IRTemp(arrayCall.name);
+        IRTemp arrayReg = getVariableTemp(arrayCall.name);
         return matchThenReturn<T, IRMove>(
             new IRMove(
                 arrayReg,
@@ -468,7 +468,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     private IRSeq allocateMultiDimArray_WithExprs(string arrayName, ExprAST[][] initialValues) {
         int numRows = initialValues.Length;
         IRTemp tArrayAddr = createNewTemp();
-        IRTemp tArray = new IRTemp(arrayName);
+        IRTemp tArray = getVariableTemp(arrayName);
 
         IRBinOp bytesToAllocate = new IRBinOp(
             BinOpType.ADD,
@@ -540,7 +540,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     public T visit<T>(MultiDimArrayDeclCallAST multiDimArrayCall) {
 
         IRCall irFunctionCall = multiDimArrayCall.function.accept<IRCall>(this);
-        IRTemp arrayReg = new IRTemp(multiDimArrayCall.name);
+        IRTemp arrayReg = getVariableTemp(multiDimArrayCall.name);
         return matchThenReturn<T, IRMove>(
             new IRMove(
                 arrayReg,
@@ -611,7 +611,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
      */
     public T visit<T>(ParameterAST parameter) { 
         IRMove irAssign = new IRMove(
-            new IRTemp(parameter.name),
+            getVariableTemp(parameter.name),
             new IRTemp(
                 IRConfiguration.ABSTRACT_ARG_PREFIX + argCounter
             )
@@ -1301,7 +1301,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
      * E[x] = TEMP(x)
      */
     public T visit<T>(VarAccessAST varAccess) { 
-        IRTemp temp = new IRTemp(varAccess.variableName);
+        IRTemp temp = getVariableTemp(varAccess.variableName);
         return matchThenReturn<T, IRTemp>(temp);
     }
 
@@ -1316,7 +1316,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
      * )
      */
     public T visit<T>(ArrayAccessAST arrayAccess) { 
-        IRTemp tArray = new IRTemp(arrayAccess.arrayName);
+        IRTemp tArray = getVariableTemp(arrayAccess.arrayName);
         IRTemp tI = createNewTemp();
 
         //Step 1: Computing the index, then moving it into the tI register.
@@ -1395,7 +1395,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
      */
     public T visit<T>(MultiDimArrayAccessAST multiDimArrayAccess) {
         string arrayName = multiDimArrayAccess.arrayName;
-        IRTemp tName = new IRTemp(arrayName);
+        IRTemp tName = getVariableTemp(arrayName);
         IRTemp tE1 = createNewTemp();
         IRTemp tE2 = createNewTemp();
         IRTemp tArray = createNewTemp();
