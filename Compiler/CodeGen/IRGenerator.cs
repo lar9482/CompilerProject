@@ -1692,6 +1692,13 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         }
     }
 
+    /*
+     * Why do it this way? 
+     * This will ensure that registers(and their side effects) do not interfere with each other. 
+     * 
+     * Register allocation will be done in later passes to make sure the registers
+     * can be simulated on an actual runtime.
+     */
     private IRTemp createNewTemp() {
         IRTemp temp = new IRTemp(
             String.Format("t{0}", tempCounter)
