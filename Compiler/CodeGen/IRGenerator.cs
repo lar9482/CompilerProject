@@ -12,10 +12,16 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     private int labelCounter;
     private int argCounter;
 
+    private int tempCounter;
+    private Dictionary<string, IRTemp> variableToTemp;
+
     public IRGenerator() {
         this.context = new Context();
         this.labelCounter = 0;
         this.argCounter = 1;
+
+        this.tempCounter = 0;
+        this.variableToTemp = new Dictionary<string, IRTemp>();
     }
 
     // Top level nodes
@@ -188,10 +194,10 @@ public sealed class IRGenerator : ASTVisitorGeneric {
      */
     private Tuple<List<IRTemp>, IRSeq> allocateArrayDecl_WithoutExpr(string arrayName, ExprAST arraySize) {
         /** Register that holds the array size **/
-        IRTemp tSize = new IRTemp(String.Format("{0}Size", arrayName));
+        IRTemp tSize = createNewTemp();
 
         /** Register that holds starting address for the entire array INCLUDING THE SIZE. **/
-        IRTemp tArrayAddr = new IRTemp(String.Format("{0}Addr", arrayName));
+        IRTemp tArrayAddr = createNewTemp();
 
         /** Register that holds the starting address for indexing the array **/
         IRTemp tArray = new IRTemp(arrayName);
@@ -269,11 +275,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
      * )
      */
     private Tuple<List<IRTemp>, IR_Eseq> allocateArrayDecl_WithExpr(string arrayName, ExprAST[] initialValues) {
-        IRTemp tArrayAddr = new IRTemp(
-            String.Format(
-                "{0}A", arrayName
-            )
-        );
+        IRTemp tArrayAddr = createNewTemp();
         IRTemp tArray = new IRTemp(arrayName);
 
         IRBinOp bytesToAllocate = new IRBinOp(
@@ -401,7 +403,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
         List<IRStmt> allStmts = allocateArrayRows_WithRegs.Item2.statements;
 
         /// Setting up the loop for allocating space for the columns///
-        IRTemp tI = new IRTemp(String.Format("{0}RowI", arrayName));
+        IRTemp tI = createNewTemp();
         IRMove initialize_TI_To_0 = new IRMove(tI, new IRConst(0));
         IRLabel startLoopLabel = createNewLabel();
         IRLabel trueLoopLabel = createNewLabel();
@@ -465,11 +467,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
      */
     private IRSeq allocateMultiDimArray_WithExprs(string arrayName, ExprAST[][] initialValues) {
         int numRows = initialValues.Length;
-        IRTemp tArrayAddr = new IRTemp(
-            String.Format(
-                "{0}A", arrayName
-            )
-        );
+        IRTemp tArrayAddr = createNewTemp();
         IRTemp tArray = new IRTemp(arrayName);
 
         IRBinOp bytesToAllocate = new IRBinOp(
@@ -1319,7 +1317,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
      */
     public T visit<T>(ArrayAccessAST arrayAccess) { 
         IRTemp tArray = new IRTemp(arrayAccess.arrayName);
-        IRTemp tI = new IRTemp(String.Format("{0}I", arrayAccess.arrayName));
+        IRTemp tI = createNewTemp();
 
         //Step 1: Computing the index, then moving it into the tI register.
         IRExpr arrayIndexAddr = arrayAccess.accessValue.accept<IRExpr>(this);
@@ -1398,9 +1396,9 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     public T visit<T>(MultiDimArrayAccessAST multiDimArrayAccess) {
         string arrayName = multiDimArrayAccess.arrayName;
         IRTemp tName = new IRTemp(arrayName);
-        IRTemp tE1 = new IRTemp(String.Format("{0}E1", arrayName));
-        IRTemp tE2 = new IRTemp(String.Format("{0}E2", arrayName));
-        IRTemp tArray = new IRTemp(String.Format("{0}A", arrayName));
+        IRTemp tE1 = createNewTemp();
+        IRTemp tE2 = createNewTemp();
+        IRTemp tArray = createNewTemp();
         
         IRLabel firstOkLabel = createNewLabel();
         IRLabel secondOkLabel = createNewLabel();
@@ -1692,5 +1690,25 @@ public sealed class IRGenerator : ASTVisitorGeneric {
                     new IRName(falseLabel.name)
                 );
         }
+    }
+
+    private IRTemp createNewTemp() {
+        IRTemp temp = new IRTemp(
+            String.Format("t{0}", tempCounter)
+        );
+
+        tempCounter++;
+        return temp;
+    }
+
+    private IRTemp getVariableTemp(string variableName) {
+        if (variableToTemp.ContainsKey(variableName)) {
+            return variableToTemp[variableName];
+        }
+
+        IRTemp temp = createNewTemp();
+        variableToTemp[variableName] = temp;
+
+        return temp;
     }
 }
