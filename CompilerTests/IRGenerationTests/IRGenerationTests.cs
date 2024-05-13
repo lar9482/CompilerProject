@@ -77,6 +77,7 @@ public class IRGenerationTests {
         Assert.That(retVal, Is.EqualTo(1));
     }
 
+    [Test]
     public void arrayDecl_noInitialValues() {
         string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDecl_noInitialValues.prgm";
 
@@ -248,6 +249,17 @@ public class IRGenerationTests {
     [Test]
     public void multiDimArrayDecl_noInitVals() {
         string filePath = "../../../IRGenerationTests/ProgramFiles/multiDimArrayDecl_noInitVals.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+
+        IRSimulator simulator = new IRSimulator(IR);
+        int retVal = simulator.call("main", args);
+        Assert.That(retVal, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void multiDimArrayDecl_noInitVals_thenAssign() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/multiDimArrayDecl_noInitVals_thenAssign.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
 

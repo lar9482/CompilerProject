@@ -184,7 +184,15 @@ public sealed class IRGenerator : ASTVisitorGeneric {
      * S[x: t[e]] = SEQ (
      *   MOVE(tSize, E[e]),
      *   MOVE(tArrayAddr, Call(Name("malloc"), tSize*wordSize + wordSize)), NOTE: wordSize = 4)
-     *   MOVE(MEM(tArrayAddr), tSize)
+     *   MOVE(MEM(tArrayAddr), tSize),
+     *   MOVE(tI, 0),
+     *   LABEL(lH)
+     *   CJUMP(tI < tSize, lT, lF),
+     *   LABEL(lT),
+     *   MOVE(MEM(tArrayAddr+wordSize + tI*wordSize), 0),
+     *   ADD(tI, 0)
+     *   JUMP(lH),
+     *   LABEL(lF)
      *   MOVE(TEMP(x), tArrayAddr + wordSize)
      * )
      * 
@@ -198,6 +206,9 @@ public sealed class IRGenerator : ASTVisitorGeneric {
 
         /** Register that holds starting address for the entire array INCLUDING THE SIZE. **/
         IRTemp tArrayAddr = createNewTemp();
+
+        /** Register that holds the index for the loop. **/
+        IRTemp tI = createNewTemp();
 
         /** Register that holds the starting address for indexing the array **/
         IRTemp tArray = getVariableTemp(arrayName);
@@ -234,7 +245,59 @@ public sealed class IRGenerator : ASTVisitorGeneric {
             tSize
         );
 
-        //Step 4: A register named after the array will now hold the starting address for the array.
+        IRLabel beginLoopLabel = createNewLabel();
+        IRLabel trueLabel = createNewLabel();
+        IRLabel falseLabel = createNewLabel();
+        
+        // Step 4:
+        IRMove initializeTI = new IRMove(tI, new IRConst(0));
+
+        // Step 5:
+        IRCJump loopCondition = new IRCJump(
+            new IRBinOp(
+                BinOpType.LT,
+                tI, 
+                tSize
+            ),
+            trueLabel.name, falseLabel.name
+        );
+
+        // Step 6:
+        IRMove moveZero_Into_ArrayLoc = new IRMove(
+            new IRMem(
+                MemType.NORMAL,
+                new IRBinOp(
+                    BinOpType.ADD,
+                    new IRBinOp(
+                        BinOpType.ADD,
+                        tArrayAddr,
+                        new IRConst(IRConfiguration.wordSize)
+                    ),
+                    new IRBinOp(
+                        BinOpType.MUL,
+                        tI,
+                        new IRConst(IRConfiguration.wordSize)
+                    )
+                )
+            ),
+            new IRConst(0)
+        );
+
+        //Step 7: 
+        IRMove incrementTI = new IRMove(
+            tI, new IRBinOp(
+                BinOpType.ADD,
+                tI,
+                new IRConst(1)
+            )
+        );
+
+        // Step 8:
+        IRJump jumpToBeginningOfLoop = new IRJump(
+            new IRName(beginLoopLabel.name)
+        );
+
+        //Step 9: A register named after the array will now hold the starting address for the array.
         IRMove createArrayRegister = new IRMove(
             tArray,
             new IRBinOp(
@@ -254,6 +317,14 @@ public sealed class IRGenerator : ASTVisitorGeneric {
                 computeSize,
                 allocateMem,
                 storeSizeInMem,
+                initializeTI,
+                beginLoopLabel,
+                loopCondition,
+                trueLabel,
+                moveZero_Into_ArrayLoc,
+                incrementTI,
+                jumpToBeginningOfLoop,
+                falseLabel,
                 createArrayRegister
             })
         );

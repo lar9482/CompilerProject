@@ -1,6 +1,10 @@
 main(): int {
     array: int[2][2];
+    array[0][0] = 1;
+    array[0][1] = 2;
+    array[1][0] = 3;
+    array[1][1] = 4;
 
-    // 0
+    // 10
     return array[0][0] + array[0][1] + array[1][0] + array[1][1];
 }
