@@ -192,8 +192,20 @@ public class IRGenerationTests {
         Assert.That(actualConsoleOutput, Is.EqualTo(expectedConsoleOutput));
     }
 
+    [Test]
     public void forLoop_DeclsInit() {
         string filePath = "../../../IRGenerationTests/ProgramFiles/forLoop_DeclsInit.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+        IRSimulator simulator = new IRSimulator(IR);
+        int retVal = simulator.call("main", args);
+
+        Assert.That(retVal, Is.EqualTo(50));
+    }
+
+    [Test]
+    public void forLoop_NonDeclsInit() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/forLoop_NonDeclsInit.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
         IRSimulator simulator = new IRSimulator(IR);

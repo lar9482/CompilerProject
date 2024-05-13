@@ -10,8 +10,7 @@ function(): int, int, int, int, int {
         println(unparseInt(b));
     }
     for (i: int[1]; i[0] < 10; i[0] = i[0]+1) {
-        // println(unparseInt(c));
-        println(unparseInt(i[0]));
+        println(unparseInt(c));
         c++;
     }
     for (i: int[][] = {{0}}; i[0][0] < 10; i[0][0] = i[0][0]+1) {
