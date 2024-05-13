@@ -70,6 +70,25 @@ public class Compiler {
         return irProgram;
     }
 
+    public static Tuple<IRCompUnit, int> generateIRWithTempCount(string filePath) {
+        ProgramAST checkedAST = ensureNoSemanticErrors(filePath);
+
+        IRGenerator generator = new IRGenerator();
+        IRCompUnit irProgram = generator.visit<IRCompUnit>(checkedAST);
+        
+        return Tuple.Create<IRCompUnit, int>(irProgram, generator.tempCounter);
+    }
+
+    public static LIRCompUnit lowerIR(string filePath) {
+        Tuple<IRCompUnit, int> irProgramWithTempCount = generateIRWithTempCount(filePath);
+
+        IRCompUnit irProgram = irProgramWithTempCount.Item1;
+        int tempCount = irProgramWithTempCount.Item2;
+
+        IRLowerer lowerer = new IRLowerer(tempCount);
+        return lowerer.visit<LIRCompUnit>(irProgram);
+    }
+
     public static void compileFile(string filePath) {
         generateIR(filePath);
     }

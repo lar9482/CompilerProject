@@ -12,7 +12,7 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     private int labelCounter;
     private int argCounter;
 
-    private int tempCounter;
+    public int tempCounter;
     private Dictionary<string, IRTemp> variableToTemp;
 
     public IRGenerator() {
