@@ -70,4 +70,17 @@ public class IRGeneration_EndToEndTests {
         IRSimulator simulator = new IRSimulator(IR);
         simulator.call("main", args);
     }
+
+    [Test]
+    public void IRGen_primes() {
+        string filePath = "../../../IRGenerationTests/EndToEndTests/primes.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] {};
+        IRSimulator simulator = new IRSimulator(IR);
+        simulator.call("main", args);
+
+        string expectedConsoleOutput = "97";
+        string actualConsoleOutput = simulator.consoleOutputCapture.ToString();
+        Assert.That(actualConsoleOutput, Is.EqualTo(expectedConsoleOutput));
+    }
 }

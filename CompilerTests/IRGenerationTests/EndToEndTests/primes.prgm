@@ -30,6 +30,8 @@ largestprime(max:int):int {
 }
 
 main(args:int[][]) {
-    largestPrime: int = largestprime(5000);
-    assert(largestPrime == 4999);
+    largestPrime: int = largestprime(100);
+    assert(largestPrime == 97);
+    
+    print(unparseInt(largestPrime));
 }
