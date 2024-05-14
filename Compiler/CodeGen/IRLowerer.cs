@@ -7,13 +7,41 @@ public sealed class IRLowerer : IRVisitorGeneric {
         this.tempCounter = tempCounter;
     }
 
-    public T visit<T>(IRCompUnit compUnit) { throw new NotImplementedException(); }
-    public T visit<T>(IRFuncDecl funcDecl) { throw new NotImplementedException(); }
+    public T visit<T>(IRCompUnit compUnit) { 
+        Dictionary<string, LIRFuncDecl> loweredFuncDecls = new Dictionary<string, LIRFuncDecl>();
+        foreach(KeyValuePair<string, IRFuncDecl> nameWithFuncDecl in compUnit.functions) {
+            string funcName = nameWithFuncDecl.Key;
+            IRFuncDecl funcDecl = nameWithFuncDecl.Value;
+
+            LIRFuncDecl loweredFuncDecl = funcDecl.accept<LIRFuncDecl>(this);
+            loweredFuncDecls.Add(funcName, loweredFuncDecl);
+        }
+
+        LIRCompUnit loweredCompUnit = new LIRCompUnit(
+            compUnit.name,
+            loweredFuncDecls
+        );
+        
+        return matchThenReturn<T, LIRCompUnit>(loweredCompUnit);
+    }
+
+    public T visit<T>(IRFuncDecl funcDecl) { 
+        List<LIRStmt> loweredBody = funcDecl.body.accept<List<LIRStmt>>(this);
+        
+        LIRFuncDecl loweredFuncDecl = new LIRFuncDecl(
+            funcDecl.name,
+            loweredBody
+        );
+
+        return matchThenReturn<T, LIRFuncDecl>(loweredFuncDecl);
+    }
 
     public T visit<T>(IRMove move) { 
         switch(move.target) {
             case IRMem mem:
+                break;
             case IRTemp temp:
+                break;
             default:
                 break;
         }
