@@ -123,7 +123,50 @@ public sealed class IRLowerer : IRVisitorGeneric {
 
     public T visit<T>(IRReturn Return) { throw new NotImplementedException(); }
     public T visit<T>(IRCallStmt callStmt) { throw new NotImplementedException(); }
-    public T visit<T>(IRCall call) { throw new NotImplementedException(); }
+
+    public T visit<T>(IRCall call) { 
+        List<LIRStmt> allLoweredStmts = new List<LIRStmt>();
+        List<LIRExpr> loweredArgTemps = new List<LIRExpr>();
+        foreach(IRExpr irArg in call.args) {
+            IRExprLowered loweredArg = irArg.accept<IRExprLowered>(this);
+            allLoweredStmts = allLoweredStmts.Concat(loweredArg.stmts).ToList();
+
+            LIRTemp newTemp = createNewTemp();
+            LIRMoveTemp moveArgIntoNewTemp = new LIRMoveTemp(
+                loweredArg.expr,
+                newTemp
+            );
+            allLoweredStmts.Add(moveArgIntoNewTemp);
+            loweredArgTemps.Add(newTemp);
+        }
+        IRExprLowered loweredTarget = call.target.accept<IRExprLowered>(this);
+        allLoweredStmts = allLoweredStmts.Concat(loweredTarget.stmts).ToList();
+
+        LIRTemp newTargetTemp = createNewTemp();
+        LIRMoveTemp moveTargetToNewTemp = new LIRMoveTemp(
+            loweredTarget.expr,
+            newTargetTemp
+        );
+        allLoweredStmts.Add(moveTargetToNewTemp);
+        LIRCallM loweredCall = new LIRCallM(
+            newTargetTemp, loweredArgTemps, 1
+        );
+        allLoweredStmts.Add(loweredCall);
+
+        LIRTemp newFunctionDestTemp = createNewTemp();
+        LIRMoveTemp moveReturnValIntoFunctionDest = new LIRMoveTemp(
+            new LIRTemp(IRConfiguration.ABSTRACT_RET_PREFIX + 1),
+            newFunctionDestTemp
+        );
+        allLoweredStmts.Add(moveReturnValIntoFunctionDest);
+
+        return matchThenReturn<T, IRExprLowered>(
+            new IRExprLowered(
+                allLoweredStmts,
+                newFunctionDestTemp
+            )
+        ); 
+    }
     public T visit<T>(IRBinOp binOp) { throw new NotImplementedException(); }
     public T visit<T>(IRUnaryOp unaryOp) { throw new NotImplementedException(); }
 
@@ -178,8 +221,8 @@ public sealed class IRLowerer : IRVisitorGeneric {
         }
     }
 
-    private IRTemp createNewTemp() {
-        IRTemp temp = new IRTemp(
+    private LIRTemp createNewTemp() {
+        LIRTemp temp = new LIRTemp(
             String.Format("t{0}", tempCounter)
         );
 

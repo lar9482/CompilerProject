@@ -394,7 +394,6 @@ public sealed class IRGenerator : ASTVisitorGeneric {
             );
         }
         
-
         return Tuple.Create<List<IRTemp>, IR_Eseq>(
             new List<IRTemp>() {
                  tArrayAddr,
