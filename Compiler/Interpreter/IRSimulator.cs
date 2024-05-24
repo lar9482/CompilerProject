@@ -384,19 +384,19 @@ public sealed class IRSimulator {
 
     private void interpretInsn(ExecutionFrame frame, IRNode insn) {
         switch(insn) {
-            case IRConst irConst: executeIRConst(irConst); break;
-            case IRTemp irTemp: executeIRTemp(irTemp, frame); break;
-            case IRBinOp irBinOp: executeIRBinOp(irBinOp); break;
-            case IRUnaryOp irUnaryOp: executeIRUnaryOp(irUnaryOp); break;
-            case IRMem irMem: executeIRMem(irMem); break;
-            case IRCall irCall: executeIRCall(irCall, frame); break;
-            case IRName irName: executeIRName(irName); break;
+            case IRConst irConst: executeIRConst(irConst.value); break;
+            case IRTemp irTemp: executeIRTemp(irTemp.name, frame); break;
+            case IRBinOp irBinOp: executeIRBinOp(irBinOp.opType); break;
+            case IRUnaryOp irUnaryOp: executeIRUnaryOp(irUnaryOp.opType); break;
+            case IRMem irMem: executeIRMem(); break;
+            case IRCall irCall: executeIRCall(irCall.args.Count, frame); break;
+            case IRName irName: executeIRName(irName.name); break;
             case IRMove irMove: executeIRMove(frame); break;
-            case IRCallStmt irCallStmt: executeIRCallStmt(irCallStmt, frame); break;
+            case IRCallStmt irCallStmt: executeIRCallStmt(irCallStmt.target, irCallStmt.args, frame); break;
             case IRExp irExp: executeIRExp(irExp); break;
-            case IRJump irJump: executeIRJump(irJump, frame); break;
-            case IRCJump irCJump: executeIRCJump(irCJump, frame); break;
-            case IRReturn irReturn: executeIRReturn(irReturn, frame); break;
+            case IRJump irJump: executeIRJump(frame); break;
+            case IRCJump irCJump: executeIRCJump(irCJump.trueLabel, irCJump.falseLabel, frame); break;
+            case IRReturn irReturn: executeIRReturn(irReturn.returns.Count, frame); break;
             default:
                 break;
         }
@@ -405,24 +405,23 @@ public sealed class IRSimulator {
     /*
      * Pushing the const onto the expr stack.
      */
-    private void executeIRConst(IRConst irConst) {
-        exprStack.pushValue(irConst.value);
+    private void executeIRConst(int irConstValue) {
+        exprStack.pushValue(irConstValue);
     }
 
     /*
      * Pushing the temp from the execution frame to the expr stack.
      */
-    private void executeIRTemp(IRTemp irTemp, ExecutionFrame frame) {
-        string tempName = irTemp.name;
+    private void executeIRTemp(string tempName, ExecutionFrame frame) {
         exprStack.pushTemp(frame.getValueFromReg(tempName), tempName);
     }
 
-    private void executeIRBinOp(IRBinOp binOp) {
+    private void executeIRBinOp(BinOpType binOpType) {
         int rightVal = exprStack.popValue();
         int leftVal = exprStack.popValue();
         int result;
 
-        switch(binOp.opType) {
+        switch(binOpType) {
             case BinOpType.ADD: result = leftVal + rightVal; break;
             case BinOpType.SUB: result = leftVal - rightVal; break;
             case BinOpType.MUL: result = leftVal * rightVal; break;
@@ -457,11 +456,11 @@ public sealed class IRSimulator {
         exprStack.pushValue(result);
     }
 
-    private void executeIRUnaryOp(IRUnaryOp unaryOp) {
+    private void executeIRUnaryOp(UnaryOpType unaryOpType) {
         int value = exprStack.popValue();
         int result;
 
-        switch(unaryOp.opType) {
+        switch(unaryOpType) {
             case UnaryOpType.NOT: result = (value == 0) ? 1 : 0; break;
             case UnaryOpType.NEGATE: result = -value; break;
             default:
@@ -471,14 +470,13 @@ public sealed class IRSimulator {
         exprStack.pushValue(result);
     }
 
-    private void executeIRMem(IRMem mem) {
+    private void executeIRMem() {
         int addr = exprStack.popValue();
         exprStack.pushAddress(read(addr), addr);
     }
 
-    private void executeIRCall(IRCall irCall, ExecutionFrame frame) {
+    private void executeIRCall(int argCount, ExecutionFrame frame) {
         // Popping the argument values from the stack.
-        int argCount = irCall.args.Count;
         int[] args = new int[argCount];
         for (int i = argCount-1; i>=0; i--) args[i] = exprStack.popValue();
 
@@ -505,8 +503,7 @@ public sealed class IRSimulator {
         exprStack.pushValue(retVal);
     }
 
-    private void executeIRName(IRName irName) {
-        string name = irName.name;
+    private void executeIRName(string name) {
         exprStack.pushName(
             libraryFunctions.Contains(name) ? -1 : findLabel(name),
             name
@@ -535,9 +532,9 @@ public sealed class IRSimulator {
         }
     }
 
-    private void executeIRCallStmt(IRCallStmt irCallStmt, ExecutionFrame frame) {
+    private void executeIRCallStmt(IRExpr target, List<IRExpr> args, ExecutionFrame frame) {
         IRCall newCall = new IRCall(
-            irCallStmt.target, irCallStmt.args
+            target, args
         );
         interpretInsn(frame, newCall);
         exprStack.popValue();
@@ -547,18 +544,18 @@ public sealed class IRSimulator {
         exprStack.pop();
     }
 
-    private void executeIRJump(IRJump irJump, ExecutionFrame frame) {
+    private void executeIRJump(ExecutionFrame frame) {
         frame.setIP(exprStack.popValue());
     }
 
-    private void executeIRCJump(IRCJump irCJump, ExecutionFrame frame) {
+    private void executeIRCJump(string trueLabel, string falseLabel, ExecutionFrame frame) {
         int CJumpResult = exprStack.popValue();
         string labelToJumpTo;
 
         if (CJumpResult == 0) {
-            labelToJumpTo = irCJump.falseLabel;
+            labelToJumpTo = falseLabel;
         } else if(CJumpResult == 1) {
-            labelToJumpTo = irCJump.trueLabel;
+            labelToJumpTo = trueLabel;
         } else {
             throw new Exception(
                 String.Format(
@@ -573,15 +570,14 @@ public sealed class IRSimulator {
         );
     }
 
-    private void executeIRReturn(IRReturn irReturn, ExecutionFrame frame) {
-        int argCount = irReturn.returns.Count;
-        int[] rets = new int[argCount];
+    private void executeIRReturn(int nReturns, ExecutionFrame frame) {
+        int[] rets = new int[nReturns];
 
-        for (int i = argCount-1; i>= 0; i--) {
+        for (int i = nReturns-1; i>= 0; i--) {
             rets[i] = exprStack.popValue();
         }
 
-        for (int i = 0; i < argCount; i++) {
+        for (int i = 0; i < nReturns; i++) {
             frame.rets.Add(rets[i]);
         }
 
