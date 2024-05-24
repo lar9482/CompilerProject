@@ -121,7 +121,27 @@ public sealed class IRLowerer : IRVisitorGeneric {
         return matchThenReturn<T, List<LIRStmt>>(loweredStmts);
     }
 
-    public T visit<T>(IRReturn Return) { throw new NotImplementedException(); }
+    public T visit<T>(IRReturn Return) { 
+        List<LIRStmt> loweredStmts = new List<LIRStmt>();
+        List<LIRExpr> loweredReturnTemps = new List<LIRExpr>();
+        foreach(IRExpr irReturn in Return.returns) {
+            IRExprLowered loweredReturn = irReturn.accept<IRExprLowered>(this);
+            loweredStmts = loweredStmts.Concat(loweredReturn.stmts).ToList();
+            LIRTemp newTemp = createNewTemp();
+
+            LIRMoveTemp moveReturnToNewTemp = new LIRMoveTemp(
+                loweredReturn.expr,
+                newTemp
+            );
+            loweredStmts.Add(moveReturnToNewTemp);
+            loweredReturnTemps.Add(newTemp);
+        }
+
+        LIRReturn loweredReturnStmt = new LIRReturn(loweredReturnTemps);
+        loweredStmts.Add(loweredReturnStmt);
+        
+        return matchThenReturn<T, List<LIRStmt>>(loweredStmts);
+    }
 
     public T visit<T>(IRCallStmt callStmt) { 
         List<LIRStmt> allLoweredStmts = new List<LIRStmt>();
