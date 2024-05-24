@@ -122,7 +122,38 @@ public sealed class IRLowerer : IRVisitorGeneric {
     }
 
     public T visit<T>(IRReturn Return) { throw new NotImplementedException(); }
-    public T visit<T>(IRCallStmt callStmt) { throw new NotImplementedException(); }
+
+    public T visit<T>(IRCallStmt callStmt) { 
+        List<LIRStmt> allLoweredStmts = new List<LIRStmt>();
+        List<LIRExpr> loweredArgTemps = new List<LIRExpr>();
+        foreach(IRExpr irArg in callStmt.args) {
+            IRExprLowered loweredArg = irArg.accept<IRExprLowered>(this);
+            allLoweredStmts = allLoweredStmts.Concat(loweredArg.stmts).ToList();
+
+            LIRTemp newTemp = createNewTemp();
+            LIRMoveTemp moveArgIntoNewTemp = new LIRMoveTemp(
+                loweredArg.expr,
+                newTemp
+            );
+            allLoweredStmts.Add(moveArgIntoNewTemp);
+            loweredArgTemps.Add(newTemp);
+        }
+        IRExprLowered loweredTarget = callStmt.target.accept<IRExprLowered>(this);
+        allLoweredStmts = allLoweredStmts.Concat(loweredTarget.stmts).ToList();
+
+        LIRTemp newTargetTemp = createNewTemp();
+        LIRMoveTemp moveTargetToNewTemp = new LIRMoveTemp(
+            loweredTarget.expr,
+            newTargetTemp
+        );
+        allLoweredStmts.Add(moveTargetToNewTemp);
+        LIRCallM loweredCall = new LIRCallM(
+            newTargetTemp, loweredArgTemps, 1
+        );
+        allLoweredStmts.Add(loweredCall);
+
+        return matchThenReturn<T, List<LIRStmt>>(allLoweredStmts);
+    }
 
     public T visit<T>(IRCall call) { 
         List<LIRStmt> allLoweredStmts = new List<LIRStmt>();
