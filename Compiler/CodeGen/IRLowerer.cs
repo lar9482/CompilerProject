@@ -39,6 +39,8 @@ public sealed class IRLowerer : IRVisitorGeneric {
     public T visit<T>(IRMove move) { 
         switch(move.target) {
             case IRMem mem:
+                IRExprLowered loweredTargetMemContent = mem.expr.accept<IRExprLowered>(this);
+                IRExprLowered loweredSrcContent = move.src.accept<IRExprLowered>(this);
                 break;
             case IRTemp temp:
                 IRExprLowered loweredSrc = move.src.accept<IRExprLowered>(this);
@@ -218,8 +220,78 @@ public sealed class IRLowerer : IRVisitorGeneric {
             )
         ); 
     }
-    public T visit<T>(IRBinOp binOp) { throw new NotImplementedException(); }
-    public T visit<T>(IRUnaryOp unaryOp) { throw new NotImplementedException(); }
+    public T visit<T>(IRBinOp binOp) { 
+        IRExprLowered loweredLeft = binOp.left.accept<IRExprLowered>(this);
+        IRExprLowered loweredRight = binOp.right.accept<IRExprLowered>(this);
+
+        LBinOpType opType;
+        switch(binOp.opType) {
+            case BinOpType.ADD: opType = LBinOpType.ADD; break; 
+            case BinOpType.SUB: opType = LBinOpType.SUB; break; 
+            case BinOpType.MUL: opType = LBinOpType.MUL; break; 
+            case BinOpType.DIV: opType = LBinOpType.DIV; break; 
+            case BinOpType.MOD: opType = LBinOpType.MOD; break; 
+            case BinOpType.AND: opType = LBinOpType.AND; break; 
+            case BinOpType.OR: opType = LBinOpType.OR; break; 
+            case BinOpType.XOR: opType = LBinOpType.XOR; break; 
+            case BinOpType.LSHIFT: opType = LBinOpType.LSHIFT; break; 
+            case BinOpType.RSHIFT: opType = LBinOpType.RSHIFT; break; 
+            case BinOpType.EQ: opType = LBinOpType.EQ; break; 
+            case BinOpType.NEQ: opType = LBinOpType.NEQ; break; 
+            case BinOpType.LT: opType = LBinOpType.LT; break; 
+            case BinOpType.GT: opType = LBinOpType.GT; break; 
+            case BinOpType.LEQ: opType = LBinOpType.LEQ; break; 
+            case BinOpType.GEQ: opType = LBinOpType.GEQ; break; 
+            case BinOpType.ULT: opType = LBinOpType.ULT; break; 
+            default:
+                throw new Exception("Unable to map IR the binary operation to lowered a IR binary operation");
+        }
+
+        if (commutes(loweredRight.stmts, loweredLeft.expr)) {
+            List<LIRStmt> allLoweredStmts = loweredLeft.stmts;
+            allLoweredStmts = allLoweredStmts.Concat(loweredRight.stmts).ToList();
+
+            LIRBinOp loweredBinOp = new LIRBinOp(
+                opType,
+                loweredLeft.expr,
+                loweredRight.expr
+            );
+
+            return matchThenReturn<T, IRExprLowered>(
+                new IRExprLowered(
+                    allLoweredStmts,
+                    loweredBinOp
+                )
+            );
+        } else {
+            List<LIRStmt> allLoweredStmts = loweredLeft.stmts;
+            LIRTemp freshTemp = createNewTemp();
+            allLoweredStmts.Add(
+                new LIRMoveTemp(
+                    loweredLeft.expr,
+                    freshTemp
+                )
+            );
+            allLoweredStmts = allLoweredStmts.Concat(loweredRight.stmts).ToList();
+
+            LIRBinOp loweredBinOp = new LIRBinOp(
+                opType,
+                freshTemp,
+                loweredRight.expr
+            );
+
+            return matchThenReturn<T, IRExprLowered>(
+                new IRExprLowered(
+                    allLoweredStmts,
+                    loweredBinOp
+                )
+            );
+        }
+    }
+
+    public T visit<T>(IRUnaryOp unaryOp) { 
+        throw new NotImplementedException(); 
+    }
 
     public T visit<T>(IRConst Const) { 
         IRExprLowered loweredConst = new IRExprLowered(
@@ -281,8 +353,25 @@ public sealed class IRLowerer : IRVisitorGeneric {
         return temp;
     }
 
-    private bool commutes() {
-        return true;
+    /*
+     * Testing if 'loweredStmts' alters the content of 'lowered' in anyway.
+     */
+    private bool commutes(List<LIRStmt> loweredStmts, LIRExpr loweredExpr) {
+        if (loweredStmts.Count == 0 || isAnUnaffectedLoweredExpr(loweredExpr)) {
+            return true;
+        }
+
+        throw new Exception();
+    }
+
+    private bool isAnUnaffectedLoweredExpr(LIRExpr loweredExpr) {
+        switch(loweredExpr) {
+            case LIRName loweredName:
+            case LIRConst loweredConst:
+                return true;
+            default:
+                return false;
+        }
     }
 
     private sealed class IRExprLowered {
