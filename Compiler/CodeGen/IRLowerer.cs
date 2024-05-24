@@ -374,7 +374,7 @@ public sealed class IRLowerer : IRVisitorGeneric {
         }
     }
 
-    private sealed class IRExprLowered {
+    private struct IRExprLowered {
         public List<LIRStmt> stmts;
         public LIRExpr expr;
 
