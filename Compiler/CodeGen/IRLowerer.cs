@@ -41,9 +41,18 @@ public sealed class IRLowerer : IRVisitorGeneric {
             case IRMem mem:
                 break;
             case IRTemp temp:
-                break;
+                IRExprLowered loweredSrc = move.src.accept<IRExprLowered>(this);
+                List<LIRStmt> loweredStmts = loweredSrc.stmts;
+                loweredStmts.Add(
+                    new LIRMoveTemp(
+                        loweredSrc.expr,
+                        new LIRTemp(temp.name)
+                    )
+                );
+
+                return matchThenReturn<T, List<LIRStmt>>(loweredStmts);
             default:
-                break;
+                throw new Exception("Move target must be a temporary or a memory access");
         }
         throw new NotImplementedException(); 
     }
@@ -115,8 +124,6 @@ public sealed class IRLowerer : IRVisitorGeneric {
     public T visit<T>(IRReturn Return) { throw new NotImplementedException(); }
     public T visit<T>(IRCallStmt callStmt) { throw new NotImplementedException(); }
     public T visit<T>(IRCall call) { throw new NotImplementedException(); }
-    
-    //Expr IR
     public T visit<T>(IRBinOp binOp) { throw new NotImplementedException(); }
     public T visit<T>(IRUnaryOp unaryOp) { throw new NotImplementedException(); }
 
@@ -178,6 +185,10 @@ public sealed class IRLowerer : IRVisitorGeneric {
 
         tempCounter++;
         return temp;
+    }
+
+    private bool commutes() {
+        return true;
     }
 
     private sealed class IRExprLowered {

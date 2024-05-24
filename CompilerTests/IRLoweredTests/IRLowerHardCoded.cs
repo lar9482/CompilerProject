@@ -4,6 +4,7 @@ namespace CompilerTests;
 
 public class IRLowerHardCodedTests {
     
+    [Test]
     public void test1() {
         IRTemp x = new IRTemp("x");
         IRTemp y = new IRTemp("y");
