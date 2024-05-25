@@ -462,6 +462,9 @@ public sealed class IRLowerer : IRVisitorGeneric {
                 );
             case LIRUnaryOp loweredUnaryOp:
                 return hasNoCommutingConflicts(usedMems, usedTemps, loweredUnaryOp.operand);
+            case LIRName loweredName:
+            case LIRConst loweredConst:
+                return true;
             default:
                 throw new Exception("Something went wrong");
         }
