@@ -86,8 +86,7 @@ public sealed class IRLowerer : IRVisitorGeneric {
                 return matchThenReturn<T, List<LIRStmt>>(loweredStmts);
             default:
                 throw new Exception("Move target must be a temporary or a memory access");
-        }
-        throw new NotImplementedException(); 
+        } 
     }
 
     public T visit<T>(IRSeq seq) { 
