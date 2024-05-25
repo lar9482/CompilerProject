@@ -41,7 +41,38 @@ public sealed class IRLowerer : IRVisitorGeneric {
             case IRMem mem:
                 IRExprLowered loweredTargetMemContent = mem.expr.accept<IRExprLowered>(this);
                 IRExprLowered loweredSrcContent = move.src.accept<IRExprLowered>(this);
-                break;
+
+                if (commutes(loweredSrcContent.stmts, loweredTargetMemContent.expr)) {
+                    List<LIRStmt> allLoweredStmts = loweredTargetMemContent.stmts;
+                    allLoweredStmts = allLoweredStmts.Concat(loweredSrcContent.stmts).ToList();
+                    allLoweredStmts.Add(
+                        new LIRMoveMem(
+                            loweredSrcContent.expr,
+                            new LIRMem(loweredTargetMemContent.expr)
+                        )
+                    );
+
+                    return matchThenReturn<T, List<LIRStmt>>(allLoweredStmts);
+
+                } else {
+                    LIRTemp freshTemp = createNewTemp();
+                    List<LIRStmt> allLoweredStmts = loweredTargetMemContent.stmts;
+                    allLoweredStmts.Add(
+                        new LIRMoveTemp(
+                            loweredTargetMemContent.expr,
+                            freshTemp
+                        )
+                    );
+                    allLoweredStmts = allLoweredStmts.Concat(loweredSrcContent.stmts).ToList();
+                    allLoweredStmts.Add(
+                        new LIRMoveMem(
+                            loweredSrcContent.expr,
+                            new LIRMem(freshTemp)
+                        )
+                    );
+
+                    return matchThenReturn<T, List<LIRStmt>>(allLoweredStmts);
+                }
             case IRTemp temp:
                 IRExprLowered loweredSrc = move.src.accept<IRExprLowered>(this);
                 List<LIRStmt> loweredStmts = loweredSrc.stmts;
@@ -354,14 +385,18 @@ public sealed class IRLowerer : IRVisitorGeneric {
     }
 
     /*
-     * Testing if 'loweredStmts' alters the content of 'lowered' in anyway.
+     * Testing if 'loweredStmts' can alter the content of 'loweredExpr' in anyway.
      */
     private bool commutes(List<LIRStmt> loweredStmts, LIRExpr loweredExpr) {
         if (loweredStmts.Count == 0 || isAnUnaffectedLoweredExpr(loweredExpr)) {
             return true;
         }
 
-        throw new Exception();
+        Tuple<List<LIRMem>, Dictionary<string, LIRTemp>> usedMemsAndTemps = extractPossibleNonCommutes(loweredStmts);
+        List<LIRMem> usedMems = usedMemsAndTemps.Item1;
+        Dictionary<string, LIRTemp> usedTemps = usedMemsAndTemps.Item2;
+
+        return hasNoCommutingConflicts(usedMems, usedTemps, loweredExpr);
     }
 
     private bool isAnUnaffectedLoweredExpr(LIRExpr loweredExpr) {
@@ -371,6 +406,50 @@ public sealed class IRLowerer : IRVisitorGeneric {
                 return true;
             default:
                 return false;
+        }
+    }
+
+    /*
+     * Extracting destinations from the lowered moves that might cause commuting problems.
+     */
+    private Tuple<List<LIRMem>, Dictionary<string, LIRTemp>> extractPossibleNonCommutes(List<LIRStmt> loweredStmts) {
+        List<LIRMem> memsUsed = new List<LIRMem>();
+        Dictionary<string, LIRTemp> tempsUsed = new Dictionary<string, LIRTemp>();
+
+        foreach(LIRStmt loweredStmt in loweredStmts) {
+            switch(loweredStmt) {
+                case LIRMoveTemp moveTemp:
+                    tempsUsed.Add(moveTemp.dest.name, moveTemp.dest);
+                    break;
+                case LIRMoveMem moveMem:
+                    memsUsed.Add(moveMem.dest);
+                    break;
+            }
+        }
+
+        return Tuple.Create<List<LIRMem>, Dictionary<string, LIRTemp>>(
+            memsUsed,
+            tempsUsed
+        );
+    }
+
+    private bool hasNoCommutingConflicts(
+        List<LIRMem> usedMems, Dictionary<string, LIRTemp> usedTemps, LIRExpr expr
+    ) {
+        switch(expr) {
+            case LIRMem loweredMem: throw new Exception("Case for handling memory isn't implemented yet.");
+            case LIRTemp loweredTemp: 
+                return !usedTemps.ContainsKey(loweredTemp.name);
+            case LIRBinOp loweredBinOp:
+                return (
+                    hasNoCommutingConflicts(usedMems, usedTemps, loweredBinOp.left) 
+                    && 
+                    hasNoCommutingConflicts(usedMems, usedTemps, loweredBinOp.right)
+                );
+            case LIRUnaryOp loweredUnaryOp:
+                return hasNoCommutingConflicts(usedMems, usedTemps, loweredUnaryOp.operand);
+            default:
+                throw new Exception("Something went wrong");
         }
     }
 
