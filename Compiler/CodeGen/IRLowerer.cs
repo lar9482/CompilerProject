@@ -320,7 +320,22 @@ public sealed class IRLowerer : IRVisitorGeneric {
     }
 
     public T visit<T>(IRUnaryOp unaryOp) { 
-        throw new NotImplementedException(); 
+        IRExprLowered loweredOperand = unaryOp.operand.accept<IRExprLowered>(this);
+        LUnaryOpType opType;
+        switch(unaryOp.opType) {
+            case UnaryOpType.NOT: opType = LUnaryOpType.NOT; break;
+            case UnaryOpType.NEGATE: opType = LUnaryOpType.NEGATE; break;
+            default:
+                throw new Exception("Could not lower the unary operation type for some reason.");
+        }
+
+        return matchThenReturn<T, IRExprLowered>(new IRExprLowered(
+            loweredOperand.stmts,
+            new LIRUnaryOp(
+                opType,
+                loweredOperand.expr
+            )
+        ));
     }
 
     public T visit<T>(IRConst Const) { 

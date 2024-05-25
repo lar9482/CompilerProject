@@ -4,7 +4,8 @@ public sealed class LIRUnaryOp : LIRExpr {
     public LUnaryOpType opType;
     public LIRExpr operand;
 
-    public LIRUnaryOp(LIRExpr operand) {
+    public LIRUnaryOp(LUnaryOpType opType, LIRExpr operand) {
+        this.opType = opType;
         this.operand = operand;
     }
 
