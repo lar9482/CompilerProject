@@ -1,5 +1,17 @@
 using CompilerProj.Visitors;
 
+/*
+ *  This pass will lower the IR to a more assembly like form.
+ *  The lowered IR will have the following properties:
+ *
+ *  1. No nested sequences of statements in an expression.
+ *  2. All instances of E_SEQ are eliminated.
+ *     - All statements within E_SEQ are hoisted upon into the statement level.
+ *  3. Each statement can only have one side effect 
+ *     - All statements on the statement level get linearized
+ *  4. All calls are hoisted above onto the statement level, instead
+ *     of being nested in an expression.   
+ */
 public sealed class IRLowerer : IRVisitorGeneric {
     private int tempCounter;
 
