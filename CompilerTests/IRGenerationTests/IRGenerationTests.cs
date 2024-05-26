@@ -2,6 +2,16 @@ using CompilerProj;
 
 namespace CompilerTests;
 
+/*
+ * The general layout for these tests are as follows:
+ *  1. Take the program located at 'filePath' and generate IR.
+ *  2. Specify possible arguments that you want to pass into a function that was specified in the program.
+ *  3. Call a function using the IRSimulator to interpret the IR.
+ *  4. Either
+ *   - Check the return value
+ *   - Check the print/println output
+ *   - Simply ensure the program didn't crash.
+ */
 public class IRGenerationTests {
     [SetUp]
     public void Setup() {}
