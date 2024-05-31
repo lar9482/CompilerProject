@@ -24,6 +24,6 @@ public class IRLowerHardCodedTests {
         );
 
         IRLowerer lowerer = new IRLowerer(0);
-        List<LIRStmt> stmts = lowerer.visit<List<LIRStmt>>(example1);
+        List<IRStmt> stmts = lowerer.visit<List<IRStmt>>(example1);
     }
 }

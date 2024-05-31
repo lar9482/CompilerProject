@@ -20,32 +20,33 @@ public sealed class IRLowerer : IRVisitorGeneric {
     }
 
     public T visit<T>(IRCompUnit compUnit) { 
-        Dictionary<string, LIRFuncDecl> loweredFuncDecls = new Dictionary<string, LIRFuncDecl>();
+        Dictionary<string, IRFuncDecl> loweredFuncDecls = new Dictionary<string, IRFuncDecl>();
         foreach(KeyValuePair<string, IRFuncDecl> nameWithFuncDecl in compUnit.functions) {
             string funcName = nameWithFuncDecl.Key;
             IRFuncDecl funcDecl = nameWithFuncDecl.Value;
 
-            LIRFuncDecl loweredFuncDecl = funcDecl.accept<LIRFuncDecl>(this);
+            IRFuncDecl loweredFuncDecl = funcDecl.accept<IRFuncDecl>(this);
             loweredFuncDecls.Add(funcName, loweredFuncDecl);
         }
 
-        LIRCompUnit loweredCompUnit = new LIRCompUnit(
+        IRCompUnit loweredCompUnit = new IRCompUnit(
             compUnit.name,
-            loweredFuncDecls
+            loweredFuncDecls,
+            new List<string>() { }
         );
         
-        return matchThenReturn<T, LIRCompUnit>(loweredCompUnit);
+        return matchThenReturn<T, IRCompUnit>(loweredCompUnit);
     }
 
     public T visit<T>(IRFuncDecl funcDecl) { 
-        List<LIRStmt> loweredBody = funcDecl.body.accept<List<LIRStmt>>(this);
+        List<IRStmt> loweredBody = funcDecl.body.accept<List<IRStmt>>(this);
         
-        LIRFuncDecl loweredFuncDecl = new LIRFuncDecl(
+        IRFuncDecl loweredFuncDecl = new IRFuncDecl(
             funcDecl.name,
-            loweredBody
+            new IRSeq(loweredBody)
         );
 
-        return matchThenReturn<T, LIRFuncDecl>(loweredFuncDecl);
+        return matchThenReturn<T, IRFuncDecl>(loweredFuncDecl);
     }
 
     public T visit<T>(IRMove move) { 
@@ -55,70 +56,70 @@ public sealed class IRLowerer : IRVisitorGeneric {
                 IRExprLowered loweredSrcContent = move.src.accept<IRExprLowered>(this);
 
                 if (commutes(loweredSrcContent.stmts, loweredTargetMemContent.expr)) {
-                    List<LIRStmt> allLoweredStmts = loweredTargetMemContent.stmts;
+                    List<IRStmt> allLoweredStmts = loweredTargetMemContent.stmts;
                     allLoweredStmts = allLoweredStmts.Concat(loweredSrcContent.stmts).ToList();
                     allLoweredStmts.Add(
-                        new LIRMoveMem(
-                            new LIRMem(loweredTargetMemContent.expr),
+                        new IRMove(
+                            new IRMem(MemType.NORMAL, loweredTargetMemContent.expr),
                             loweredSrcContent.expr
                         )
                     );
 
-                    return matchThenReturn<T, List<LIRStmt>>(allLoweredStmts);
+                    return matchThenReturn<T, List<IRStmt>>(allLoweredStmts);
 
                 } else {
-                    LIRTemp freshTemp = createNewTemp();
-                    List<LIRStmt> allLoweredStmts = loweredTargetMemContent.stmts;
+                    IRTemp freshTemp = createNewTemp();
+                    List<IRStmt> allLoweredStmts = loweredTargetMemContent.stmts;
                     allLoweredStmts.Add(
-                        new LIRMoveTemp(
+                        new IRMove(
                             freshTemp,
                             loweredTargetMemContent.expr
                         )
                     );
                     allLoweredStmts = allLoweredStmts.Concat(loweredSrcContent.stmts).ToList();
                     allLoweredStmts.Add(
-                        new LIRMoveMem(
-                            new LIRMem(freshTemp),
+                        new IRMove(
+                            new IRMem(MemType.NORMAL, freshTemp),
                             loweredSrcContent.expr
                         )
                     );
 
-                    return matchThenReturn<T, List<LIRStmt>>(allLoweredStmts);
+                    return matchThenReturn<T, List<IRStmt>>(allLoweredStmts);
                 }
             case IRTemp temp:
                 IRExprLowered loweredSrc = move.src.accept<IRExprLowered>(this);
-                List<LIRStmt> loweredStmts = loweredSrc.stmts;
+                List<IRStmt> loweredStmts = loweredSrc.stmts;
                 loweredStmts.Add(
-                    new LIRMoveTemp(
-                        new LIRTemp(temp.name),
+                    new IRMove(
+                        new IRTemp(temp.name),
                         loweredSrc.expr
                     )
                 );
 
-                return matchThenReturn<T, List<LIRStmt>>(loweredStmts);
+                return matchThenReturn<T, List<IRStmt>>(loweredStmts);
             default:
                 throw new Exception("Move target must be a temporary or a memory access");
         } 
     }
 
     public T visit<T>(IRSeq seq) { 
-        List<LIRStmt> loweredStmts = new List<LIRStmt>();
+        List<IRStmt> loweredStmts = new List<IRStmt>();
 
         foreach(IRStmt irStmt in seq.statements) {
             loweredStmts.Add(
-                irStmt.accept<LIRStmt>(this)
+                irStmt.accept<IRStmt>(this)
             );
         }
 
-        return matchThenReturn<T, List<LIRStmt>>(loweredStmts);
+        return matchThenReturn<T, List<IRStmt>>(loweredStmts);
     }
 
     public T visit<T>(IR_Eseq Eseq) { 
-        List<LIRStmt> loweredEval = Eseq.stmt.accept<List<LIRStmt>>(this);
+        List<IRStmt> loweredEval = Eseq.stmt.accept<List<IRStmt>>(this);
         IRExprLowered loweredExe = Eseq.expr.accept<IRExprLowered>(this);
 
         IRExprLowered loweredESeq = new IRExprLowered(
-            loweredEval.Concat(loweredExe.stmts).ToList<LIRStmt>(),
+            loweredEval.Concat(loweredExe.stmts).ToList<IRStmt>(),
             loweredExe.expr
         );
         
@@ -127,17 +128,17 @@ public sealed class IRLowerer : IRVisitorGeneric {
 
     public T visit<T>(IRCJump cJump) { 
         IRExprLowered loweredCond = cJump.cond.accept<IRExprLowered>(this);
-        List<LIRStmt> loweredStmts = loweredCond.stmts;
+        List<IRStmt> loweredStmts = loweredCond.stmts;
 
         loweredStmts.Add(
-            new LIRCJump(
+            new IRCJump(
                 loweredCond.expr,
                 cJump.trueLabel,
                 cJump.falseLabel
             )
         );
         
-        return matchThenReturn<T, List<LIRStmt>>(loweredStmts);
+        return matchThenReturn<T, List<IRStmt>>(loweredStmts);
     }
 
     public T visit<T>(IRExp exp) { 
@@ -148,32 +149,32 @@ public sealed class IRLowerer : IRVisitorGeneric {
     public T visit<T>(IRJump jump) { 
         IRExprLowered loweredTarget = jump.target.accept<IRExprLowered>(this);
         
-        List<LIRStmt> loweredStmts = loweredTarget.stmts;
+        List<IRStmt> loweredStmts = loweredTarget.stmts;
         loweredStmts.Add(
-            new LIRJump(loweredTarget.expr)
+            new IRJump(loweredTarget.expr)
         );
 
-        return matchThenReturn<T, List<LIRStmt>>(loweredStmts);
+        return matchThenReturn<T, List<IRStmt>>(loweredStmts);
     }
 
     public T visit<T>(IRLabel label) { 
-        List<LIRStmt> loweredStmts = new List<LIRStmt>();
+        List<IRStmt> loweredStmts = new List<IRStmt>();
         loweredStmts.Add(
-            new LIRLabel(label.name)
+            new IRLabel(label.name)
         );
 
-        return matchThenReturn<T, List<LIRStmt>>(loweredStmts);
+        return matchThenReturn<T, List<IRStmt>>(loweredStmts);
     }
 
     public T visit<T>(IRReturn Return) { 
-        List<LIRStmt> loweredStmts = new List<LIRStmt>();
-        List<LIRExpr> loweredReturnTemps = new List<LIRExpr>();
+        List<IRStmt> loweredStmts = new List<IRStmt>();
+        List<IRExpr> loweredReturnTemps = new List<IRExpr>();
         foreach(IRExpr irReturn in Return.returns) {
             IRExprLowered loweredReturn = irReturn.accept<IRExprLowered>(this);
             loweredStmts = loweredStmts.Concat(loweredReturn.stmts).ToList();
-            LIRTemp newTemp = createNewTemp();
+            IRTemp newTemp = createNewTemp();
 
-            LIRMoveTemp moveReturnToNewTemp = new LIRMoveTemp(
+            IRMove moveReturnToNewTemp = new IRMove(
                 newTemp,
                 loweredReturn.expr
             );
@@ -181,21 +182,21 @@ public sealed class IRLowerer : IRVisitorGeneric {
             loweredReturnTemps.Add(newTemp);
         }
 
-        LIRReturn loweredReturnStmt = new LIRReturn(loweredReturnTemps);
+        IRReturn loweredReturnStmt = new IRReturn(loweredReturnTemps);
         loweredStmts.Add(loweredReturnStmt);
         
-        return matchThenReturn<T, List<LIRStmt>>(loweredStmts);
+        return matchThenReturn<T, List<IRStmt>>(loweredStmts);
     }
 
     public T visit<T>(IRCallStmt callStmt) { 
-        List<LIRStmt> allLoweredStmts = new List<LIRStmt>();
-        List<LIRExpr> loweredArgTemps = new List<LIRExpr>();
+        List<IRStmt> allLoweredStmts = new List<IRStmt>();
+        List<IRExpr> loweredArgTemps = new List<IRExpr>();
         foreach(IRExpr irArg in callStmt.args) {
             IRExprLowered loweredArg = irArg.accept<IRExprLowered>(this);
             allLoweredStmts = allLoweredStmts.Concat(loweredArg.stmts).ToList();
 
-            LIRTemp newTemp = createNewTemp();
-            LIRMoveTemp moveArgIntoNewTemp = new LIRMoveTemp(
+            IRTemp newTemp = createNewTemp();
+            IRMove moveArgIntoNewTemp = new IRMove(
                 newTemp,
                 loweredArg.expr
             );
@@ -205,29 +206,29 @@ public sealed class IRLowerer : IRVisitorGeneric {
         IRExprLowered loweredTarget = callStmt.target.accept<IRExprLowered>(this);
         allLoweredStmts = allLoweredStmts.Concat(loweredTarget.stmts).ToList();
 
-        LIRTemp newTargetTemp = createNewTemp();
-        LIRMoveTemp moveTargetToNewTemp = new LIRMoveTemp(
+        IRTemp newTargetTemp = createNewTemp();
+        IRMove moveTargetToNewTemp = new IRMove(
             newTargetTemp,
             loweredTarget.expr
         );
         allLoweredStmts.Add(moveTargetToNewTemp);
-        LIRCallM loweredCall = new LIRCallM(
-            newTargetTemp, loweredArgTemps, 1
+        IRCallStmt loweredCall = new IRCallStmt(
+            newTargetTemp, loweredArgTemps, callStmt.nReturns
         );
         allLoweredStmts.Add(loweredCall);
 
-        return matchThenReturn<T, List<LIRStmt>>(allLoweredStmts);
+        return matchThenReturn<T, List<IRStmt>>(allLoweredStmts);
     }
 
     public T visit<T>(IRCall call) { 
-        List<LIRStmt> allLoweredStmts = new List<LIRStmt>();
-        List<LIRExpr> loweredArgTemps = new List<LIRExpr>();
+        List<IRStmt> allLoweredStmts = new List<IRStmt>();
+        List<IRExpr> loweredArgTemps = new List<IRExpr>();
         foreach(IRExpr irArg in call.args) {
             IRExprLowered loweredArg = irArg.accept<IRExprLowered>(this);
             allLoweredStmts = allLoweredStmts.Concat(loweredArg.stmts).ToList();
 
-            LIRTemp newTemp = createNewTemp();
-            LIRMoveTemp moveArgIntoNewTemp = new LIRMoveTemp(
+            IRTemp newTemp = createNewTemp();
+            IRMove moveArgIntoNewTemp = new IRMove(
                 newTemp,
                 loweredArg.expr
             );
@@ -237,20 +238,20 @@ public sealed class IRLowerer : IRVisitorGeneric {
         IRExprLowered loweredTarget = call.target.accept<IRExprLowered>(this);
         allLoweredStmts = allLoweredStmts.Concat(loweredTarget.stmts).ToList();
 
-        LIRTemp newTargetTemp = createNewTemp();
-        LIRMoveTemp moveTargetToNewTemp = new LIRMoveTemp(
+        IRTemp newTargetTemp = createNewTemp();
+        IRMove moveTargetToNewTemp = new IRMove(
             newTargetTemp,
             loweredTarget.expr
         );
         allLoweredStmts.Add(moveTargetToNewTemp);
-        LIRCallM loweredCall = new LIRCallM(
+        IRCallStmt loweredCall = new IRCallStmt(
             newTargetTemp, loweredArgTemps, 1
         );
         allLoweredStmts.Add(loweredCall);
 
-        LIRTemp newFunctionDestTemp = createNewTemp();
-        LIRMoveTemp moveReturnValIntoFunctionDest = new LIRMoveTemp(
-            new LIRTemp(IRConfiguration.ABSTRACT_RET_PREFIX + 1),
+        IRTemp newFunctionDestTemp = createNewTemp();
+        IRMove moveReturnValIntoFunctionDest = new IRMove(
+            new IRTemp(IRConfiguration.ABSTRACT_RET_PREFIX + 1),
             newFunctionDestTemp
         );
         allLoweredStmts.Add(moveReturnValIntoFunctionDest);
@@ -266,35 +267,12 @@ public sealed class IRLowerer : IRVisitorGeneric {
         IRExprLowered loweredLeft = binOp.left.accept<IRExprLowered>(this);
         IRExprLowered loweredRight = binOp.right.accept<IRExprLowered>(this);
 
-        LBinOpType opType;
-        switch(binOp.opType) {
-            case BinOpType.ADD: opType = LBinOpType.ADD; break; 
-            case BinOpType.SUB: opType = LBinOpType.SUB; break; 
-            case BinOpType.MUL: opType = LBinOpType.MUL; break; 
-            case BinOpType.DIV: opType = LBinOpType.DIV; break; 
-            case BinOpType.MOD: opType = LBinOpType.MOD; break; 
-            case BinOpType.AND: opType = LBinOpType.AND; break; 
-            case BinOpType.OR: opType = LBinOpType.OR; break; 
-            case BinOpType.XOR: opType = LBinOpType.XOR; break; 
-            case BinOpType.LSHIFT: opType = LBinOpType.LSHIFT; break; 
-            case BinOpType.RSHIFT: opType = LBinOpType.RSHIFT; break; 
-            case BinOpType.EQ: opType = LBinOpType.EQ; break; 
-            case BinOpType.NEQ: opType = LBinOpType.NEQ; break; 
-            case BinOpType.LT: opType = LBinOpType.LT; break; 
-            case BinOpType.GT: opType = LBinOpType.GT; break; 
-            case BinOpType.LEQ: opType = LBinOpType.LEQ; break; 
-            case BinOpType.GEQ: opType = LBinOpType.GEQ; break; 
-            case BinOpType.ULT: opType = LBinOpType.ULT; break; 
-            default:
-                throw new Exception("Unable to map IR the binary operation to lowered a IR binary operation");
-        }
-
         if (commutes(loweredRight.stmts, loweredLeft.expr)) {
-            List<LIRStmt> allLoweredStmts = loweredLeft.stmts;
+            List<IRStmt> allLoweredStmts = loweredLeft.stmts;
             allLoweredStmts = allLoweredStmts.Concat(loweredRight.stmts).ToList();
 
-            LIRBinOp loweredBinOp = new LIRBinOp(
-                opType,
+            IRBinOp loweredBinOp = new IRBinOp(
+                binOp.opType,
                 loweredLeft.expr,
                 loweredRight.expr
             );
@@ -306,18 +284,18 @@ public sealed class IRLowerer : IRVisitorGeneric {
                 )
             );
         } else {
-            List<LIRStmt> allLoweredStmts = loweredLeft.stmts;
-            LIRTemp freshTemp = createNewTemp();
+            List<IRStmt> allLoweredStmts = loweredLeft.stmts;
+            IRTemp freshTemp = createNewTemp();
             allLoweredStmts.Add(
-                new LIRMoveTemp(
+                new IRMove(
                     freshTemp,
                     loweredLeft.expr
                 )
             );
             allLoweredStmts = allLoweredStmts.Concat(loweredRight.stmts).ToList();
 
-            LIRBinOp loweredBinOp = new LIRBinOp(
-                opType,
+            IRBinOp loweredBinOp = new IRBinOp(
+                binOp.opType,
                 freshTemp,
                 loweredRight.expr
             );
@@ -333,18 +311,11 @@ public sealed class IRLowerer : IRVisitorGeneric {
 
     public T visit<T>(IRUnaryOp unaryOp) { 
         IRExprLowered loweredOperand = unaryOp.operand.accept<IRExprLowered>(this);
-        LUnaryOpType opType;
-        switch(unaryOp.opType) {
-            case UnaryOpType.NOT: opType = LUnaryOpType.NOT; break;
-            case UnaryOpType.NEGATE: opType = LUnaryOpType.NEGATE; break;
-            default:
-                throw new Exception("Could not lower the unary operation type for some reason.");
-        }
 
         return matchThenReturn<T, IRExprLowered>(new IRExprLowered(
             loweredOperand.stmts,
-            new LIRUnaryOp(
-                opType,
+            new IRUnaryOp(
+                unaryOp.opType,
                 loweredOperand.expr
             )
         ));
@@ -352,8 +323,8 @@ public sealed class IRLowerer : IRVisitorGeneric {
 
     public T visit<T>(IRConst Const) { 
         IRExprLowered loweredConst = new IRExprLowered(
-            new List<LIRStmt>(),
-            new LIRConst(Const.value)
+            new List<IRStmt>(),
+            new IRConst(Const.value)
         );
         
         return matchThenReturn<T, IRExprLowered>(loweredConst);
@@ -363,7 +334,7 @@ public sealed class IRLowerer : IRVisitorGeneric {
         IRExprLowered loweredAddress = mem.expr.accept<IRExprLowered>(this);
         IRExprLowered loweredMem = new IRExprLowered(
             loweredAddress.stmts,
-            new LIRMem(loweredAddress.expr)
+            new IRMem(MemType.NORMAL, loweredAddress.expr)
         );
         
         return matchThenReturn<T, IRExprLowered>(loweredMem);
@@ -371,8 +342,8 @@ public sealed class IRLowerer : IRVisitorGeneric {
 
     public T visit<T>(IRName name) { 
         IRExprLowered loweredExpr = new IRExprLowered(
-            new List<LIRStmt>(),
-            new LIRName(name.name)
+            new List<IRStmt>(),
+            new IRName(name.name)
         ); 
 
         return matchThenReturn<T, IRExprLowered>(loweredExpr);
@@ -380,8 +351,8 @@ public sealed class IRLowerer : IRVisitorGeneric {
 
     public T visit<T>(IRTemp temp) { 
         IRExprLowered loweredTemp = new IRExprLowered(
-            new List<LIRStmt>(),
-            new LIRTemp(temp.name)
+            new List<IRStmt>(),
+            new IRTemp(temp.name)
         );
 
         return matchThenReturn<T, IRExprLowered>(loweredTemp);
@@ -401,8 +372,8 @@ public sealed class IRLowerer : IRVisitorGeneric {
         }
     }
 
-    private LIRTemp createNewTemp() {
-        LIRTemp temp = new LIRTemp(
+    private IRTemp createNewTemp() {
+        IRTemp temp = new IRTemp(
             String.Format("t{0}", tempCounter)
         );
 
@@ -413,22 +384,22 @@ public sealed class IRLowerer : IRVisitorGeneric {
     /*
      * Testing if 'loweredStmts' can alter the content of 'loweredExpr' in anyway.
      */
-    private bool commutes(List<LIRStmt> loweredStmts, LIRExpr loweredExpr) {
+    private bool commutes(List<IRStmt> loweredStmts, IRExpr loweredExpr) {
         if (loweredStmts.Count == 0 || isAnUnaffectedLoweredExpr(loweredExpr)) {
             return true;
         }
 
-        Tuple<List<LIRMem>, Dictionary<string, LIRTemp>> usedMemsAndTemps = extractPossibleNonCommutes(loweredStmts);
-        List<LIRMem> usedMems = usedMemsAndTemps.Item1;
-        Dictionary<string, LIRTemp> usedTemps = usedMemsAndTemps.Item2;
+        Tuple<List<IRMem>, Dictionary<string, IRTemp>> usedMemsAndTemps = extractPossibleNonCommutes(loweredStmts);
+        List<IRMem> usedMems = usedMemsAndTemps.Item1;
+        Dictionary<string, IRTemp> usedTemps = usedMemsAndTemps.Item2;
 
         return hasNoCommutingConflicts(usedMems, usedTemps, loweredExpr);
     }
 
-    private bool isAnUnaffectedLoweredExpr(LIRExpr loweredExpr) {
+    private bool isAnUnaffectedLoweredExpr(IRExpr loweredExpr) {
         switch(loweredExpr) {
-            case LIRName loweredName:
-            case LIRConst loweredConst:
+            case IRName loweredName:
+            case IRConst loweredConst:
                 return true;
             default:
                 return false;
@@ -438,44 +409,49 @@ public sealed class IRLowerer : IRVisitorGeneric {
     /*
      * Extracting destinations from the lowered moves that might cause commuting problems.
      */
-    private Tuple<List<LIRMem>, Dictionary<string, LIRTemp>> extractPossibleNonCommutes(List<LIRStmt> loweredStmts) {
-        List<LIRMem> memsUsed = new List<LIRMem>();
-        Dictionary<string, LIRTemp> tempsUsed = new Dictionary<string, LIRTemp>();
+    private Tuple<List<IRMem>, Dictionary<string, IRTemp>> extractPossibleNonCommutes(List<IRStmt> loweredStmts) {
+        List<IRMem> memsUsed = new List<IRMem>();
+        Dictionary<string, IRTemp> tempsUsed = new Dictionary<string, IRTemp>();
 
-        foreach(LIRStmt loweredStmt in loweredStmts) {
+        foreach(IRStmt loweredStmt in loweredStmts) {
             switch(loweredStmt) {
-                case LIRMoveTemp moveTemp:
-                    tempsUsed.Add(moveTemp.dest.name, moveTemp.dest);
-                    break;
-                case LIRMoveMem moveMem:
-                    memsUsed.Add(moveMem.dest);
-                    break;
+                case IRMove move:
+                    if (move.target.GetType() == typeof(IRTemp)) {
+                        IRTemp moveTemp = (IRTemp)move.target;
+                        tempsUsed.Add(moveTemp.name, moveTemp);
+                    } else if (move.target.GetType() == typeof(IRMem)) {
+                        IRMem moveMem = (IRMem)move.target;
+                        memsUsed.Add(moveMem);
+                    } else {
+                        throw new Exception("The move target must be a temp or a mem.");
+                    }
+                break;
             }
         }
 
-        return Tuple.Create<List<LIRMem>, Dictionary<string, LIRTemp>>(
+        return Tuple.Create<List<IRMem>, Dictionary<string, IRTemp>>(
             memsUsed,
             tempsUsed
         );
     }
 
     private bool hasNoCommutingConflicts(
-        List<LIRMem> usedMems, Dictionary<string, LIRTemp> usedTemps, LIRExpr expr
+        List<IRMem> usedMems, Dictionary<string, IRTemp> usedTemps, IRExpr expr
     ) {
         switch(expr) {
-            case LIRMem loweredMem: throw new Exception("Case for handling memory isn't implemented yet.");
-            case LIRTemp loweredTemp: 
+            case IRMem loweredMem: throw new Exception("Case for handling memory isn't implemented yet.");
+            case IRTemp loweredTemp: 
                 return !usedTemps.ContainsKey(loweredTemp.name);
-            case LIRBinOp loweredBinOp:
+            case IRBinOp loweredBinOp:
                 return (
                     hasNoCommutingConflicts(usedMems, usedTemps, loweredBinOp.left) 
                     && 
                     hasNoCommutingConflicts(usedMems, usedTemps, loweredBinOp.right)
                 );
-            case LIRUnaryOp loweredUnaryOp:
+            case IRUnaryOp loweredUnaryOp:
                 return hasNoCommutingConflicts(usedMems, usedTemps, loweredUnaryOp.operand);
-            case LIRName loweredName:
-            case LIRConst loweredConst:
+            case IRName loweredName:
+            case IRConst loweredConst:
                 return true;
             default:
                 throw new Exception("Something went wrong");
@@ -483,10 +459,10 @@ public sealed class IRLowerer : IRVisitorGeneric {
     }
 
     private struct IRExprLowered {
-        public List<LIRStmt> stmts;
-        public LIRExpr expr;
+        public List<IRStmt> stmts;
+        public IRExpr expr;
 
-        public IRExprLowered(List<LIRStmt> stmts, LIRExpr expr) {
+        public IRExprLowered(List<IRStmt> stmts, IRExpr expr) {
             this.stmts = stmts;
             this.expr = expr;
         }
