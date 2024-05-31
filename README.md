@@ -11,8 +11,7 @@ Side node:
 - [x] Lexical Analysis
 - [x] Syntactic Analysis
 - [x] Type checking
-- [ ] Other static analysis
-- [ ] IR generation
+- [x] IR generation
 - [ ] Converting IR to assembly language in the runtime
 - [ ] Optimization somewhere?
 
