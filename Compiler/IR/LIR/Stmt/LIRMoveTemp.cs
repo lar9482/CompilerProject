@@ -6,7 +6,7 @@ public sealed class LIRMoveTemp : LIRStmt {
     public LIRExpr source;
     public LIRTemp dest;
 
-    public LIRMoveTemp(LIRExpr source, LIRTemp dest) {
+    public LIRMoveTemp(LIRTemp dest, LIRExpr source) {
         this.source = source;
         this.dest = dest;
     }

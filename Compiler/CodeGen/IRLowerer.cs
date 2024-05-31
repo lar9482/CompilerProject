@@ -59,8 +59,8 @@ public sealed class IRLowerer : IRVisitorGeneric {
                     allLoweredStmts = allLoweredStmts.Concat(loweredSrcContent.stmts).ToList();
                     allLoweredStmts.Add(
                         new LIRMoveMem(
-                            loweredSrcContent.expr,
-                            new LIRMem(loweredTargetMemContent.expr)
+                            new LIRMem(loweredTargetMemContent.expr),
+                            loweredSrcContent.expr
                         )
                     );
 
@@ -71,15 +71,15 @@ public sealed class IRLowerer : IRVisitorGeneric {
                     List<LIRStmt> allLoweredStmts = loweredTargetMemContent.stmts;
                     allLoweredStmts.Add(
                         new LIRMoveTemp(
-                            loweredTargetMemContent.expr,
-                            freshTemp
+                            freshTemp,
+                            loweredTargetMemContent.expr
                         )
                     );
                     allLoweredStmts = allLoweredStmts.Concat(loweredSrcContent.stmts).ToList();
                     allLoweredStmts.Add(
                         new LIRMoveMem(
-                            loweredSrcContent.expr,
-                            new LIRMem(freshTemp)
+                            new LIRMem(freshTemp),
+                            loweredSrcContent.expr
                         )
                     );
 
@@ -90,8 +90,8 @@ public sealed class IRLowerer : IRVisitorGeneric {
                 List<LIRStmt> loweredStmts = loweredSrc.stmts;
                 loweredStmts.Add(
                     new LIRMoveTemp(
-                        loweredSrc.expr,
-                        new LIRTemp(temp.name)
+                        new LIRTemp(temp.name),
+                        loweredSrc.expr
                     )
                 );
 
@@ -174,8 +174,8 @@ public sealed class IRLowerer : IRVisitorGeneric {
             LIRTemp newTemp = createNewTemp();
 
             LIRMoveTemp moveReturnToNewTemp = new LIRMoveTemp(
-                loweredReturn.expr,
-                newTemp
+                newTemp,
+                loweredReturn.expr
             );
             loweredStmts.Add(moveReturnToNewTemp);
             loweredReturnTemps.Add(newTemp);
@@ -196,8 +196,8 @@ public sealed class IRLowerer : IRVisitorGeneric {
 
             LIRTemp newTemp = createNewTemp();
             LIRMoveTemp moveArgIntoNewTemp = new LIRMoveTemp(
-                loweredArg.expr,
-                newTemp
+                newTemp,
+                loweredArg.expr
             );
             allLoweredStmts.Add(moveArgIntoNewTemp);
             loweredArgTemps.Add(newTemp);
@@ -207,8 +207,8 @@ public sealed class IRLowerer : IRVisitorGeneric {
 
         LIRTemp newTargetTemp = createNewTemp();
         LIRMoveTemp moveTargetToNewTemp = new LIRMoveTemp(
-            loweredTarget.expr,
-            newTargetTemp
+            newTargetTemp,
+            loweredTarget.expr
         );
         allLoweredStmts.Add(moveTargetToNewTemp);
         LIRCallM loweredCall = new LIRCallM(
@@ -228,8 +228,8 @@ public sealed class IRLowerer : IRVisitorGeneric {
 
             LIRTemp newTemp = createNewTemp();
             LIRMoveTemp moveArgIntoNewTemp = new LIRMoveTemp(
-                loweredArg.expr,
-                newTemp
+                newTemp,
+                loweredArg.expr
             );
             allLoweredStmts.Add(moveArgIntoNewTemp);
             loweredArgTemps.Add(newTemp);
@@ -239,8 +239,8 @@ public sealed class IRLowerer : IRVisitorGeneric {
 
         LIRTemp newTargetTemp = createNewTemp();
         LIRMoveTemp moveTargetToNewTemp = new LIRMoveTemp(
-            loweredTarget.expr,
-            newTargetTemp
+            newTargetTemp,
+            loweredTarget.expr
         );
         allLoweredStmts.Add(moveTargetToNewTemp);
         LIRCallM loweredCall = new LIRCallM(
@@ -310,8 +310,8 @@ public sealed class IRLowerer : IRVisitorGeneric {
             LIRTemp freshTemp = createNewTemp();
             allLoweredStmts.Add(
                 new LIRMoveTemp(
-                    loweredLeft.expr,
-                    freshTemp
+                    freshTemp,
+                    loweredLeft.expr
                 )
             );
             allLoweredStmts = allLoweredStmts.Concat(loweredRight.stmts).ToList();
