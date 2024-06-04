@@ -204,16 +204,23 @@ public sealed class IRLowerer : IRVisitorGeneric {
         IRExprLowered loweredTarget = callStmt.target.accept<IRExprLowered>(this);
         allLoweredStmts = allLoweredStmts.Concat(loweredTarget.stmts).ToList();
 
-        LIRTemp newTargetTemp = createNewTemp();
-        LIRMoveTemp moveTargetToNewTemp = new LIRMoveTemp(
-            newTargetTemp,
-            loweredTarget.expr
-        );
-        allLoweredStmts.Add(moveTargetToNewTemp);
-        LIRCallM loweredCall = new LIRCallM(
-            newTargetTemp, loweredArgTemps, 1
-        );
-        allLoweredStmts.Add(loweredCall);
+        if (loweredTarget.expr.GetType() == typeof(LIRName)) {
+            LIRCallM loweredCall = new LIRCallM(
+                loweredTarget.expr, loweredArgTemps, 1
+            );
+            allLoweredStmts.Add(loweredCall);
+        } else {
+            LIRTemp newTargetTemp = createNewTemp();
+            LIRMoveTemp moveTargetToNewTemp = new LIRMoveTemp(
+                newTargetTemp,
+                loweredTarget.expr
+            );
+            allLoweredStmts.Add(moveTargetToNewTemp);
+            LIRCallM loweredCall = new LIRCallM(
+                newTargetTemp, loweredArgTemps, 1
+            );
+            allLoweredStmts.Add(loweredCall);
+        }
 
         return matchThenReturn<T, List<LIRStmt>>(allLoweredStmts);
     }
@@ -236,16 +243,23 @@ public sealed class IRLowerer : IRVisitorGeneric {
         IRExprLowered loweredTarget = call.target.accept<IRExprLowered>(this);
         allLoweredStmts = allLoweredStmts.Concat(loweredTarget.stmts).ToList();
 
-        LIRTemp newTargetTemp = createNewTemp();
-        LIRMoveTemp moveTargetToNewTemp = new LIRMoveTemp(
-            newTargetTemp,
-            loweredTarget.expr
-        );
-        allLoweredStmts.Add(moveTargetToNewTemp);
-        LIRCallM loweredCall = new LIRCallM(
-            newTargetTemp, loweredArgTemps, 1
-        );
-        allLoweredStmts.Add(loweredCall);
+        if (loweredTarget.expr.GetType() == typeof(LIRName)) {
+            LIRCallM loweredCall = new LIRCallM(
+                loweredTarget.expr, loweredArgTemps, 1
+            );
+            allLoweredStmts.Add(loweredCall);
+        } else {
+            LIRTemp newTargetTemp = createNewTemp();
+            LIRMoveTemp moveTargetToNewTemp = new LIRMoveTemp(
+                newTargetTemp,
+                loweredTarget.expr
+            );
+            allLoweredStmts.Add(moveTargetToNewTemp);
+            LIRCallM loweredCall = new LIRCallM(
+                newTargetTemp, loweredArgTemps, 1
+            );
+            allLoweredStmts.Add(loweredCall);
+        }
 
         LIRTemp newFunctionDestTemp = createNewTemp();
         LIRMoveTemp moveReturnValIntoFunctionDest = new LIRMoveTemp(
@@ -462,7 +476,8 @@ public sealed class IRLowerer : IRVisitorGeneric {
         List<LIRMem> usedMems, Dictionary<string, LIRTemp> usedTemps, LIRExpr expr
     ) {
         switch(expr) {
-            case LIRMem loweredMem: throw new Exception("Case for handling memory isn't implemented yet.");
+            case LIRMem loweredMem: 
+                return (usedMems.Count == 0);
             case LIRTemp loweredTemp: 
                 return !usedTemps.ContainsKey(loweredTemp.name);
             case LIRBinOp loweredBinOp:
