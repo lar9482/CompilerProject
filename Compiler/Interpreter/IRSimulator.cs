@@ -492,6 +492,8 @@ public sealed class IRSimulator {
             IRNode node = addressToInsn[target.value];
             if (node.GetType() == typeof(IRFuncDecl)) {
                 targetName = ((IRFuncDecl) node).name;
+            } else if (node.GetType() == typeof(IRLabel)) {
+                targetName = ((IRLabel) node).name;
             } else { throw new Exception("Tried to call a non-function"); }
         } else {
             throw new Exception(String.Format(

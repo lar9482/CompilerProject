@@ -105,9 +105,8 @@ public sealed class IRLowerer : IRVisitorGeneric {
         List<LIRStmt> loweredStmts = new List<LIRStmt>();
 
         foreach(IRStmt irStmt in seq.statements) {
-            loweredStmts.Add(
-                irStmt.accept<LIRStmt>(this)
-            );
+            List<LIRStmt> lowerIR = irStmt.accept<List<LIRStmt>>(this);
+            loweredStmts = loweredStmts.Concat(lowerIR).ToList();
         }
 
         return matchThenReturn<T, List<LIRStmt>>(loweredStmts);
