@@ -172,7 +172,6 @@ public class IRLowererProgramTests {
         ensureRetValsAreEqual(filePath, "main", args);
     }
 
-    //TODO: Handle this later.
     [Test]
     public void forLoopSimple() {
         string filePath = "../../../IRGenerationTests/ProgramFiles/forLoopSimple.prgm";
@@ -190,6 +189,139 @@ public class IRLowererProgramTests {
     [Test]
     public void forLoop_NonDeclsInit() {
         string filePath = "../../../IRGenerationTests/ProgramFiles/forLoop_NonDeclsInit.prgm";
+        int[] args = new int[] { };
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+
+    [Test]
+    public void ifStmt() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/ifStmt.prgm";
+        int[] args = new int[] { };
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+
+    [Test]
+    public void if_elseif_stmts() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/if_elseif_stmts.prgm";
+        int[] args = new int[] { };
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+
+    [Test]
+    public void if_else_stmt() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/if_else_stmt.prgm";
+        int[] args = new int[] { };
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+
+    [Test]
+    public void if_elseif_else_stmts() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/if_elseif_else_stmts.prgm";
+        int[] args = new int[] { };
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+
+    [Test]
+    public void multiDimArrayDecl_noInitVals() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/multiDimArrayDecl_noInitVals.prgm";
+        int[] args = new int[] { };
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+
+    [Test]
+    public void multiDimArrayDecl_noInitVals_thenAssign() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/multiDimArrayDecl_noInitVals_thenAssign.prgm";
+        int[] args = new int[] { };
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+
+    [Test]
+    public void multiDimArrayDecl_initVals() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/multiDimArrayDecl_initVals.prgm";
+        int[] args = new int[] { };
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+
+    [Test]
+    public void multiDimArrayDeclCall() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/multiDimArrayDeclCall.prgm";
+        int[] args = new int[] { };
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+
+    [Test]
+    public void printlnHelloWorld() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/printlnHelloWorld.prgm";
+        int[] args = new int[] { };
+        ensureConsoleOutputIsEqual(filePath, "main", args, "Hello World\r\n");
+    }
+
+    [Test]
+    public void printHelloWorld() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/printHelloWorld.prgm";
+        int[] args = new int[] { };
+        ensureConsoleOutputIsEqual(filePath, "main", args, "Hello World");
+    }
+
+    [Test]
+    public void assertPass() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/assertPass.prgm";
+        int[] args = new int[] { };
+
+        Tuple<IRCompUnit, IRCompUnit> bothIR = getBothVersionsOfIR(filePath);
+        IRSimulator sim1 = new IRSimulator(bothIR.Item1);
+        sim1.call("main", args);
+
+        IRSimulator sim2 = new IRSimulator(bothIR.Item2);
+        sim2.call("main", args);
+    }
+
+    //TODO: Handle this later
+    [Test]
+    public void assertFail() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/assertFail.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+
+        IRSimulator simulator = new IRSimulator(IR);
+        try {
+            simulator.call("main", args);
+            Assert.Fail("The assertation passed. Not expected");
+        } catch {
+        }
+    }
+
+    [Test]
+    public void unparseInt() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/unparseInt.prgm";
+        int[] args = new int[] { };
+
+        int[] expectedNums = {1, 100, -100};
+
+        string expectedConsoleOutput = "";
+        foreach(int expectedNum in expectedNums) {
+            string expectedNumString = expectedNum.ToString();
+            expectedConsoleOutput += expectedNumString + "\r\n";
+        }
+        ensureConsoleOutputIsEqual(filePath, "main", args, expectedConsoleOutput);
+    }
+
+    [Test]
+    public void parseIntAndUnparseInt() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/parseIntAndUnparseInt.prgm";
+        int[] args = new int[] { };
+
+        Tuple<IRCompUnit, IRCompUnit> bothIR = getBothVersionsOfIR(filePath);
+        IRSimulator sim1 = new IRSimulator(bothIR.Item1);
+        sim1.call("main", args);
+
+        IRSimulator sim2 = new IRSimulator(bothIR.Item2);
+        sim2.call("main", args);
+    }
+
+    [Test]
+    public void mutation() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/mutation.prgm";
         int[] args = new int[] { };
         ensureRetValsAreEqual(filePath, "main", args);
     }
