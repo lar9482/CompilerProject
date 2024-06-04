@@ -9,7 +9,7 @@ public sealed class IRCompUnit : IRNode {
     
     public IRCompUnit(
         string name,
-        Dictionary<String, IRFuncDecl> functions,
+        Dictionary<string, IRFuncDecl> functions,
         List<string> ctors
     ) {
         this.name = name;

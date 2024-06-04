@@ -1,0 +1,9 @@
+main() {
+    num1: int[] = unparseInt(1);
+    num2: int[] = unparseInt(100);
+    num3: int[] = unparseInt(-100);
+
+    println(num1);
+    println(num2);
+    println(num3);
+}

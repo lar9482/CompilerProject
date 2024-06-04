@@ -1,0 +1,17 @@
+function(x: int): int {
+    y: int;
+    if (x > 0) {
+        y = 10;
+    } else if (x == 0) {
+        y = 0;
+    } else {
+        y = -10;
+    }
+    return y;
+}
+
+main(): int {
+    return(
+        function(10) + function(0) + function(-10)
+    );
+}
