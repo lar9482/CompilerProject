@@ -176,14 +176,7 @@ public class IRLowererProgramTests {
     [Test]
     public void forLoopSimple() {
         string filePath = "../../../IRGenerationTests/ProgramFiles/forLoopSimple.prgm";
-        // IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
-        // IRSimulator simulator = new IRSimulator(IR);
-        // simulator.call("main", args);
-
-        // string expectedConsoleOutput = "10";
-        // string actualConsoleOutput = simulator.consoleOutputCapture.ToString();
-        // Assert.That(actualConsoleOutput, Is.EqualTo(expectedConsoleOutput));
         ensureConsoleOutputIsEqual(filePath, "main", args, "10");
     }
 
