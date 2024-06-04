@@ -25,8 +25,8 @@ public class IRLowererProgramTests {
         IRSimulator sim1 = new IRSimulator(originalIR);
         IRSimulator sim2 = new IRSimulator(liftedIR);
 
-        int retVal1 = sim1.call(functionCall, args);
         int retVal2 = sim2.call(functionCall, args);
+        int retVal1 = sim1.call(functionCall, args);
 
         Assert.That(retVal1, Is.EqualTo(retVal2));
     }
@@ -39,5 +39,144 @@ public class IRLowererProgramTests {
         };
 
         ensureRetValsAreEqual(filePath, "b", args);
+    }
+
+    [Test]
+    public void funcCall_singleReturn1() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/funcCall_singleReturn1.prgm";
+        int[] args = new int[] { 10 };
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+
+    [Test]
+    public void funcCall_singleReturn2() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/funcCall_singleReturn2.prgm";
+        int[] args = new int[] { };
+
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+
+    [Test]
+    public void funcCall_singleReturn3() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/funcCall_singleReturn3.prgm";
+        int[] args = new int[] { };
+
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+
+    [Test]
+    public void exprInteger() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/exprInteger.prgm";
+        int[] args = new int[] { };
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+
+    [Test]
+    public void exprBool() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/exprBool.prgm";
+        int[] args = new int[] { };
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+
+    [Test]
+    public void arrayDecl_noInitialValues() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDecl_noInitialValues.prgm";
+        int[] args = new int[] { };
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+
+    [Test]
+    public void arrayDecl_noInitialValues_thenAssigned() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDecl_noInitialValues_thenAssigned.prgm";
+        int[] args = new int[] { };
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+
+    [Test]
+    public void arrayDecl_hasInitialValues() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDecl_hasInitialValues.prgm";
+        int[] args = new int[] { };
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+    //TODO:Handle this later
+    [Test]
+    public void arrayDecl_outOfBounds_Positive() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDecl_outOfBounds_Positive.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        try {
+            int[] args = new int[] { };
+            IRSimulator simulator = new IRSimulator(IR);
+            simulator.call("main", args);
+            Assert.Fail();
+        } catch(Exception e) {
+            string errorMsg = e.Message;
+            bool isOutOfBoundsError = errorMsg.Contains("Out of bounds!");
+            Assert.That(isOutOfBoundsError, Is.True);
+        }
+    }
+
+    //TODO:Handle this later
+    [Test]
+    public void arrayDecl_outOfBounds_Negative() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDecl_outOfBounds_Negative.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        try {
+            int[] args = new int[] { };
+            IRSimulator simulator = new IRSimulator(IR);
+            simulator.call("main", args);
+            Assert.Fail();
+        } catch(Exception e) {
+            string errorMsg = e.Message;
+            bool isOutOfBoundsError = errorMsg.Contains("Out of bounds!");
+            Assert.That(isOutOfBoundsError, Is.True);
+        }
+    }
+
+    [Test]
+    public void arrayDeclCall() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDeclCall.prgm";
+        int[] args = new int[] { };
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+
+    [Test]
+    public void whileLoop_10Iterations() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/whileLoop_10Iterations.prgm";
+        int[] args = new int[] { };
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+
+    [Test]
+    public void whileLoop_0Iterations() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/whileLoop_0Iterations.prgm";
+        int[] args = new int[] { };
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+    //TODO: Handle this later.
+    [Test]
+    public void forLoopSimple() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/forLoopSimple.prgm";
+        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+        IRSimulator simulator = new IRSimulator(IR);
+        simulator.call("main", args);
+
+        string expectedConsoleOutput = "10";
+        string actualConsoleOutput = simulator.consoleOutputCapture.ToString();
+        Assert.That(actualConsoleOutput, Is.EqualTo(expectedConsoleOutput));
+    }
+
+    [Test]
+    public void forLoop_DeclsInit() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/forLoop_DeclsInit.prgm";
+        int[] args = new int[] { };
+        ensureRetValsAreEqual(filePath, "main", args);
+    }
+
+    [Test]
+    public void forLoop_NonDeclsInit() {
+        string filePath = "../../../IRGenerationTests/ProgramFiles/forLoop_NonDeclsInit.prgm";
+        int[] args = new int[] { };
+        ensureRetValsAreEqual(filePath, "main", args);
     }
 }

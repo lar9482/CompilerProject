@@ -249,8 +249,8 @@ public sealed class IRLowerer : IRVisitorGeneric {
 
         LIRTemp newFunctionDestTemp = createNewTemp();
         LIRMoveTemp moveReturnValIntoFunctionDest = new LIRMoveTemp(
-            new LIRTemp(IRConfiguration.ABSTRACT_RET_PREFIX + 1),
-            newFunctionDestTemp
+            newFunctionDestTemp,
+            new LIRTemp(IRConfiguration.ABSTRACT_RET_PREFIX + 1)
         );
         allLoweredStmts.Add(moveReturnValIntoFunctionDest);
 
