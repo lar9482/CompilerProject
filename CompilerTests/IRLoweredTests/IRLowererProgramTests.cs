@@ -117,34 +117,53 @@ public class IRLowererProgramTests {
         int[] args = new int[] { };
         ensureRetValsAreEqual(filePath, "main", args);
     }
-    //TODO:Handle this later
+
     [Test]
     public void arrayDecl_outOfBounds_Positive() {
         string filePath = "../../../ProgramFiles/arrayDecl_outOfBounds_Positive.prgm";
-        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+        Tuple<IRCompUnit, IRCompUnit> bothIR = getBothVersionsOfIR(filePath);
         try {
-            int[] args = new int[] { };
-            IRSimulator simulator = new IRSimulator(IR);
-            simulator.call("main", args);
+            IRSimulator sim = new IRSimulator(bothIR.Item1);
+            sim.call("main", args);
             Assert.Fail();
-        } catch(Exception e) {
+        } catch (Exception e) {
+            string errorMsg = e.Message;
+            bool isOutOfBoundsError = errorMsg.Contains("Out of bounds!");
+            Assert.That(isOutOfBoundsError, Is.True);
+        }
+
+        try {
+            IRSimulator sim = new IRSimulator(bothIR.Item2);
+            sim.call("main", args);
+            Assert.Fail();
+        } catch (Exception e) {
             string errorMsg = e.Message;
             bool isOutOfBoundsError = errorMsg.Contains("Out of bounds!");
             Assert.That(isOutOfBoundsError, Is.True);
         }
     }
 
-    //TODO:Handle this later
     [Test]
     public void arrayDecl_outOfBounds_Negative() {
         string filePath = "../../../ProgramFiles/arrayDecl_outOfBounds_Negative.prgm";
-        IRCompUnit IR = Compiler.generateIR(filePath);
+        int[] args = new int[] { };
+        Tuple<IRCompUnit, IRCompUnit> bothIR = getBothVersionsOfIR(filePath);
         try {
-            int[] args = new int[] { };
-            IRSimulator simulator = new IRSimulator(IR);
-            simulator.call("main", args);
+            IRSimulator sim = new IRSimulator(bothIR.Item1);
+            sim.call("main", args);
             Assert.Fail();
-        } catch(Exception e) {
+        } catch (Exception e) {
+            string errorMsg = e.Message;
+            bool isOutOfBoundsError = errorMsg.Contains("Out of bounds!");
+            Assert.That(isOutOfBoundsError, Is.True);
+        }
+
+        try {
+            IRSimulator sim = new IRSimulator(bothIR.Item2);
+            sim.call("main", args);
+            Assert.Fail();
+        } catch (Exception e) {
             string errorMsg = e.Message;
             bool isOutOfBoundsError = errorMsg.Contains("Out of bounds!");
             Assert.That(isOutOfBoundsError, Is.True);
@@ -276,16 +295,21 @@ public class IRLowererProgramTests {
         sim2.call("main", args);
     }
 
-    //TODO: Handle this later
     [Test]
     public void assertFail() {
         string filePath = "../../../ProgramFiles/assertFail.prgm";
-        IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
-
-        IRSimulator simulator = new IRSimulator(IR);
+        Tuple<IRCompUnit, IRCompUnit> bothIR = getBothVersionsOfIR(filePath);
         try {
-            simulator.call("main", args);
+            IRSimulator sim = new IRSimulator(bothIR.Item1);
+            sim.call("main", args);
+            Assert.Fail("The assertation passed. Not expected");
+        } catch {
+        }
+
+        try {
+            IRSimulator sim = new IRSimulator(bothIR.Item2);
+            sim.call("main", args);
             Assert.Fail("The assertation passed. Not expected");
         } catch {
         }
