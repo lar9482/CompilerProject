@@ -31,6 +31,25 @@ public class IRLowererProgramTests {
         Assert.That(retVal1, Is.EqualTo(retVal2));
     }
 
+    private void ensureConsoleOutputIsEqual(string filePath, string functionCall, int[] args, string pattern) {
+        Tuple<IRCompUnit, IRCompUnit> bothIR = getBothVersionsOfIR(filePath);
+        IRCompUnit originalIR = bothIR.Item1;
+        IRCompUnit liftedIR = bothIR.Item2;
+
+        IRSimulator sim1 = new IRSimulator(originalIR);
+        IRSimulator sim2 = new IRSimulator(liftedIR);
+
+        sim1.call(functionCall, args);
+        sim2.call(functionCall, args);
+
+        string consoleOutput = sim2.consoleOutputCapture.ToString();
+        Assert.That(consoleOutput.Length, Is.EqualTo(pattern.Length * 2));
+        string firstConsoleOutput = consoleOutput.Substring(0, pattern.Length);
+        string secondConsoleOutput = consoleOutput.Substring(pattern.Length);
+        Assert.That(firstConsoleOutput, Is.EqualTo(pattern));
+        Assert.That(secondConsoleOutput, Is.EqualTo(pattern));
+    }
+
     [Test]
     public void funcCall_multiReturn() {
         string filePath = "../../../IRGenerationTests/ProgramFiles/funcCall_multiReturn.prgm";
@@ -152,18 +171,20 @@ public class IRLowererProgramTests {
         int[] args = new int[] { };
         ensureRetValsAreEqual(filePath, "main", args);
     }
+
     //TODO: Handle this later.
     [Test]
     public void forLoopSimple() {
         string filePath = "../../../IRGenerationTests/ProgramFiles/forLoopSimple.prgm";
-        IRCompUnit IR = Compiler.generateIR(filePath);
+        // IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
-        IRSimulator simulator = new IRSimulator(IR);
-        simulator.call("main", args);
+        // IRSimulator simulator = new IRSimulator(IR);
+        // simulator.call("main", args);
 
-        string expectedConsoleOutput = "10";
-        string actualConsoleOutput = simulator.consoleOutputCapture.ToString();
-        Assert.That(actualConsoleOutput, Is.EqualTo(expectedConsoleOutput));
+        // string expectedConsoleOutput = "10";
+        // string actualConsoleOutput = simulator.consoleOutputCapture.ToString();
+        // Assert.That(actualConsoleOutput, Is.EqualTo(expectedConsoleOutput));
+        ensureConsoleOutputIsEqual(filePath, "main", args, "10");
     }
 
     [Test]
