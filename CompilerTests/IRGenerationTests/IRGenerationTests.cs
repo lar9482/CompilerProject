@@ -18,7 +18,7 @@ public class IRGenerationTests {
 
     [Test]
     public void funcCall_multiReturn() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/funcCall_multiReturn.prgm";
+        string filePath = "../../../ProgramFiles/funcCall_multiReturn.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] {
             2, 1
@@ -31,7 +31,7 @@ public class IRGenerationTests {
 
     [Test]
     public void funcCall_singleReturn1() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/funcCall_singleReturn1.prgm";
+        string filePath = "../../../ProgramFiles/funcCall_singleReturn1.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { 10 };
 
@@ -42,7 +42,7 @@ public class IRGenerationTests {
 
     [Test]
     public void funcCall_singleReturn2() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/funcCall_singleReturn2.prgm";
+        string filePath = "../../../ProgramFiles/funcCall_singleReturn2.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
 
@@ -53,7 +53,7 @@ public class IRGenerationTests {
 
     [Test]
     public void funcCall_singleReturn3() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/funcCall_singleReturn3.prgm";
+        string filePath = "../../../ProgramFiles/funcCall_singleReturn3.prgm";
 
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
@@ -65,7 +65,7 @@ public class IRGenerationTests {
 
     [Test]
     public void exprInteger() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/exprInteger.prgm";
+        string filePath = "../../../ProgramFiles/exprInteger.prgm";
 
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
@@ -77,7 +77,7 @@ public class IRGenerationTests {
 
     [Test]
     public void exprBool() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/exprBool.prgm";
+        string filePath = "../../../ProgramFiles/exprBool.prgm";
 
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
@@ -89,7 +89,7 @@ public class IRGenerationTests {
 
     [Test]
     public void arrayDecl_noInitialValues() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDecl_noInitialValues.prgm";
+        string filePath = "../../../ProgramFiles/arrayDecl_noInitialValues.prgm";
 
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
@@ -101,7 +101,7 @@ public class IRGenerationTests {
 
     [Test]
     public void arrayDecl_noInitialValues_thenAssigned() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDecl_noInitialValues_thenAssigned.prgm";
+        string filePath = "../../../ProgramFiles/arrayDecl_noInitialValues_thenAssigned.prgm";
 
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
@@ -113,7 +113,7 @@ public class IRGenerationTests {
 
     [Test]
     public void arrayDecl_hasInitialValues() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDecl_hasInitialValues.prgm";
+        string filePath = "../../../ProgramFiles/arrayDecl_hasInitialValues.prgm";
 
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
@@ -125,7 +125,7 @@ public class IRGenerationTests {
 
     [Test]
     public void arrayDecl_outOfBounds_Positive() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDecl_outOfBounds_Positive.prgm";
+        string filePath = "../../../ProgramFiles/arrayDecl_outOfBounds_Positive.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         try {
             int[] args = new int[] { };
@@ -141,7 +141,7 @@ public class IRGenerationTests {
 
     [Test]
     public void arrayDecl_outOfBounds_Negative() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDecl_outOfBounds_Negative.prgm";
+        string filePath = "../../../ProgramFiles/arrayDecl_outOfBounds_Negative.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         try {
             int[] args = new int[] { };
@@ -157,7 +157,7 @@ public class IRGenerationTests {
 
     [Test]
     public void arrayDeclCall() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/arrayDeclCall.prgm";
+        string filePath = "../../../ProgramFiles/arrayDeclCall.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
 
         int[] args = new int[] { };
@@ -169,7 +169,7 @@ public class IRGenerationTests {
 
     [Test]
     public void whileLoop_10Iterations() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/whileLoop_10Iterations.prgm";
+        string filePath = "../../../ProgramFiles/whileLoop_10Iterations.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
 
@@ -180,7 +180,7 @@ public class IRGenerationTests {
 
     [Test]
     public void whileLoop_0Iterations() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/whileLoop_0Iterations.prgm";
+        string filePath = "../../../ProgramFiles/whileLoop_0Iterations.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
 
@@ -191,7 +191,7 @@ public class IRGenerationTests {
 
     [Test]
     public void forLoopSimple() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/forLoopSimple.prgm";
+        string filePath = "../../../ProgramFiles/forLoopSimple.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
         IRSimulator simulator = new IRSimulator(IR);
@@ -204,7 +204,7 @@ public class IRGenerationTests {
 
     [Test]
     public void forLoop_DeclsInit() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/forLoop_DeclsInit.prgm";
+        string filePath = "../../../ProgramFiles/forLoop_DeclsInit.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
         IRSimulator simulator = new IRSimulator(IR);
@@ -215,7 +215,7 @@ public class IRGenerationTests {
 
     [Test]
     public void forLoop_NonDeclsInit() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/forLoop_NonDeclsInit.prgm";
+        string filePath = "../../../ProgramFiles/forLoop_NonDeclsInit.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
         IRSimulator simulator = new IRSimulator(IR);
@@ -226,7 +226,7 @@ public class IRGenerationTests {
 
     [Test]
     public void ifStmt() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/ifStmt.prgm";
+        string filePath = "../../../ProgramFiles/ifStmt.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
 
@@ -237,7 +237,7 @@ public class IRGenerationTests {
 
     [Test]
     public void if_elseif_stmts() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/if_elseif_stmts.prgm";
+        string filePath = "../../../ProgramFiles/if_elseif_stmts.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
 
@@ -248,7 +248,7 @@ public class IRGenerationTests {
 
     [Test]
     public void if_else_stmt() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/if_else_stmt.prgm";
+        string filePath = "../../../ProgramFiles/if_else_stmt.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
 
@@ -259,7 +259,7 @@ public class IRGenerationTests {
 
     [Test]
     public void if_elseif_else_stmts() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/if_elseif_else_stmts.prgm";
+        string filePath = "../../../ProgramFiles/if_elseif_else_stmts.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
 
@@ -270,7 +270,7 @@ public class IRGenerationTests {
 
     [Test]
     public void multiDimArrayDecl_noInitVals() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/multiDimArrayDecl_noInitVals.prgm";
+        string filePath = "../../../ProgramFiles/multiDimArrayDecl_noInitVals.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
 
@@ -281,7 +281,7 @@ public class IRGenerationTests {
 
     [Test]
     public void multiDimArrayDecl_noInitVals_thenAssign() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/multiDimArrayDecl_noInitVals_thenAssign.prgm";
+        string filePath = "../../../ProgramFiles/multiDimArrayDecl_noInitVals_thenAssign.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
 
@@ -292,7 +292,7 @@ public class IRGenerationTests {
 
     [Test]
     public void multiDimArrayDecl_initVals() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/multiDimArrayDecl_initVals.prgm";
+        string filePath = "../../../ProgramFiles/multiDimArrayDecl_initVals.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
 
@@ -303,7 +303,7 @@ public class IRGenerationTests {
 
     [Test]
     public void multiDimArrayDeclCallAST() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/multiDimArrayDeclCall.prgm";
+        string filePath = "../../../ProgramFiles/multiDimArrayDeclCall.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
 
@@ -314,7 +314,7 @@ public class IRGenerationTests {
 
     [Test]
     public void printlnHelloWorld() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/printlnHelloWorld.prgm";
+        string filePath = "../../../ProgramFiles/printlnHelloWorld.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
 
@@ -328,7 +328,7 @@ public class IRGenerationTests {
 
     [Test]
     public void printHelloWorld() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/printHelloWorld.prgm";
+        string filePath = "../../../ProgramFiles/printHelloWorld.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
 
@@ -342,7 +342,7 @@ public class IRGenerationTests {
 
     [Test]
     public void assertPass() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/assertPass.prgm";
+        string filePath = "../../../ProgramFiles/assertPass.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
 
@@ -352,7 +352,7 @@ public class IRGenerationTests {
 
     [Test]
     public void assertFail() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/assertFail.prgm";
+        string filePath = "../../../ProgramFiles/assertFail.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
 
@@ -366,7 +366,7 @@ public class IRGenerationTests {
 
     [Test]
     public void unparseInt() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/unparseInt.prgm";
+        string filePath = "../../../ProgramFiles/unparseInt.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
         IRSimulator simulator = new IRSimulator(IR);
@@ -385,7 +385,7 @@ public class IRGenerationTests {
 
     [Test]
     public void parseIntAndUnparseInt() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/parseIntAndUnparseInt.prgm";
+        string filePath = "../../../ProgramFiles/parseIntAndUnparseInt.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
         IRSimulator simulator = new IRSimulator(IR);
@@ -394,7 +394,7 @@ public class IRGenerationTests {
 
     [Test]
     public void mutation() {
-        string filePath = "../../../IRGenerationTests/ProgramFiles/mutation.prgm";
+        string filePath = "../../../ProgramFiles/mutation.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] { };
         IRSimulator simulator = new IRSimulator(IR);

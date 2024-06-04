@@ -1,4 +1,0 @@
-main() {
-    array: int[10];
-    array[11] = 0;
-}

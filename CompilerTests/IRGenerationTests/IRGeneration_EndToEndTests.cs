@@ -8,7 +8,7 @@ public class IRGeneration_EndToEndTests {
 
     [Test]
     public void IRGen_Factorial() {
-        string filePath = "../../../IRGenerationTests/EndToEndTests/factorial.prgm";
+        string filePath = "../../../EndToEndTests/factorial.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] {
             5
@@ -24,7 +24,7 @@ public class IRGeneration_EndToEndTests {
 
     [Test]
     public void IRGen_binsearch() {
-        string filePath = "../../../IRGenerationTests/EndToEndTests/binsearch.prgm";
+        string filePath = "../../../EndToEndTests/binsearch.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] {};
         IRSimulator simulator = new IRSimulator(IR);
@@ -38,7 +38,7 @@ public class IRGeneration_EndToEndTests {
 
     [Test] 
     public void IRGen_collatz() {
-        string filePath = "../../../IRGenerationTests/EndToEndTests/collatz.prgm";
+        string filePath = "../../../EndToEndTests/collatz.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] {};
         IRSimulator simulator = new IRSimulator(IR);
@@ -51,7 +51,7 @@ public class IRGeneration_EndToEndTests {
 
     [Test]
     public void IRGen_sort() {
-        string filePath = "../../../IRGenerationTests/EndToEndTests/sort.prgm";
+        string filePath = "../../../EndToEndTests/sort.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] {};
         IRSimulator simulator = new IRSimulator(IR);
@@ -64,7 +64,7 @@ public class IRGeneration_EndToEndTests {
 
     [Test]
     public void IRGen_simpleLoop() {
-        string filePath = "../../../IRGenerationTests/EndToEndTests/loop.prgm";
+        string filePath = "../../../EndToEndTests/loop.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] {};
         IRSimulator simulator = new IRSimulator(IR);
@@ -73,7 +73,7 @@ public class IRGeneration_EndToEndTests {
 
     [Test]
     public void IRGen_primes() {
-        string filePath = "../../../IRGenerationTests/EndToEndTests/primes.prgm";
+        string filePath = "../../../EndToEndTests/primes.prgm";
         IRCompUnit IR = Compiler.generateIR(filePath);
         int[] args = new int[] {};
         IRSimulator simulator = new IRSimulator(IR);
