@@ -31,7 +31,7 @@ public class IRLowererProgramTests {
         Assert.That(retVal1, Is.EqualTo(retVal2));
     }
 
-    private void ensureConsoleOutputIsEqual(string filePath, string functionCall, int[] args, string pattern) {
+    private void ensureConsoleOutputIsEqual(string filePath, string functionCall, int[] args, string expectedConsoleOutput) {
         Tuple<IRCompUnit, IRCompUnit> bothIR = getBothVersionsOfIR(filePath);
         IRCompUnit originalIR = bothIR.Item1;
         IRCompUnit liftedIR = bothIR.Item2;
@@ -42,12 +42,18 @@ public class IRLowererProgramTests {
         sim1.call(functionCall, args);
         sim2.call(functionCall, args);
 
-        string consoleOutput = sim2.consoleOutputCapture.ToString();
-        Assert.That(consoleOutput.Length, Is.EqualTo(pattern.Length * 2));
-        string firstConsoleOutput = consoleOutput.Substring(0, pattern.Length);
-        string secondConsoleOutput = consoleOutput.Substring(pattern.Length);
-        Assert.That(firstConsoleOutput, Is.EqualTo(pattern));
-        Assert.That(secondConsoleOutput, Is.EqualTo(pattern));
+        // The first simulator will not have any 
+        // output captured and the second simulator will have both console outputs captured.
+        // Thus, these assertions test that 'expectedConsoleOutput' occurs in the 
+        // sim2.consoleOutputCapture twice.
+        string bothConsoleOutput = sim2.consoleOutputCapture.ToString();
+        Assert.That(bothConsoleOutput.Length, Is.EqualTo(expectedConsoleOutput.Length * 2));
+        
+        string firstConsoleOutput = bothConsoleOutput.Substring(0, expectedConsoleOutput.Length);
+        string secondConsoleOutput = bothConsoleOutput.Substring(expectedConsoleOutput.Length);
+
+        Assert.That(firstConsoleOutput, Is.EqualTo(expectedConsoleOutput));
+        Assert.That(secondConsoleOutput, Is.EqualTo(expectedConsoleOutput));
     }
 
     [Test]
