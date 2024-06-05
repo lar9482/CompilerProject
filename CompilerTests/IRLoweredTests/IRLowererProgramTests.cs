@@ -349,4 +349,59 @@ public class IRLowererProgramTests {
         int[] args = new int[] { };
         ensureRetValsAreEqual(filePath, "main", args);
     }
+
+    [Test]
+    public void factorial() {
+        string filePath = "../../../EndToEndTests/factorial.prgm";
+        int[] args = new int[] {
+            5
+        };
+
+        ensureRetValsAreEqual(filePath, "factorial_nonTail", args);
+        ensureRetValsAreEqual(filePath, "factorial_tailWrap", args);
+    }
+
+    [Test]
+    public void Binsearch() {
+        string filePath = "../../../EndToEndTests/binsearch.prgm";
+        int[] args = new int[] {};
+        ensureConsoleOutputIsEqual(filePath, "main", args, "1");
+    }
+
+    [Test] 
+    public void Collatz() {
+        string filePath = "../../../EndToEndTests/collatz.prgm";
+        int[] args = new int[] {};
+        ensureConsoleOutputIsEqual(filePath, "main", args, "25");
+    }  
+
+    [Test]
+    public void Sort() {
+        string filePath = "../../../EndToEndTests/sort.prgm";
+        int[] args = new int[] {};
+        ensureConsoleOutputIsEqual(filePath, "main", args, "12345678910");
+    }
+
+    [Test]
+    public void SimpleLoop() {
+        string filePath = "../../../EndToEndTests/loop.prgm";
+        int[] args = new int[] {};
+
+        Tuple<IRCompUnit, IRCompUnit> bothIR = getBothVersionsOfIR(filePath);
+        IRCompUnit originalIR = bothIR.Item1;
+        IRCompUnit liftedIR = bothIR.Item2;
+
+        IRSimulator sim1 = new IRSimulator(originalIR);
+        IRSimulator sim2 = new IRSimulator(liftedIR);
+
+        sim1.call("main", args);
+        sim2.call("main", args);
+    }
+
+    [Test]
+    public void Primes() {
+        string filePath = "../../../EndToEndTests/primes.prgm";
+        int[] args = new int[] {};
+        ensureConsoleOutputIsEqual(filePath, "main", args, "97");
+    }
 }
