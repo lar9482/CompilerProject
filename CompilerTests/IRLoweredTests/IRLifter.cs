@@ -1,3 +1,10 @@
+
+/*
+ * For testing purposes, the lowered IR is directly translated back into a HIR version.
+ * NOTE:
+ * This version should still reassemble the lowered IR, in that there are only statements with
+ * one effect and expressions have no side effects.
+ */
 public sealed class IRLifter : LIRVisitorGeneric {
 
     public T visit<T>(LIRCompUnit compUnit) {
