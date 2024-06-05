@@ -3,6 +3,10 @@ using NUnit.Framework.Constraints;
 
 namespace CompilerTests;
 
+/*
+ * This testing suite ensures that both the original version of the IR
+ * and the lowered version of the IR produce the same results in the IRSimulator.
+ */
 public class IRLowererProgramTests {
     [SetUp]
     public void Setup() {}
