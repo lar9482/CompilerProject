@@ -20,7 +20,7 @@ public class PrintAndSaveLIR {
         PrintVisitor printVisitor = new PrintVisitor();
         printVisitor.visit(loweredIR);
 
-        string fileOutput = String.Format("../../../PrintLIROutput/{0}.log", extractFileName(inputFilePath));
+        string fileOutput = String.Format("../../../PrintLIR/PrintLIROutput/{0}.LIR", extractFileName(inputFilePath));
         File.WriteAllLines(fileOutput, printVisitor.printContent.ToArray());
     }
 
