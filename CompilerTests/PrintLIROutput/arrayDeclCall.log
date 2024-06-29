@@ -1,0 +1,93 @@
+initializeA:
+	Move(t0, 5)
+	Move(t18, t0 * 4 + 4)
+	Call_1(malloc, t18)
+	Move(t19, _RV1)
+	Move(t1, t19)
+	Move([t1], t0)
+	Move(t2, 0)
+L0:
+	CJump(t2 < t0, L1, L2)
+L1:
+	Move([t1 + 4 + t2 * 4], 0)
+	Move(t2, t2 + 1)
+	Jump(L0)
+L2:
+	Move(t3, t1 + 4)
+	Move(t4, 0)
+	CJump(t4 U< [t3 - 4], L3, outOfBounds)
+L3:
+	Move([t3 + t4 * 4], 1)
+	Move(t5, 1)
+	CJump(t5 U< [t3 - 4], L4, outOfBounds)
+L4:
+	Move([t3 + t5 * 4], 2)
+	Move(t6, 2)
+	CJump(t6 U< [t3 - 4], L5, outOfBounds)
+L5:
+	Move([t3 + t6 * 4], 3)
+	Move(t7, 3)
+	CJump(t7 U< [t3 - 4], L6, outOfBounds)
+L6:
+	Move([t3 + t7 * 4], 4)
+	Move(t8, 4)
+	CJump(t8 U< [t3 - 4], L7, outOfBounds)
+L7:
+	Move([t3 + t8 * 4], 5)
+	Move(t20, t3)
+	Return(t20)
+initializeB:
+	Move(t21, 2 * 4 + 4)
+	Call_1(malloc, t21)
+	Move(t22, _RV1)
+	Move(t9, t22)
+	Move([t9], 2)
+	Move([t9 + 4], 1)
+	Move([t9 + 8], 0)
+	Move(t10, t9 + 4)
+	Move(t23, t10)
+	Return(t23)
+main:
+	Call_1(initializeA)
+	Move(t24, _RV1)
+	Move(t3, t24)
+	Call_1(initializeB)
+	Move(t25, _RV1)
+	Move(t10, t25)
+	Move(t11, 0)
+	CJump(t11 U< [t10 - 4], L11, outOfBounds)
+L11:
+	CJump([t10 + t11 * 4] == 1, L8, L9)
+L8:
+	Move(t12, 1)
+	CJump(t12 U< [t10 - 4], L15, outOfBounds)
+L15:
+	CJump([t10 + t12 * 4] == 0, L12, L13)
+L12:
+	Move(t13, 0)
+	CJump(t13 U< [t3 - 4], L16, outOfBounds)
+L16:
+	Move(t14, 1)
+	CJump(t14 U< [t3 - 4], L17, outOfBounds)
+L17:
+	Move(t15, 2)
+	CJump(t15 U< [t3 - 4], L18, outOfBounds)
+L18:
+	Move(t16, 3)
+	CJump(t16 U< [t3 - 4], L19, outOfBounds)
+L19:
+	Move(t17, 4)
+	CJump(t17 U< [t3 - 4], L20, outOfBounds)
+L20:
+	Move(t26, [t3 + t13 * 4] + [t3 + t14 * 4] + [t3 + t15 * 4] + [t3 + t16 * 4] + [t3 + t17 * 4])
+	Return(t26)
+	Jump(L14)
+L13:
+	Move(t27, -1)
+	Return(t27)
+L14:
+	Jump(L10)
+L9:
+	Move(t28, -1)
+	Return(t28)
+L10:

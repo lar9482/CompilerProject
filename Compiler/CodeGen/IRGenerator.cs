@@ -11,9 +11,9 @@ public sealed class IRGenerator : ASTVisitorGeneric {
     private Context context;
     private int labelCounter;
     private int argCounter;
-
-    public int tempCounter;
     private Dictionary<string, IRTemp> variableToTemp;
+
+    public int tempCounter { get; set; }
 
     public IRGenerator() {
         this.context = new Context();

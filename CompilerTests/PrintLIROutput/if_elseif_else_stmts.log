@@ -1,0 +1,29 @@
+function:
+	Move(t0, _ARG1)
+	Move(t1, 0)
+	CJump(t0 > 0, L0, L1)
+L0:
+	Move(t1, 10)
+	Jump(L2)
+L1:
+	CJump(t0 == 0, L3, L4)
+L3:
+	Move(t1, 0)
+	Jump(L2)
+L4:
+	Move(t1, -10)
+L2:
+	Move(t2, t1)
+	Return(t2)
+main:
+	Move(t3, 10)
+	Call_1(function, t3)
+	Move(t4, _RV1)
+	Move(t5, 0)
+	Call_1(function, t5)
+	Move(t6, _RV1)
+	Move(t7, -10)
+	Call_1(function, t7)
+	Move(t8, _RV1)
+	Move(t9, t4 + t6 + t8)
+	Return(t9)

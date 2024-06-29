@@ -1,0 +1,21 @@
+function1:
+	Move(t0, _ARG1)
+	Call_1(function2)
+	Move(t1, _RV1)
+	Move(t2, t0 * t1)
+	Return(t2)
+function2:
+	Move(t3, 10)
+	Return(t3)
+main:
+	Move(t4, 10)
+	Call_1(function1, t4)
+	Move(t5, _RV1)
+	Move(t6, 20)
+	Call_1(function1, t6)
+	Move(t7, _RV1)
+	Move(t8, 30)
+	Call_1(function1, t8)
+	Move(t9, _RV1)
+	Move(t10, t5 + t7 + t9)
+	Return(t10)

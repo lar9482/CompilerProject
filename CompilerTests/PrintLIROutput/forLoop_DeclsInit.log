@@ -1,0 +1,399 @@
+function:
+	Move(t0, 0)
+	Move(t1, 0)
+	Move(t2, 0)
+	Move(t3, 0)
+	Move(t4, 0)
+	Move(t5, 0)
+L0:
+	CJump(t5 < 10, L1, L2)
+L1:
+	Move(t0, t0 + 1)
+	Move(t79, t0)
+	Call_1(unparseInt, t79)
+	Move(t80, _RV1)
+	Move(t81, t80)
+	Call_1(println, t81)
+	Move(t5, t5 + 1)
+	Jump(L0)
+L2:
+	Move(t82, 1 * 4 + 4)
+	Call_1(malloc, t82)
+	Move(t83, _RV1)
+	Move(t6, t83)
+	Move([t6], 1)
+	Move([t6 + 4], 0)
+	Move(t5, t6 + 4)
+L3:
+	Move(t7, 0)
+	CJump(t7 U< [t5 - 4], L6, outOfBounds)
+L6:
+	CJump([t5 + t7 * 4] < 10, L4, L5)
+L4:
+	Move(t1, t1 + 1)
+	Move(t84, t1)
+	Call_1(unparseInt, t84)
+	Move(t85, _RV1)
+	Move(t86, t85)
+	Call_1(println, t86)
+	Move(t8, 0)
+	CJump(t8 U< [t5 - 4], L7, outOfBounds)
+L7:
+	Move(t9, 0)
+	CJump(t9 U< [t5 - 4], L8, outOfBounds)
+L8:
+	Move([t5 + t8 * 4], [t5 + t9 * 4] + 1)
+	Jump(L3)
+L5:
+	Move(t10, 1)
+	Move(t87, t10 * 4 + 4)
+	Call_1(malloc, t87)
+	Move(t88, _RV1)
+	Move(t11, t88)
+	Move([t11], t10)
+	Move(t12, 0)
+L9:
+	CJump(t12 < t10, L10, L11)
+L10:
+	Move([t11 + 4 + t12 * 4], 0)
+	Move(t12, t12 + 1)
+	Jump(L9)
+L11:
+	Move(t5, t11 + 4)
+L12:
+	Move(t13, 0)
+	CJump(t13 U< [t5 - 4], L15, outOfBounds)
+L15:
+	CJump([t5 + t13 * 4] < 10, L13, L14)
+L13:
+	Move(t89, t2)
+	Call_1(unparseInt, t89)
+	Move(t90, _RV1)
+	Move(t91, t90)
+	Call_1(println, t91)
+	Move(t2, t2 + 1)
+	Move(t14, 0)
+	CJump(t14 U< [t5 - 4], L16, outOfBounds)
+L16:
+	Move(t15, 0)
+	CJump(t15 U< [t5 - 4], L17, outOfBounds)
+L17:
+	Move([t5 + t14 * 4], [t5 + t15 * 4] + 1)
+	Jump(L12)
+L14:
+	Move(t92, 1 * 4 + 4)
+	Call_1(malloc, t92)
+	Move(t93, _RV1)
+	Move(t16, t93)
+	Move([t16], 1)
+	Move(t94, 1 * 4 + 4)
+	Call_1(malloc, t94)
+	Move(t95, _RV1)
+	Move(t17, t95)
+	Move([t17], 1)
+	Move([t17 + 4], 0)
+	Move([t16 + 4], t17 + 4)
+	Move(t5, t16 + 4)
+L18:
+	Move(t19, 0)
+	CJump(t19 U< [t5 - 4], L21, outOfBounds)
+L21:
+	Move(t21, [t5 + t19 * 4])
+	Move(t20, 0)
+	CJump(t20 U< [t21 - 4], L22, outOfBounds)
+L22:
+	CJump([t21 + t20 * 4] < 10, L19, L20)
+L19:
+	Move(t3, t3 + 1)
+	Move(t96, t3)
+	Call_1(unparseInt, t96)
+	Move(t97, _RV1)
+	Move(t98, t97)
+	Call_1(println, t98)
+	Move(t22, 0)
+	CJump(t22 U< [t5 - 4], L23, outOfBounds)
+L23:
+	Move(t24, [t5 + t22 * 4])
+	Move(t23, 0)
+	CJump(t23 U< [t24 - 4], L24, outOfBounds)
+L24:
+	Move(t25, 0)
+	CJump(t25 U< [t5 - 4], L25, outOfBounds)
+L25:
+	Move(t27, [t5 + t25 * 4])
+	Move(t26, 0)
+	CJump(t26 U< [t27 - 4], L26, outOfBounds)
+L26:
+	Move([t24 + t23 * 4], [t27 + t26 * 4] + 1)
+	Jump(L18)
+L20:
+	Move(t28, 1)
+	Move(t99, t28 * 4 + 4)
+	Call_1(malloc, t99)
+	Move(t100, _RV1)
+	Move(t29, t100)
+	Move([t29], t28)
+	Move(t30, 0)
+L27:
+	CJump(t30 < t28, L28, L29)
+L28:
+	Move([t29 + 4 + t30 * 4], 0)
+	Move(t30, t30 + 1)
+	Jump(L27)
+L29:
+	Move(t5, t29 + 4)
+	Move(t31, 0)
+L30:
+	CJump(t31 < t28, L31, L32)
+L31:
+	Move(t32, 1)
+	Move(t101, t32 * 4 + 4)
+	Call_1(malloc, t101)
+	Move(t102, _RV1)
+	Move(t33, t102)
+	Move([t33], t32)
+	Move(t34, 0)
+L33:
+	CJump(t34 < t32, L34, L35)
+L34:
+	Move([t33 + 4 + t34 * 4], 0)
+	Move(t34, t34 + 1)
+	Jump(L33)
+L35:
+	Move(t35, t33 + 4)
+	Move([t29 + 4 + t31 * 4], t35)
+	Move(t31, t31 + 1)
+	Jump(L30)
+L32:
+L36:
+	Move(t36, 0)
+	CJump(t36 U< [t5 - 4], L39, outOfBounds)
+L39:
+	Move(t38, [t5 + t36 * 4])
+	Move(t37, 0)
+	CJump(t37 U< [t38 - 4], L40, outOfBounds)
+L40:
+	CJump([t38 + t37 * 4] < 10, L37, L38)
+L37:
+	Move(t4, t4 + 1)
+	Move(t103, t4)
+	Call_1(unparseInt, t103)
+	Move(t104, _RV1)
+	Move(t105, t104)
+	Call_1(println, t105)
+	Move(t39, 0)
+	CJump(t39 U< [t5 - 4], L41, outOfBounds)
+L41:
+	Move(t41, [t5 + t39 * 4])
+	Move(t40, 0)
+	CJump(t40 U< [t41 - 4], L42, outOfBounds)
+L42:
+	Move(t42, 0)
+	CJump(t42 U< [t5 - 4], L43, outOfBounds)
+L43:
+	Move(t44, [t5 + t42 * 4])
+	Move(t43, 0)
+	CJump(t43 U< [t44 - 4], L44, outOfBounds)
+L44:
+	Move([t41 + t40 * 4], [t44 + t43 * 4] + 1)
+	Jump(L36)
+L38:
+	Move(t106, t0)
+	Move(t107, t1)
+	Move(t108, t2)
+	Move(t109, t3)
+	Move(t110, t4)
+	Return(t106, t107, t108, t109, t110)
+main:
+	Call_1(function)
+	Move(t0, _RV1)
+	Move(t1, _RV2)
+	Move(t2, _RV3)
+	Move(t3, _RV4)
+	Move(t4, _RV5)
+	Move(t45, 0)
+	Move(t46, 0)
+	Move(t47, 0)
+	Move(t48, 0)
+	Move(t49, 0)
+	Move(t5, 0)
+L45:
+	CJump(t5 < 10, L46, L47)
+L46:
+	Move(t45, t45 + 1)
+	Move(t111, t45)
+	Call_1(unparseInt, t111)
+	Move(t112, _RV1)
+	Move(t113, t112)
+	Call_1(println, t113)
+	Move(t5, t5 + 1)
+	Jump(L45)
+L47:
+	Move(t114, 1 * 4 + 4)
+	Call_1(malloc, t114)
+	Move(t115, _RV1)
+	Move(t50, t115)
+	Move([t50], 1)
+	Move([t50 + 4], 0)
+	Move(t5, t50 + 4)
+L48:
+	Move(t51, 0)
+	CJump(t51 U< [t5 - 4], L51, outOfBounds)
+L51:
+	CJump([t5 + t51 * 4] < 10, L49, L50)
+L49:
+	Move(t46, t46 + 1)
+	Move(t116, t46)
+	Call_1(unparseInt, t116)
+	Move(t117, _RV1)
+	Move(t118, t117)
+	Call_1(println, t118)
+	Move(t52, 0)
+	CJump(t52 U< [t5 - 4], L52, outOfBounds)
+L52:
+	Move([t5 + t52 * 4], [t5 + t52 * 4] + 1)
+	Jump(L48)
+L50:
+	Move(t53, 1)
+	Move(t119, t53 * 4 + 4)
+	Call_1(malloc, t119)
+	Move(t120, _RV1)
+	Move(t54, t120)
+	Move([t54], t53)
+	Move(t55, 0)
+L53:
+	CJump(t55 < t53, L54, L55)
+L54:
+	Move([t54 + 4 + t55 * 4], 0)
+	Move(t55, t55 + 1)
+	Jump(L53)
+L55:
+	Move(t5, t54 + 4)
+L56:
+	Move(t56, 0)
+	CJump(t56 U< [t5 - 4], L59, outOfBounds)
+L59:
+	CJump([t5 + t56 * 4] < 10, L57, L58)
+L57:
+	Move(t47, t47 + 1)
+	Move(t121, t47)
+	Call_1(unparseInt, t121)
+	Move(t122, _RV1)
+	Move(t123, t122)
+	Call_1(println, t123)
+	Move(t57, 0)
+	CJump(t57 U< [t5 - 4], L60, outOfBounds)
+L60:
+	Move([t5 + t57 * 4], [t5 + t57 * 4] + 1)
+	Jump(L56)
+L58:
+	Move(t124, 1 * 4 + 4)
+	Call_1(malloc, t124)
+	Move(t125, _RV1)
+	Move(t58, t125)
+	Move([t58], 1)
+	Move(t126, 1 * 4 + 4)
+	Call_1(malloc, t126)
+	Move(t127, _RV1)
+	Move(t59, t127)
+	Move([t59], 1)
+	Move([t59 + 4], 0)
+	Move([t58 + 4], t59 + 4)
+	Move(t5, t58 + 4)
+L61:
+	Move(t60, 0)
+	CJump(t60 U< [t5 - 4], L64, outOfBounds)
+L64:
+	Move(t62, [t5 + t60 * 4])
+	Move(t61, 0)
+	CJump(t61 U< [t62 - 4], L65, outOfBounds)
+L65:
+	CJump([t62 + t61 * 4] < 10, L62, L63)
+L62:
+	Move(t48, t48 + 1)
+	Move(t128, t48)
+	Call_1(unparseInt, t128)
+	Move(t129, _RV1)
+	Move(t130, t129)
+	Call_1(println, t130)
+	Move(t63, 0)
+	CJump(t63 U< [t5 - 4], L66, outOfBounds)
+L66:
+	Move(t65, [t5 + t63 * 4])
+	Move(t64, 0)
+	CJump(t64 U< [t65 - 4], L67, outOfBounds)
+L67:
+	Move([t65 + t64 * 4], [t65 + t64 * 4] + 1)
+	Jump(L61)
+L63:
+	Move(t66, 1)
+	Move(t131, t66 * 4 + 4)
+	Call_1(malloc, t131)
+	Move(t132, _RV1)
+	Move(t67, t132)
+	Move([t67], t66)
+	Move(t68, 0)
+L68:
+	CJump(t68 < t66, L69, L70)
+L69:
+	Move([t67 + 4 + t68 * 4], 0)
+	Move(t68, t68 + 1)
+	Jump(L68)
+L70:
+	Move(t5, t67 + 4)
+	Move(t69, 0)
+L71:
+	CJump(t69 < t66, L72, L73)
+L72:
+	Move(t70, 1)
+	Move(t133, t70 * 4 + 4)
+	Call_1(malloc, t133)
+	Move(t134, _RV1)
+	Move(t71, t134)
+	Move([t71], t70)
+	Move(t72, 0)
+L74:
+	CJump(t72 < t70, L75, L76)
+L75:
+	Move([t71 + 4 + t72 * 4], 0)
+	Move(t72, t72 + 1)
+	Jump(L74)
+L76:
+	Move(t35, t71 + 4)
+	Move([t67 + 4 + t69 * 4], t35)
+	Move(t69, t69 + 1)
+	Jump(L71)
+L73:
+L77:
+	Move(t73, 0)
+	CJump(t73 U< [t5 - 4], L80, outOfBounds)
+L80:
+	Move(t75, [t5 + t73 * 4])
+	Move(t74, 0)
+	CJump(t74 U< [t75 - 4], L81, outOfBounds)
+L81:
+	CJump([t75 + t74 * 4] < 10, L78, L79)
+L78:
+	Move(t49, t49 + 1)
+	Move(t135, t49)
+	Call_1(unparseInt, t135)
+	Move(t136, _RV1)
+	Move(t137, t136)
+	Call_1(println, t137)
+	Move(t76, 0)
+	CJump(t76 U< [t5 - 4], L82, outOfBounds)
+L82:
+	Move(t78, [t5 + t76 * 4])
+	Move(t77, 0)
+	CJump(t77 U< [t78 - 4], L83, outOfBounds)
+L83:
+	Move([t78 + t77 * 4], [t78 + t77 * 4] + 1)
+	Jump(L77)
+L79:
+	CJump(t0 + t1 + t2 + t3 + t4 != 50, L84, L85)
+L84:
+	Move(t138, -1)
+	Return(t138)
+L85:
+	Move(t139, t45 + t46 + t47 + t48 + t49)
+	Return(t139)

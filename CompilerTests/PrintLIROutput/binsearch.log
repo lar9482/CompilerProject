@@ -1,0 +1,62 @@
+binary_search:
+	Move(t0, _ARG1)
+	Move(t1, _ARG2)
+	Move(t11, t0)
+	Call_1(lengthInt, t11)
+	Move(t12, _RV1)
+	Move(t2, t12)
+	Move(t3, 0)
+	Move(t4, t2 - 1)
+L0:
+	CJump(t3 < t4, L1, L2)
+L1:
+	Move(t5, t3 + t4 / 2)
+	Move(t6, t5)
+	CJump(t6 U< [t0 - 4], L6, outOfBounds)
+L6:
+	CJump([t0 + t6 * 4] < t1, L3, L4)
+L3:
+	Move(t3, t5 + 1)
+	Jump(L5)
+L4:
+	Move(t7, t5)
+	CJump(t7 U< [t0 - 4], L9, outOfBounds)
+L9:
+	CJump([t0 + t7 * 4] > t1, L7, L8)
+L7:
+	Move(t4, t5 - 1)
+	Jump(L5)
+L8:
+	Move(t13, t5)
+	Return(t13)
+L5:
+	Jump(L0)
+L2:
+	Move(t14, -1)
+	Return(t14)
+main:
+	Move(t15, 7 * 4 + 4)
+	Call_1(malloc, t15)
+	Move(t16, _RV1)
+	Move(t8, t16)
+	Move([t8], 7)
+	Move([t8 + 4], 0)
+	Move([t8 + 8], 5)
+	Move([t8 + 12], 10)
+	Move([t8 + 16], 15)
+	Move([t8 + 20], 20)
+	Move([t8 + 24], 25)
+	Move([t8 + 28], 30)
+	Move(t9, t8 + 4)
+	Move(t1, 5)
+	Move(t17, t9)
+	Move(t18, t1)
+	Call_1(binary_search, t17, t18)
+	Move(t19, _RV1)
+	Move(t10, t19)
+	Move(t20, t10)
+	Call_1(unparseInt, t20)
+	Move(t21, _RV1)
+	Move(t22, t21)
+	Call_1(print, t22)
+	Return()

@@ -1,0 +1,4 @@
+main:
+	Move(t0, 1 != 1)
+	Call_1(assert, t0)
+	Return()

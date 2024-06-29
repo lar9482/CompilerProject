@@ -1,0 +1,69 @@
+main:
+	Move(t0, 2)
+	Move(t21, t0 * 4 + 4)
+	Call_1(malloc, t21)
+	Move(t22, _RV1)
+	Move(t1, t22)
+	Move([t1], t0)
+	Move(t2, 0)
+L0:
+	CJump(t2 < t0, L1, L2)
+L1:
+	Move([t1 + 4 + t2 * 4], 0)
+	Move(t2, t2 + 1)
+	Jump(L0)
+L2:
+	Move(t3, t1 + 4)
+	Move(t4, 0)
+L3:
+	CJump(t4 < t0, L4, L5)
+L4:
+	Move(t5, 2)
+	Move(t23, t5 * 4 + 4)
+	Call_1(malloc, t23)
+	Move(t24, _RV1)
+	Move(t6, t24)
+	Move([t6], t5)
+	Move(t7, 0)
+L6:
+	CJump(t7 < t5, L7, L8)
+L7:
+	Move([t6 + 4 + t7 * 4], 0)
+	Move(t7, t7 + 1)
+	Jump(L6)
+L8:
+	Move(t8, t6 + 4)
+	Move([t1 + 4 + t4 * 4], t8)
+	Move(t4, t4 + 1)
+	Jump(L3)
+L5:
+	Move(t9, 0)
+	CJump(t9 U< [t3 - 4], L9, outOfBounds)
+L9:
+	Move(t11, [t3 + t9 * 4])
+	Move(t10, 0)
+	CJump(t10 U< [t11 - 4], L10, outOfBounds)
+L10:
+	Move(t12, 0)
+	CJump(t12 U< [t3 - 4], L11, outOfBounds)
+L11:
+	Move(t14, [t3 + t12 * 4])
+	Move(t13, 1)
+	CJump(t13 U< [t14 - 4], L12, outOfBounds)
+L12:
+	Move(t15, 1)
+	CJump(t15 U< [t3 - 4], L13, outOfBounds)
+L13:
+	Move(t17, [t3 + t15 * 4])
+	Move(t16, 0)
+	CJump(t16 U< [t17 - 4], L14, outOfBounds)
+L14:
+	Move(t18, 1)
+	CJump(t18 U< [t3 - 4], L15, outOfBounds)
+L15:
+	Move(t20, [t3 + t18 * 4])
+	Move(t19, 1)
+	CJump(t19 U< [t20 - 4], L16, outOfBounds)
+L16:
+	Move(t25, [t11 + t10 * 4] + [t14 + t13 * 4] + [t17 + t16 * 4] + [t20 + t19 * 4])
+	Return(t25)

@@ -1,0 +1,22 @@
+main:
+	Move(t0, 100)
+	Move(t1, 0)
+L0:
+	CJump(t0 > 1, L1, L2)
+L1:
+	CJump(t0 % 2 == 0, L3, L4)
+L3:
+	Move(t0, t0 / 2)
+	Jump(L5)
+L4:
+	Move(t0, 3 * t0 + 1)
+L5:
+	Move(t1, t1 + 1)
+	Jump(L0)
+L2:
+	Move(t2, t1)
+	Call_1(unparseInt, t2)
+	Move(t3, _RV1)
+	Move(t4, t3)
+	Call_1(print, t4)
+	Return()

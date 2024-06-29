@@ -1,0 +1,9 @@
+main:
+	Move(t0, 1 + 1 + 1 + 1)
+	Move(t1, 10 * 2)
+	Move(t2, 5 / 5)
+	Move(t3, 55 % 10)
+	Move(t4, 5 - 5)
+	Move(t5, -10 * -1)
+	Move(t6, t3 + t4 + t5 + t0 + t1 + t2)
+	Return(t6)

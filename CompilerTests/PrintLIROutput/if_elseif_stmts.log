@@ -1,0 +1,21 @@
+main:
+	Move(t0, 0)
+	Move(t1, -1)
+	CJump(t0 > 0, L0, L1)
+L0:
+	Move(t1, 10)
+	Jump(L2)
+L1:
+	CJump(t0 == 0, L3, L4)
+L3:
+	Move(t1, 0)
+	Jump(L2)
+L4:
+	CJump(t0 < 0, L5, L6)
+L5:
+	Move(t1, -10)
+	Jump(L2)
+L6:
+L2:
+	Move(t2, t1)
+	Return(t2)

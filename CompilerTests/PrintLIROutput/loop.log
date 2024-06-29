@@ -1,0 +1,22 @@
+sum:
+	Move(t0, _ARG1)
+	Move(t1, 1)
+	Move(t2, 0)
+L0:
+	CJump(t1 <= t0, L1, L2)
+L1:
+	Move(t2, t2 + t1)
+	Move(t1, t1 + 1)
+	Jump(L0)
+L2:
+	Move(t3, t2)
+	Return(t3)
+main:
+	Move(t4, 500)
+	Call_1(sum, t4)
+	Move(t5, _RV1)
+	Move(t1, t5)
+	Move(t2, 501 * 250)
+	Move(t6, t1 == t2)
+	Call_1(assert, t6)
+	Return()

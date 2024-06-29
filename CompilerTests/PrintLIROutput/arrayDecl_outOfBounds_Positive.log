@@ -1,0 +1,21 @@
+main:
+	Move(t0, 10)
+	Move(t5, t0 * 4 + 4)
+	Call_1(malloc, t5)
+	Move(t6, _RV1)
+	Move(t1, t6)
+	Move([t1], t0)
+	Move(t2, 0)
+L0:
+	CJump(t2 < t0, L1, L2)
+L1:
+	Move([t1 + 4 + t2 * 4], 0)
+	Move(t2, t2 + 1)
+	Jump(L0)
+L2:
+	Move(t3, t1 + 4)
+	Move(t4, 11)
+	CJump(t4 U< [t3 - 4], L3, outOfBounds)
+L3:
+	Move([t3 + t4 * 4], 0)
+	Return()

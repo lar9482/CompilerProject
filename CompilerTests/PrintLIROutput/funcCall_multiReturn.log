@@ -1,0 +1,16 @@
+a:
+	Move(t0, _ARG1)
+	Move(t1, _ARG2)
+	Move(t4, t0)
+	Move(t5, 2 * t1)
+	Return(t4, t5)
+b:
+	Move(t0, _ARG1)
+	Move(t1, _ARG2)
+	Move(t6, t0)
+	Move(t7, t1)
+	Call_1(a, t6, t7)
+	Move(t2, _RV1)
+	Move(t3, _RV2)
+	Move(t8, t2 + 5 * t3)
+	Return(t8)

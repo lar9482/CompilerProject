@@ -1,0 +1,70 @@
+gcd:
+	Move(t0, _ARG1)
+	Move(t1, _ARG2)
+L0:
+	CJump(t0 != 0, L1, L2)
+L1:
+	CJump(t0 < t1, L3, L4)
+L3:
+	Move(t1, t1 - t0)
+	Jump(L5)
+L4:
+	Move(t0, t0 - t1)
+L5:
+	Jump(L0)
+L2:
+	Move(t8, t1)
+	Return(t8)
+isprime:
+	Move(t2, _ARG1)
+	Move(t3, 2)
+L6:
+	CJump(t3 < t2, L7, L8)
+L7:
+	Move(t9, t3)
+	Move(t10, t2)
+	Call_1(gcd, t9, t10)
+	Move(t11, _RV1)
+	CJump(t11 != 1, L9, L10)
+L9:
+	Move(t12, 0)
+	Return(t12)
+L10:
+	Move(t3, t3 + 1)
+	Jump(L6)
+L8:
+	Move(t13, 1)
+	Return(t13)
+largestprime:
+	Move(t4, _ARG1)
+	Move(t5, 1)
+	Move(t3, 1)
+L11:
+	CJump(t3 < t4, L12, L13)
+L12:
+	Move(t14, t3)
+	Call_1(isprime, t14)
+	Move(t15, _RV1)
+	CJump(t15, L14, L15)
+L14:
+	Move(t5, t3)
+L15:
+	Move(t3, t3 + 1)
+	Jump(L11)
+L13:
+	Move(t16, t5)
+	Return(t16)
+main:
+	Move(t6, _ARG1)
+	Move(t17, 100)
+	Call_1(largestprime, t17)
+	Move(t18, _RV1)
+	Move(t7, t18)
+	Move(t19, t7 == 97)
+	Call_1(assert, t19)
+	Move(t20, t7)
+	Call_1(unparseInt, t20)
+	Move(t21, _RV1)
+	Move(t22, t21)
+	Call_1(print, t22)
+	Return()

@@ -1,0 +1,101 @@
+main:
+	Move(t0, 2)
+	Move(t33, t0 * 4 + 4)
+	Call_1(malloc, t33)
+	Move(t34, _RV1)
+	Move(t1, t34)
+	Move([t1], t0)
+	Move(t2, 0)
+L0:
+	CJump(t2 < t0, L1, L2)
+L1:
+	Move([t1 + 4 + t2 * 4], 0)
+	Move(t2, t2 + 1)
+	Jump(L0)
+L2:
+	Move(t3, t1 + 4)
+	Move(t4, 0)
+L3:
+	CJump(t4 < t0, L4, L5)
+L4:
+	Move(t5, 2)
+	Move(t35, t5 * 4 + 4)
+	Call_1(malloc, t35)
+	Move(t36, _RV1)
+	Move(t6, t36)
+	Move([t6], t5)
+	Move(t7, 0)
+L6:
+	CJump(t7 < t5, L7, L8)
+L7:
+	Move([t6 + 4 + t7 * 4], 0)
+	Move(t7, t7 + 1)
+	Jump(L6)
+L8:
+	Move(t8, t6 + 4)
+	Move([t1 + 4 + t4 * 4], t8)
+	Move(t4, t4 + 1)
+	Jump(L3)
+L5:
+	Move(t9, 0)
+	CJump(t9 U< [t3 - 4], L9, outOfBounds)
+L9:
+	Move(t11, [t3 + t9 * 4])
+	Move(t10, 0)
+	CJump(t10 U< [t11 - 4], L10, outOfBounds)
+L10:
+	Move([t11 + t10 * 4], 1)
+	Move(t12, 0)
+	CJump(t12 U< [t3 - 4], L11, outOfBounds)
+L11:
+	Move(t14, [t3 + t12 * 4])
+	Move(t13, 1)
+	CJump(t13 U< [t14 - 4], L12, outOfBounds)
+L12:
+	Move([t14 + t13 * 4], 2)
+	Move(t15, 1)
+	CJump(t15 U< [t3 - 4], L13, outOfBounds)
+L13:
+	Move(t17, [t3 + t15 * 4])
+	Move(t16, 0)
+	CJump(t16 U< [t17 - 4], L14, outOfBounds)
+L14:
+	Move([t17 + t16 * 4], 3)
+	Move(t18, 1)
+	CJump(t18 U< [t3 - 4], L15, outOfBounds)
+L15:
+	Move(t20, [t3 + t18 * 4])
+	Move(t19, 1)
+	CJump(t19 U< [t20 - 4], L16, outOfBounds)
+L16:
+	Move([t20 + t19 * 4], 4)
+	Move(t21, 0)
+	CJump(t21 U< [t3 - 4], L17, outOfBounds)
+L17:
+	Move(t23, [t3 + t21 * 4])
+	Move(t22, 0)
+	CJump(t22 U< [t23 - 4], L18, outOfBounds)
+L18:
+	Move(t24, 0)
+	CJump(t24 U< [t3 - 4], L19, outOfBounds)
+L19:
+	Move(t26, [t3 + t24 * 4])
+	Move(t25, 1)
+	CJump(t25 U< [t26 - 4], L20, outOfBounds)
+L20:
+	Move(t27, 1)
+	CJump(t27 U< [t3 - 4], L21, outOfBounds)
+L21:
+	Move(t29, [t3 + t27 * 4])
+	Move(t28, 0)
+	CJump(t28 U< [t29 - 4], L22, outOfBounds)
+L22:
+	Move(t30, 1)
+	CJump(t30 U< [t3 - 4], L23, outOfBounds)
+L23:
+	Move(t32, [t3 + t30 * 4])
+	Move(t31, 1)
+	CJump(t31 U< [t32 - 4], L24, outOfBounds)
+L24:
+	Move(t37, [t23 + t22 * 4] + [t26 + t25 * 4] + [t29 + t28 * 4] + [t32 + t31 * 4])
+	Return(t37)

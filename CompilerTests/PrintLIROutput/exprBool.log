@@ -1,0 +1,6 @@
+main:
+	Move(t0, 1 || 0)
+	Move(t1, 0)
+	Move(t2, t0 && 1)
+	Move(t3, t1 || t2)
+	Return(t3)

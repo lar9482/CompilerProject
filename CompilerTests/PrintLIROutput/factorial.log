@@ -1,0 +1,34 @@
+factorial_nonTail:
+	Move(t0, _ARG1)
+	CJump(t0 == 0, L0, L1)
+L0:
+	Move(t2, 1)
+	Return(t2)
+L1:
+	Move(t3, t0 - 1)
+	Call_1(factorial_nonTail, t3)
+	Move(t4, _RV1)
+	Move(t5, t0 * t4)
+	Return(t5)
+factorial_tail:
+	Move(t0, _ARG1)
+	Move(t1, _ARG2)
+	CJump(t0 <= 1, L2, L3)
+L2:
+	Move(t6, t1)
+	Return(t6)
+L3:
+	Move(t7, t0 - 1)
+	Move(t8, t0 * t1)
+	Call_1(factorial_tail, t7, t8)
+	Move(t9, _RV1)
+	Move(t10, t9)
+	Return(t10)
+factorial_tailWrap:
+	Move(t0, _ARG1)
+	Move(t11, t0)
+	Move(t12, 1)
+	Call_1(factorial_tail, t11, t12)
+	Move(t13, _RV1)
+	Move(t14, t13)
+	Return(t14)
