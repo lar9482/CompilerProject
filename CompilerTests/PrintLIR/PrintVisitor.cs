@@ -3,7 +3,6 @@
  * This visitor will produce a pretty printer of the lowered IR.
  * This will help with debugging.
  */
-using System.Collections;
 
 public sealed class PrintVisitor : LIRVisitorVoid {
     public List<string> printContent;
