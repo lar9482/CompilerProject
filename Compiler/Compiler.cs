@@ -90,6 +90,6 @@ public class Compiler {
     }
 
     public static void compileFile(string filePath) {
-        generateIR(filePath);
+        LIRCompUnit program = lowerIR(filePath);
     }
 }
