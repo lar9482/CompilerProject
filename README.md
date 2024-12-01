@@ -1,3 +1,11 @@
+# UPDATE
+I'm strongly considering rewriting this project in C++.
+Why? A couple of reasons.
+1. I'm currently employed at a firm that uses C++ as their primary language.
+2. There's more opportunity to explore different backends. Most notably, LLVM.
+
+So, I may archive this project soon.
+
 # IN PROGRESS
 # What is this?
 This is my attempt at writing a compiler for a simple C-like imperative language that targets my custom [runtime.](https://github.com/lar9482/AssemblySimulator)
